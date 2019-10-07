@@ -1,0 +1,74 @@
+### YamlMime:XRefMap
+sorted: true
+references:
+- uid: Platform.RegularExpressions.Transformer.CSharpToCpp
+  name: Platform.RegularExpressions.Transformer.CSharpToCpp
+  href: api/Platform.RegularExpressions.Transformer.CSharpToCpp.html
+  commentId: N:Platform.RegularExpressions.Transformer.CSharpToCpp
+  fullName: Platform.RegularExpressions.Transformer.CSharpToCpp
+  nameWithType: Platform.RegularExpressions.Transformer.CSharpToCpp
+- uid: Platform.RegularExpressions.Transformer.CSharpToCpp.CSharpToCppTransformer
+  name: CSharpToCppTransformer
+  href: api/Platform.RegularExpressions.Transformer.CSharpToCpp.CSharpToCppTransformer.html
+  commentId: T:Platform.RegularExpressions.Transformer.CSharpToCpp.CSharpToCppTransformer
+  fullName: Platform.RegularExpressions.Transformer.CSharpToCpp.CSharpToCppTransformer
+  nameWithType: CSharpToCppTransformer
+- uid: Platform.RegularExpressions.Transformer.CSharpToCpp.CSharpToCppTransformer.#ctor
+  name: CSharpToCppTransformer()
+  href: api/Platform.RegularExpressions.Transformer.CSharpToCpp.CSharpToCppTransformer.html#Platform_RegularExpressions_Transformer_CSharpToCpp_CSharpToCppTransformer__ctor
+  commentId: M:Platform.RegularExpressions.Transformer.CSharpToCpp.CSharpToCppTransformer.#ctor
+  fullName: Platform.RegularExpressions.Transformer.CSharpToCpp.CSharpToCppTransformer.CSharpToCppTransformer()
+  nameWithType: CSharpToCppTransformer.CSharpToCppTransformer()
+- uid: Platform.RegularExpressions.Transformer.CSharpToCpp.CSharpToCppTransformer.#ctor(System.Collections.Generic.IList{Platform.RegularExpressions.Transformer.ISubstitutionRule})
+  name: CSharpToCppTransformer(IList<ISubstitutionRule>)
+  href: api/Platform.RegularExpressions.Transformer.CSharpToCpp.CSharpToCppTransformer.html#Platform_RegularExpressions_Transformer_CSharpToCpp_CSharpToCppTransformer__ctor_System_Collections_Generic_IList_Platform_RegularExpressions_Transformer_ISubstitutionRule__
+  commentId: M:Platform.RegularExpressions.Transformer.CSharpToCpp.CSharpToCppTransformer.#ctor(System.Collections.Generic.IList{Platform.RegularExpressions.Transformer.ISubstitutionRule})
+  name.vb: CSharpToCppTransformer(IList(Of ISubstitutionRule))
+  fullName: Platform.RegularExpressions.Transformer.CSharpToCpp.CSharpToCppTransformer.CSharpToCppTransformer(System.Collections.Generic.IList<Platform.RegularExpressions.Transformer.ISubstitutionRule>)
+  fullName.vb: Platform.RegularExpressions.Transformer.CSharpToCpp.CSharpToCppTransformer.CSharpToCppTransformer(System.Collections.Generic.IList(Of Platform.RegularExpressions.Transformer.ISubstitutionRule))
+  nameWithType: CSharpToCppTransformer.CSharpToCppTransformer(IList<ISubstitutionRule>)
+  nameWithType.vb: CSharpToCppTransformer.CSharpToCppTransformer(IList(Of ISubstitutionRule))
+- uid: Platform.RegularExpressions.Transformer.CSharpToCpp.CSharpToCppTransformer.#ctor*
+  name: CSharpToCppTransformer
+  href: api/Platform.RegularExpressions.Transformer.CSharpToCpp.CSharpToCppTransformer.html#Platform_RegularExpressions_Transformer_CSharpToCpp_CSharpToCppTransformer__ctor_
+  commentId: Overload:Platform.RegularExpressions.Transformer.CSharpToCpp.CSharpToCppTransformer.#ctor
+  isSpec: "True"
+  fullName: Platform.RegularExpressions.Transformer.CSharpToCpp.CSharpToCppTransformer.CSharpToCppTransformer
+  nameWithType: CSharpToCppTransformer.CSharpToCppTransformer
+- uid: Platform.RegularExpressions.Transformer.CSharpToCpp.CSharpToCppTransformer.FirstStage
+  name: FirstStage
+  href: api/Platform.RegularExpressions.Transformer.CSharpToCpp.CSharpToCppTransformer.html#Platform_RegularExpressions_Transformer_CSharpToCpp_CSharpToCppTransformer_FirstStage
+  commentId: F:Platform.RegularExpressions.Transformer.CSharpToCpp.CSharpToCppTransformer.FirstStage
+  fullName: Platform.RegularExpressions.Transformer.CSharpToCpp.CSharpToCppTransformer.FirstStage
+  nameWithType: CSharpToCppTransformer.FirstStage
+- uid: Platform.RegularExpressions.Transformer.CSharpToCpp.CSharpToCppTransformer.LastStage
+  name: LastStage
+  href: api/Platform.RegularExpressions.Transformer.CSharpToCpp.CSharpToCppTransformer.html#Platform_RegularExpressions_Transformer_CSharpToCpp_CSharpToCppTransformer_LastStage
+  commentId: F:Platform.RegularExpressions.Transformer.CSharpToCpp.CSharpToCppTransformer.LastStage
+  fullName: Platform.RegularExpressions.Transformer.CSharpToCpp.CSharpToCppTransformer.LastStage
+  nameWithType: CSharpToCppTransformer.LastStage
+- uid: Platform.RegularExpressions.Transformer.CSharpToCpp.Tests
+  name: Platform.RegularExpressions.Transformer.CSharpToCpp.Tests
+  href: api/Platform.RegularExpressions.Transformer.CSharpToCpp.Tests.html
+  commentId: N:Platform.RegularExpressions.Transformer.CSharpToCpp.Tests
+  fullName: Platform.RegularExpressions.Transformer.CSharpToCpp.Tests
+  nameWithType: Platform.RegularExpressions.Transformer.CSharpToCpp.Tests
+- uid: Platform.RegularExpressions.Transformer.CSharpToCpp.Tests.CSharpToCppTransformerTests
+  name: CSharpToCppTransformerTests
+  href: api/Platform.RegularExpressions.Transformer.CSharpToCpp.Tests.CSharpToCppTransformerTests.html
+  commentId: T:Platform.RegularExpressions.Transformer.CSharpToCpp.Tests.CSharpToCppTransformerTests
+  fullName: Platform.RegularExpressions.Transformer.CSharpToCpp.Tests.CSharpToCppTransformerTests
+  nameWithType: CSharpToCppTransformerTests
+- uid: Platform.RegularExpressions.Transformer.CSharpToCpp.Tests.CSharpToCppTransformerTests.HelloWorldTest
+  name: HelloWorldTest()
+  href: api/Platform.RegularExpressions.Transformer.CSharpToCpp.Tests.CSharpToCppTransformerTests.html#Platform_RegularExpressions_Transformer_CSharpToCpp_Tests_CSharpToCppTransformerTests_HelloWorldTest
+  commentId: M:Platform.RegularExpressions.Transformer.CSharpToCpp.Tests.CSharpToCppTransformerTests.HelloWorldTest
+  fullName: Platform.RegularExpressions.Transformer.CSharpToCpp.Tests.CSharpToCppTransformerTests.HelloWorldTest()
+  nameWithType: CSharpToCppTransformerTests.HelloWorldTest()
+- uid: Platform.RegularExpressions.Transformer.CSharpToCpp.Tests.CSharpToCppTransformerTests.HelloWorldTest*
+  name: HelloWorldTest
+  href: api/Platform.RegularExpressions.Transformer.CSharpToCpp.Tests.CSharpToCppTransformerTests.html#Platform_RegularExpressions_Transformer_CSharpToCpp_Tests_CSharpToCppTransformerTests_HelloWorldTest_
+  commentId: Overload:Platform.RegularExpressions.Transformer.CSharpToCpp.Tests.CSharpToCppTransformerTests.HelloWorldTest
+  isSpec: "True"
+  fullName: Platform.RegularExpressions.Transformer.CSharpToCpp.Tests.CSharpToCppTransformerTests.HelloWorldTest
+  nameWithType: CSharpToCppTransformerTests.HelloWorldTest
