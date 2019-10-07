@@ -15,7 +15,7 @@ NuGet package: [Platform.RegularExpressions.Transformer.CSharpToCpp](https://www
 ## [Documentation](https://linksplatform.github.io/RegularExpressions.Transformer.CSharpToCpp)
 [PDF file](https://linksplatform.github.io/RegularExpressions.Transformer.CSharpToCpp/Platform.RegularExpressions.Transformer.CSharpToCpp.pdf) with code for e-readers.
 
-## Dependent libraries
+## Depend on
 *   [Platform.RegularExpressions.Transformer](https://github.com/linksplatform/RegularExpressions.Transformer)
 
 ## Mystery files
