@@ -11,9 +11,12 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
     {
         public static readonly IList<ISubstitutionRule> FirstStage = new List<SubstitutionRule>
         {
+            // // ...
+            // 
+            (new Regex(@"(\r?\n)?[ \t]+//+.+"), "", null, 0),
             // #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
             // 
-            (new Regex(@"^\s*?\#pragma[\sa-zA-Z0-9\/]+$"), "", null, 0),
+            (new Regex(@"^\s*?\#pragma[\sa-zA-Z0-9]+$"), "", null, 0),
             // [MethodImpl(MethodImplOptions.AggressiveInlining)]
             // 
             (new Regex(@"$\s+\[MethodImpl\(MethodImplOptions\.AggressiveInlining\)\]"), "", null, 0),
@@ -132,6 +135,12 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
 
         public static readonly IList<ISubstitutionRule> LastStage = new List<SubstitutionRule>
         {
+            // (expression)
+            // expression
+            (new Regex(@"(\(| )\(([a-zA-Z0-9_\*:]+)\)(,| |;|\))"), "$1$2$3", null, 0),
+            // (method(expression))
+            // method(expression)
+            (new Regex(@"(?<firstSeparator>(\(| ))\((?<method>[a-zA-Z0-9_\->\*:]+)\((?<expression>((?<parenthesis>\()|(?<-parenthesis>\))|[a-zA-Z0-9_\->\*:]*)+)(?(parenthesis)(?!))\)\)(?<lastSeparator>(,| |;|\)))"), "${firstSeparator}${method}(${expression})${lastSeparator}", null, 0),
             // ref sizeBalancedTree2.Root
             // &sizeBalancedTree2.Root
             (new Regex(@"ref ([a-zA-Z0-9]+)\.([a-zA-Z0-9\*]+)"), "&$1->$2", null, 0),
