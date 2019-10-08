@@ -24,7 +24,7 @@ mono $(echo ./*docfx.console.*)/tools/docfx.exe docfx.json
 
 # Clone the existing gh-pages for this repo into out/
 # Create a new empty branch if gh-pages doesn't exist yet (should only happen on first deply)
-git clone https://$REPOSITORY out
+git clone "https://$REPOSITORY" out
 cd out || exit
 git checkout $TARGET_BRANCH || git checkout --orphan $TARGET_BRANCH
 cd ..
@@ -44,7 +44,7 @@ cp README.html index.html
 git config user.name "$COMMIT_USER_NAME"
 git config user.email "$COMMIT_USER_EMAIL"
 git remote rm origin
-git remote add origin https://$COMMIT_USER_NAME:$TOKEN@$REPOSITORY.git
+git remote add origin "https://$COMMIT_USER_NAME:$TOKEN@$REPOSITORY.git"
 
 # Commit the "changes", i.e. the new version.
 # The delta will show diffs between new and old versions.
@@ -52,7 +52,7 @@ git add --all
 git commit -m "Deploy to GitHub Pages: ${SHA}"
 
 # Now that we're all set up, we can push.
-git push https://$COMMIT_USER_NAME:$TOKEN@$REPOSITORY.git $TARGET_BRANCH
+git push "https://$COMMIT_USER_NAME:$TOKEN@$REPOSITORY.git" "$TARGET_BRANCH"
 cd ..
 
 # Clean up
