@@ -19,7 +19,7 @@ dvips document.dvi
 
 # Copy pdf to publish location (with be used in the next script)
 mkdir _site
-cp document.pdf _site/Platform.${TRAVIS_REPO_NAME}.pdf
+cp document.pdf "_site/Platform.${TRAVIS_REPO_NAME}.pdf"
 
 # Clean up
 rm document.tex
