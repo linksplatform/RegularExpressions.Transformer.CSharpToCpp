@@ -9,7 +9,7 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
 {
     public class CSharpToCppTransformer : Transformer
     {
-        public static readonly IList<ISubstitutionRule> FirstStage = new List<SubstitutionRule>()
+        public static readonly IList<ISubstitutionRule> FirstStage = new List<SubstitutionRule>
         {
             // #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
             // 
@@ -130,7 +130,7 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             (new Regex(@"class ([a-zA-Z0-9]+) : ([a-zA-Z0-9]+)"), "class $1 : public $2", null, 0),
         }.Cast<ISubstitutionRule>().ToList();
 
-        public static readonly IList<ISubstitutionRule> LastStage = new List<SubstitutionRule>()
+        public static readonly IList<ISubstitutionRule> LastStage = new List<SubstitutionRule>
         {
             // ref sizeBalancedTree2.Root
             // &sizeBalancedTree2.Root
