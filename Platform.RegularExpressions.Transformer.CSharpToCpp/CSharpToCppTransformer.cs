@@ -131,6 +131,39 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // class SizedBinaryTreeMethodsBase : GenericCollectionMethodsBase
             // class SizedBinaryTreeMethodsBase : public GenericCollectionMethodsBase
             (new Regex(@"class ([a-zA-Z0-9]+) : ([a-zA-Z0-9]+)"), "class $1 : public $2", null, 0),
+            // Insert scope borders.
+            // ref TElement root
+            // ~!root!~ref TElement root
+            (new Regex(@"(?<definition>(?<= |\()(ref [a-zA-Z0-9]+|[a-zA-Z0-9]+(?<!ref)) (?<variable>[a-zA-Z0-9]+)(?=\)|, | =))"), "~!${variable}!~${definition}", null, 0),
+            // Inside the scope of ~!root!~ replace:
+            // root
+            // *root
+            (new Regex(@"(?<definition>~!(?<pointer>[a-zA-Z0-9]+)!~ref [a-zA-Z0-9]+ (?<pointer>[a-zA-Z0-9]+)(?=\)|, | =))(?<before>((?<!~!\k<pointer>!~)(.|\n))*?)(?<prefix>(\W |\())\k<pointer>(?<suffix>( |\)|;|,))"), "${definition}${before}${prefix}*${pointer}${suffix}", null, 70),
+            // Remove scope borders.
+            // ~!root!~
+            // 
+            (new Regex(@"~!(?<pointer>[a-zA-Z0-9]+)!~"), "", null, 5),
+            // ref auto root = ref
+            // ref auto root = 
+            (new Regex(@"ref ([a-zA-Z0-9]+) ([a-zA-Z0-9]+) = ref(\W)"), "$1* $2 =$3", null, 0),
+            // *root = ref left;
+            // root = left;
+            (new Regex(@"\*([a-zA-Z0-9]+) = ref ([a-zA-Z0-9]+)(\W)"), "$1 = $2$3", null, 0),
+            // (ref left)
+            // (left)
+            (new Regex(@"\(ref ([a-zA-Z0-9]+)(\)|\(|,)"), "($1$2", null, 0),
+            //  ref TElement 
+            //  TElement* 
+            (new Regex(@"( |\()ref ([a-zA-Z0-9]+) "), "$1$2* ", null, 0),
+            // ref sizeBalancedTree2.Root
+            // &sizeBalancedTree2->Root
+            (new Regex(@"ref ([a-zA-Z0-9]+)\.([a-zA-Z0-9\*]+)"), "&$1->$2", null, 0),
+            // ref GetElement(node).Right
+            // &GetElement(node)->Right
+            (new Regex(@"ref ([a-zA-Z0-9]+)\(([a-zA-Z0-9\*]+)\)\.([a-zA-Z0-9]+)"), "&$1($2)->$3", null, 0),
+            // GetElement(node).Right
+            // GetElement(node)->Right
+            (new Regex(@"([a-zA-Z0-9]+)\(([a-zA-Z0-9\*]+)\)\.([a-zA-Z0-9]+)"), "$1($2)->$3", null, 0),
         }.Cast<ISubstitutionRule>().ToList();
 
         public static readonly IList<ISubstitutionRule> LastStage = new List<SubstitutionRule>
