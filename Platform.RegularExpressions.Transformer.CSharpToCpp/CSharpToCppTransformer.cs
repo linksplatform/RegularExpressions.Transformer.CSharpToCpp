@@ -141,33 +141,6 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // (method(expression))
             // method(expression)
             (new Regex(@"(?<firstSeparator>(\(| ))\((?<method>[a-zA-Z0-9_\->\*:]+)\((?<expression>((?<parenthesis>\()|(?<-parenthesis>\))|[a-zA-Z0-9_\->\*:]*)+)(?(parenthesis)(?!))\)\)(?<lastSeparator>(,| |;|\)))"), "${firstSeparator}${method}(${expression})${lastSeparator}", null, 0),
-            // ref sizeBalancedTree2.Root
-            // &sizeBalancedTree2.Root
-            (new Regex(@"ref ([a-zA-Z0-9]+)\.([a-zA-Z0-9\*]+)"), "&$1->$2", null, 0),
-            // ref GetElement(node).Right
-            // &GetElement(node).Right
-            (new Regex(@"ref ([a-zA-Z0-9]+)\(([a-zA-Z0-9\*]+)\)\.([a-zA-Z0-9]+)"), "&$1($2)->$3", null, 0),
-            // GetElement(node).Right
-            // GetElement(node)->Right
-            (new Regex(@"([a-zA-Z0-9]+)\(([a-zA-Z0-9\*]+)\)\.([a-zA-Z0-9]+)"), "$1($2)->$3", null, 0),
-            // = ref GetLeftReference(root);
-            // = GetLeftReference(root);
-            (new Regex(@" = ref ([a-zA-Z0-9]+)\(([a-zA-Z0-9\*]+)\);"), " = $1($2);", null, 0),
-            // ref this->GetElement(node)
-            // this->GetElement(node)
-            (new Regex(@"ref this->([a-zA-Z0-9]+)\(([a-zA-Z0-9\*]+)\)"), "this->$1($2)", null, 0),
-            // ref GetElement(node)
-            // GetElement(node)
-            (new Regex(@"ref ([a-zA-Z0-9]+)\(([a-zA-Z0-9\*]+)\)"), "$1($2)", null, 0),
-            // = ref left;
-            // = left;
-            (new Regex(@" = ref ([a-zA-Z0-9]+);"), " = $1;", null, 0),
-            // (ref left)
-            // (left)
-            (new Regex(@"\(ref ([a-zA-Z0-9]+)(\)|\(|,)"), "($1$2", null, 0),
-            //  ref TElement 
-            //  TElement* 
-            (new Regex(@"( |\()ref ([a-zA-Z0-9]+) "), "$1$2* ", null, 0),
             // return ref _elements[node];
             // return &_elements[node];
             (new Regex(@"return ref ([_a-zA-Z0-9]+)\[([_a-zA-Z0-9\*]+)\];"), "return &$1[$2];", null, 0),
