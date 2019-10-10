@@ -45,11 +45,11 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // (
             (new Regex(@"\(this "), "(", null, 0),
             // Func<TElement> treeCount
-            // TElement(*treeCount)()
-            (new Regex(@"Func<([a-zA-Z0-9]+)> ([a-zA-Z0-9]+)"), "$1(*$2)()", null, 0),
+            // std::function<TElement()> treeCount
+            (new Regex(@"Func<([a-zA-Z0-9]+)> ([a-zA-Z0-9]+)"), "std::function<$1()> $2", null, 0),
             // Action<TElement> free
-            // void (*free)(TElement)
-            (new Regex(@"Action<([a-zA-Z0-9]+)> ([a-zA-Z0-9]+)"), "void (*$2)($1)", null, 0),
+            // std::function<void(TElement)> free
+            (new Regex(@"Action<([a-zA-Z0-9]+)> ([a-zA-Z0-9]+)"), "std::function<void($1)> $2", null, 0),
             // private const int MaxPath = 92;
             // static const int MaxPath = 92;
             (new Regex(@"private const ([a-zA-Z0-9]+) ([_a-zA-Z0-9]+) = ([a-zA-Z0-9]+);"), "static const $1 $2 = $3;", null, 0),
@@ -84,8 +84,8 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // { return Integer<TElement>.Zero; }
             (new Regex(@"\)\s+=>\s+([^\r\n;]+?);"), ") { return $1; }", null, 0),
             // () { return avlTree.Count; }
-            // []()-> auto { return avlTree.Count; }
-            (new Regex(@", \(\) { return ([^;]+); }"), ", []()-> auto { return $1; }", null, 0),
+            // [&]()-> auto { return avlTree.Count; }
+            (new Regex(@", \(\) { return ([^;]+); }"), ", [&]()-> auto { return $1; }", null, 0),
             // Count => GetSizeOrZero(Root);
             // GetCount() { return GetSizeOrZero(Root); }
             (new Regex(@"([A-Z][a-z]+)\s+=>\s+([^;]+);"), "Get$1() { return $2; }", null, 0),
