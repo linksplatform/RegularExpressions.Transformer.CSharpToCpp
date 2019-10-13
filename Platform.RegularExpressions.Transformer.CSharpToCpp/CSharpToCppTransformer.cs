@@ -158,6 +158,55 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // GetElement(node).Right
             // GetElement(node)->Right
             (new Regex(@"([a-zA-Z0-9]+)\(([a-zA-Z0-9\*]+)\)\.([a-zA-Z0-9]+)"), "$1($2)->$3", null, 0),
+            // [Fact]\npublic static void SizeBalancedTreeMultipleAttachAndDetachTest()
+            // TEST_METHOD(SizeBalancedTreeMultipleAttachAndDetachTest)
+            (new Regex(@"\[Fact\][\s\n]+(static )?void ([a-zA-Z0-9]+)\(\)"), "TEST_METHOD($2)", null, 0),
+            // class TreesTests
+            // TEST_CLASS(TreesTests)
+            (new Regex(@"class ([a-zA-Z0-9]+)Tests"), "TEST_CLASS($1)", null, 0),
+            // Assert.Equal
+            // Assert::AreEqual
+            (new Regex(@"Assert\.Equal"), "Assert::AreEqual", null, 0),
+            // TElement Root;
+            // TElement Root = 0;
+            (new Regex(@"(\r?\n[\t ]+)([a-zA-Z0-9:_]+(?<!return)) ([_a-zA-Z0-9]+);"), "$1$2 $3 = 0;", null, 0),
+            // TreeElement _elements[N];
+            // TreeElement _elements[N] = { {0} };
+            (new Regex(@"(\r?\n[\t ]+)([a-zA-Z0-9]+) ([_a-zA-Z0-9]+)\[([_a-zA-Z0-9]+)\];"), "$1$2 $3[$4] = { {0} };", null, 0),
+            // auto path = new TElement[MaxPath];
+            // TElement path[MaxPath] = { {0} };
+            (new Regex(@"(\r?\n[\t ]+)[a-zA-Z0-9]+ ([a-zA-Z0-9]+) = new ([a-zA-Z0-9]+)\[([a-zA-Z0-9]+)\];"), "$1$3 $2[$4] = { {0} };", null, 0),
+            // Insert scope borders.
+            // auto added = new HashSet<TElement>();
+            // ~!added!~std::unordered_set<TElement> added;
+            (new Regex(@"auto (?<variable>[a-zA-Z0-9]+) = new HashSet<(?<element>[a-zA-Z0-9]+)>\(\);"), "~!${variable}!~std::unordered_set<${element}> ${variable};", null, 0),
+            // Inside the scope of ~!added!~ replace:
+            // added.Add(node)
+            // added.insert(node)
+            (new Regex(@"(?<scope>~!(?<variable>[a-zA-Z0-9]+)!~)(?<separator>.|\n)(?<before>((?<!~!\k<variable>!~)(.|\n))*?)\k<variable>\.Add\((?<argument>[a-zA-Z0-9]+)\)"), "${scope}${separator}${before}${variable}.insert(${argument})", null, 10),
+            // Inside the scope of ~!added!~ replace:
+            // added.Remove(node)
+            // added.erase(node)
+            (new Regex(@"(?<scope>~!(?<variable>[a-zA-Z0-9]+)!~)(?<separator>.|\n)(?<before>((?<!~!\k<variable>!~)(.|\n))*?)\k<variable>\.Remove\((?<argument>[a-zA-Z0-9]+)\)"), "${scope}${separator}${before}${variable}.erase(${argument})", null, 10),
+            // if (added.insert(node)) {
+            // if (!added.contains(node)) { added.insert(node);
+            (new Regex(@"if \((?<variable>[a-zA-Z0-9]+)\.insert\((?<argument>[a-zA-Z0-9]+)\)\)(?<separator>[\t ]*[\r\n]+)(?<indent>[\t ]*){"), "if (!${variable}.contains(${argument}))${separator}${indent}{" + Environment.NewLine + "${indent}    ${variable}.insert(${argument});", null, 0),
+            // Remove scope borders.
+            // ~!added!~
+            // 
+            (new Regex(@"~!(?<pointer>[a-zA-Z0-9]+)!~"), "", null, 5),
+            // Insert scope borders.
+            // auto random = new System.Random(0);
+            // std::srand(0);
+            (new Regex(@"[a-zA-Z0-9\.]+ ([a-zA-Z0-9]+) = new (System\.)?Random\(([a-zA-Z0-9]+)\);"), "~!$1!~std::srand($3);", null, 0),
+            // Inside the scope of ~!random!~ replace:
+            // random.Next(1, N)
+            // (std::rand() % N) + 1
+            (new Regex(@"(?<scope>~!(?<variable>[a-zA-Z0-9]+)!~)(?<separator>.|\n)(?<before>((?<!~!\k<variable>!~)(.|\n))*?)\k<variable>\.Next\((?<from>[a-zA-Z0-9]+), (?<to>[a-zA-Z0-9]+)\)"), "${scope}${separator}${before}(std::rand() % ${to}) + ${from}", null, 10),
+            // Remove scope borders.
+            // ~!random!~
+            // 
+            (new Regex(@"~!(?<pointer>[a-zA-Z0-9]+)!~"), "", null, 5),
         }.Cast<ISubstitutionRule>().ToList();
 
         public static readonly IList<ISubstitutionRule> LastStage = new List<SubstitutionRule>
