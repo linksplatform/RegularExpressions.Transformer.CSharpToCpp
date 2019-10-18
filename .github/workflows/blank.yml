@@ -27,5 +27,6 @@ jobs:
       run: |
         export REPOSITORY_NAME=$(basename ${{ github.repository }})
         export GITHUB_TOKEN="${{ secrets.GITHUB_TOKEN }}"
+        export CURRENT_BRANCH=$(basename ${{ github.ref }})
         export DEFAULT_BRANCH="master"
         bash ./publish-release.sh
