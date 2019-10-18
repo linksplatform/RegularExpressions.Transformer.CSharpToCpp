@@ -9,7 +9,7 @@ env:
   NUGETTOKEN: ${{ secrets.NUGETTOKEN }}
 
 jobs:
-  buildAndTest:
+  buildTestAndDeploy:
     
     runs-on: ubuntu-latest
 
@@ -20,21 +20,25 @@ jobs:
     - name: Test
       run: dotnet test -c Release -f netcoreapp3.0
     - name: Generate PDF with code
+      if: github.event_name == 'push' && endsWith(github.ref, '/master')
       run: |
         export REPOSITORY_NAME=$(basename ${{ github.repository }})
         export CURRENT_BRANCH=$(basename ${{ github.ref }})
         bash ./generate-pdf.sh
     - name: Publish documentation to gh-pages branch
+      if: github.event_name == 'push' && endsWith(github.ref, '/master')
       run: |
         export REPOSITORY_NAME=$(basename ${{ github.repository }})
         export CURRENT_BRANCH=$(basename ${{ github.ref }})
         bash ./publish-docs.sh
     - name: Publish NuGet package
+      if: github.event_name == 'push' && endsWith(github.ref, '/master')
       run: |
         export REPOSITORY_NAME=$(basename ${{ github.repository }})
         export CURRENT_BRANCH=$(basename ${{ github.ref }})
         bash ./push-nuget.sh
     - name: Publish release
+      if: github.event_name == 'push' && endsWith(github.ref, '/master')
       run: |
         export REPOSITORY_NAME=$(basename ${{ github.repository }})
         export CURRENT_BRANCH=$(basename ${{ github.ref }})
