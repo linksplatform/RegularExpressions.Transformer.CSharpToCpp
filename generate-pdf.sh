@@ -7,6 +7,8 @@ if [[ ( "$TRAVIS_PULL_REQUEST" != "false" ) || ( "$TRAVIS_BRANCH" != "$SOURCE_BR
     exit 0
 fi
 
+sudo apt-get install -y texlive texlive-lang-cyrillic texlive-latex-extra python-pygments ghostscript
+
 # Generate tex file
 bash format-document.sh > document.tex
 
