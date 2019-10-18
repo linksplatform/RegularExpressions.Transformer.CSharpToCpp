@@ -11,7 +11,15 @@ jobs:
     - uses: actions/setup-dotnet@v1
       with:
         dotnet-version: '3.0.100'
-    - name: What is the GITHUB_WORKSPACE equal to?
-      run: ls ${{ github.workspace }}
+    - name: Where am I?
+      run: |
+        cd ${{ github.workspace }}
+        ls
+        cd ..
+        ls
+        cd ..
+        ls
+        cd ..
+        ls
     - name: Build
       run: dotnet build -c Release ${{ github.workspace }}/Platform.RegularExpressions.Transformer.CSharpToCpp.sln
