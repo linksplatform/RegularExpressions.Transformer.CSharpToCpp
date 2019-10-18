@@ -18,7 +18,7 @@
       "output": {
         ".html": {
           "relative_path": "README.html",
-          "hash": "LAERfud0G2JknnZb/W55LQ=="
+          "hash": "70zgxFzI2CUUGGib4wNA+w=="
         }
       },
       "is_incremental": false,
@@ -30,7 +30,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Platform.RegularExpressions.Transformer.CSharpToCpp.CSharpToCppTransformer.html",
-          "hash": "iRal6uscybU3kWINAUn1ig=="
+          "hash": "BqPAjsvIU1hrwtnF0iFWGQ=="
         }
       },
       "is_incremental": false,
@@ -42,7 +42,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Platform.RegularExpressions.Transformer.CSharpToCpp.Tests.CSharpToCppTransformerTests.html",
-          "hash": "GO1zjE8exX4guE5oDHtNrg=="
+          "hash": "8M+wERMpCuTWWhrMrdOf8g=="
         }
       },
       "is_incremental": false,
