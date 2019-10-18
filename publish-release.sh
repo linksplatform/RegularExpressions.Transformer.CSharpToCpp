@@ -7,7 +7,7 @@ if [[ ( "$GITHUB_EVENT_NAME" != "push" ) || ( "$CURRENT_BRANCH" != "$DEFAULT_BRA
     exit 0
 fi
 
-sudo apt-get install xmlstarlet jq
+sudo apt-get install xmlstarlet
 
 PACKAGE_VERSION=$(xmlstarlet sel -t -m '//VersionPrefix[1]' -v . -n <Platform.$REPOSITORY_NAME/Platform.$REPOSITORY_NAME.csproj)
 PACKAGE_RELEASE_NOTES=$(xmlstarlet sel -t -m '//PackageReleaseNotes[1]' -v . -n <Platform.$REPOSITORY_NAME/Platform.$REPOSITORY_NAME.csproj)

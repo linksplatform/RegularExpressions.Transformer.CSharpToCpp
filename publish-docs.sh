@@ -7,6 +7,8 @@ if [[ ( "$GITHUB_EVENT_NAME" != "push" ) || ( "$CURRENT_BRANCH" != "$DEFAULT_BRA
     exit 0
 fi
 
+sudo apt install nuget
+
 # Settings
 TARGET_BRANCH="gh-pages"
 SHA=$(git rev-parse --verify HEAD)
