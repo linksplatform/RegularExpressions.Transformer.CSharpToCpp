@@ -9,15 +9,15 @@
     "title": "RegularExpressions.Transformer.CSharpToCpp | LinksPlatform's Platform.RegularExpressions.Transformer.CSharpToCpp Library",
     "keywords": "RegularExpressions.Transformer.CSharpToCpp LinksPlatform's Platform.RegularExpressions.Transformer.CSharpToCpp Class Library. Namespace: Platform.RegularExpressions.Transformer.CSharpToCpp Forked from: LinksPlatform/Collections.Methods/CSharpToCppTranslator NuGet package: Platform.RegularExpressions.Transformer.CSharpToCpp Documentation PDF file with code for e-readers. Depend on Platform.RegularExpressions.Transformer Mystery files .travis.yml - Travis CI build configuration. docfx.json and toc.yml - DocFX build configuration. format-document.sh - script for formatting tex file for generating PDF from it. format-csharp-files.py - script for formatting .cs files as a part of tex file. generate-pdf.sh - script that generates PDF with code for e-readers. publish-docs.sh - script that publishes generated documentation and PDF with code for e-readers to gh-pages branch. push-nuget.sh - script for publishing current version of NuGet package."
   },
-  "api/Platform.RegularExpressions.Transformer.CSharpToCpp.html": {
-    "href": "api/Platform.RegularExpressions.Transformer.CSharpToCpp.html",
-    "title": "Namespace Platform.RegularExpressions.Transformer.CSharpToCpp | LinksPlatform's Platform.RegularExpressions.Transformer.CSharpToCpp Library",
-    "keywords": "Namespace Platform.RegularExpressions.Transformer.CSharpToCpp Classes CSharpToCppTransformer"
-  },
   "api/Platform.RegularExpressions.Transformer.CSharpToCpp.Tests.html": {
     "href": "api/Platform.RegularExpressions.Transformer.CSharpToCpp.Tests.html",
     "title": "Namespace Platform.RegularExpressions.Transformer.CSharpToCpp.Tests | LinksPlatform's Platform.RegularExpressions.Transformer.CSharpToCpp Library",
     "keywords": "Namespace Platform.RegularExpressions.Transformer.CSharpToCpp.Tests Classes CSharpToCppTransformerTests"
+  },
+  "api/Platform.RegularExpressions.Transformer.CSharpToCpp.html": {
+    "href": "api/Platform.RegularExpressions.Transformer.CSharpToCpp.html",
+    "title": "Namespace Platform.RegularExpressions.Transformer.CSharpToCpp | LinksPlatform's Platform.RegularExpressions.Transformer.CSharpToCpp Library",
+    "keywords": "Namespace Platform.RegularExpressions.Transformer.CSharpToCpp Classes CSharpToCppTransformer"
   },
   "api/Platform.RegularExpressions.Transformer.CSharpToCpp.CSharpToCppTransformer.html": {
     "href": "api/Platform.RegularExpressions.Transformer.CSharpToCpp.CSharpToCppTransformer.html",
