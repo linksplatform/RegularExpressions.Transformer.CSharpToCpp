@@ -16,6 +16,12 @@ jobs:
       run: dotnet build -c Release
     - name: Test
       run: dotnet test -c Release -f netcoreapp3.0
+    - name: Generate PDF with code
+      run: |
+        export REPOSITORY_NAME=$(basename ${{ github.repository }})
+        export CURRENT_BRANCH=$(basename ${{ github.ref }})
+        export DEFAULT_BRANCH="master"
+        bash ./generate-pdf.sh
     - name: Publish release
       run: |
         export REPOSITORY_NAME=$(basename ${{ github.repository }})
