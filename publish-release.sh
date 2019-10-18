@@ -1,10 +1,6 @@
 #!/bin/bash
 set -e # Exit with nonzero exit code if anything fails
 
-echo $GITHUB_EVENT_NAME
-echo $CURRENT_BRANCH
-echo $DEFAULT_BRANCH
-
 # Pull requests and commits to other branches shouldn't try to deploy, just build to verify
 if [[ ( "$GITHUB_EVENT_NAME" != "push" ) || ( "$CURRENT_BRANCH" != "$DEFAULT_BRANCH" ) ]]; then
     echo "Skipping release deploy."
