@@ -10,4 +10,6 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: Is the xmlstarlet available?
-      run: xmlstarlet
+      run: |
+        sudo apt-get install xmlstarlet
+        xmlstarlet
