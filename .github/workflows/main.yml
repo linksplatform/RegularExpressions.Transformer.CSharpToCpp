@@ -7,9 +7,9 @@ on:
     branches: master
 
 env:
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   TOKEN: ${{ secrets.TOKEN }}
   NUGETTOKEN: ${{ secrets.NUGETTOKEN }}
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
   buildTestAndDeploy:
