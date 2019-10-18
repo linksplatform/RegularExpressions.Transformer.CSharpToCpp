@@ -8,10 +8,12 @@ on:
 jobs:
   build:
     env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       DEFAULT_BRANCH: master
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      TOKEN: ${{ secrets.TOKEN }}
+      NUGETTOKEN: ${{ secrets.NUGETTOKEN }}
     
-    runs-on: ubuntu-latest    
+    runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v1
@@ -28,13 +30,11 @@ jobs:
       run: |
         export REPOSITORY_NAME=$(basename ${{ github.repository }})
         export CURRENT_BRANCH=$(basename ${{ github.ref }})
-        export TOKEN="${{ secrets.TOKEN }}"
         bash ./publish-docs.sh
     - name: Publish NuGet package
       run: |
         export REPOSITORY_NAME=$(basename ${{ github.repository }})
         export CURRENT_BRANCH=$(basename ${{ github.ref }})
-        export NUGETTOKEN="${{ secrets.NUGETTOKEN }}"
         bash ./push-nuget.sh
     - name: Publish release
       run: |
