@@ -12,4 +12,6 @@ jobs:
     - name: Install xmlstarlet
       run: sudo apt-get install xmlstarlet
     - name: What is the repository name?
-      run: ${{ github.repository }}
+      run: |
+        export REPOSITORY_NAME=$(echo "${${{ github.repository }}#*/}" | sed 's/.*/\u&/')
+        echo $REPOSITORY_NAME
