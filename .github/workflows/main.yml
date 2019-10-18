@@ -29,6 +29,13 @@ jobs:
         export DEFAULT_BRANCH="master"
         export TOKEN="${{ secrets.TOKEN }}"
         bash ./publish-docs.sh
+    - name: Publish NuGet package
+      run: |
+        export REPOSITORY_NAME=$(basename ${{ github.repository }})
+        export CURRENT_BRANCH=$(basename ${{ github.ref }})
+        export DEFAULT_BRANCH="master"
+        export NUGETTOKEN="${{ secrets.NUGETTOKEN }}"
+        bash ./push-nuget.sh
     - name: Publish release
       run: |
         export REPOSITORY_NAME=$(basename ${{ github.repository }})
