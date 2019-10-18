@@ -34,8 +34,9 @@ jobs:
         echo $PACKAGE_VERSION
         export PACKAGE_RELEASE_NOTES=$(xmlstarlet sel -t -m '//PackageReleaseNotes[1]' -v . -n <Platform.$REPOSITORY_NAME/Platform.$REPOSITORY_NAME.csproj)
         echo $PACKAGE_RELEASE_NOTES
+        # ${PACKAGE_VERSION}
         curl --request GET \
-        --url https://api.github.com/repos/${{ github.repository }}/releases/tags/${PACKAGE_VERSION} \
+        --url https://api.github.com/repos/${{ github.repository }}/releases/tags/0.0.8 \
         --header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' | jq -r '.id'
         #cat getReleaseByTag.json
         #curl --request POST \
