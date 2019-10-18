@@ -14,4 +14,4 @@ jobs:
     - name: What is the GITHUB_WORKSPACE equal to?
       run: ls ${{ github.workspace }}
     - name: Build
-      run: dotnet build -c Release ${{ github.workspace }}
+      run: dotnet build -c Release ${{ github.workspace }}/Platform.RegularExpressions.Transformer.CSharpToCpp.sln
