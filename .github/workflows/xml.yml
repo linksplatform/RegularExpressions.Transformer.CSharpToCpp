@@ -9,7 +9,7 @@ jobs:
     
     steps:
     - uses: actions/checkout@v1
-    - name: Is the xmlstarlet available?
-      run: |
-        sudo apt-get install xmlstarlet
-        xmlstarlet
+    - name: Install xmlstarlet
+      run: sudo apt-get install xmlstarlet
+    - name: What is the repository name?
+      run: ${{ github.repository }}
