@@ -7,8 +7,11 @@ on:
 
 jobs:
   build:
-
-    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      DEFAULT_BRANCH: master
+    
+    runs-on: ubuntu-latest    
 
     steps:
     - uses: actions/checkout@v1
@@ -20,26 +23,21 @@ jobs:
       run: |
         export REPOSITORY_NAME=$(basename ${{ github.repository }})
         export CURRENT_BRANCH=$(basename ${{ github.ref }})
-        export DEFAULT_BRANCH="master"
         bash ./generate-pdf.sh
     - name: Publish documentation to gh-pages branch
       run: |
         export REPOSITORY_NAME=$(basename ${{ github.repository }})
         export CURRENT_BRANCH=$(basename ${{ github.ref }})
-        export DEFAULT_BRANCH="master"
         export TOKEN="${{ secrets.TOKEN }}"
         bash ./publish-docs.sh
     - name: Publish NuGet package
       run: |
         export REPOSITORY_NAME=$(basename ${{ github.repository }})
         export CURRENT_BRANCH=$(basename ${{ github.ref }})
-        export DEFAULT_BRANCH="master"
         export NUGETTOKEN="${{ secrets.NUGETTOKEN }}"
         bash ./push-nuget.sh
     - name: Publish release
       run: |
         export REPOSITORY_NAME=$(basename ${{ github.repository }})
-        export GITHUB_TOKEN="${{ secrets.GITHUB_TOKEN }}"
         export CURRENT_BRANCH=$(basename ${{ github.ref }})
-        export DEFAULT_BRANCH="master"
         bash ./publish-release.sh
