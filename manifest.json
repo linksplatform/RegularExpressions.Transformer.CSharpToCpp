@@ -30,7 +30,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Platform.RegularExpressions.Transformer.CSharpToCpp.CSharpToCppTransformer.html",
-          "hash": "Py5CgW04Gs+E9PwljzSH+A=="
+          "hash": "e7pUcLXlglhm+dxxtOk+bQ=="
         }
       },
       "is_incremental": false,
@@ -42,7 +42,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Platform.RegularExpressions.Transformer.CSharpToCpp.Tests.CSharpToCppTransformerTests.html",
-          "hash": "H7Cx2fWr9wNLV8qPoTNZRQ=="
+          "hash": "AeFm3c08c1FwCuepPOSuYA=="
         }
       },
       "is_incremental": false,
