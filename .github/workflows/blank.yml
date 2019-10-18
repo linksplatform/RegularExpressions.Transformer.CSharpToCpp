@@ -36,7 +36,7 @@ jobs:
         echo $PACKAGE_RELEASE_NOTES
         curl --request GET \
         --url https://api.github.com/repos/${{ github.repository }}/releases/tags/${PACKAGE_VERSION} \
-        --header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' | jq -r '.name'
+        --header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' | jq -r '.id'
         #cat getReleaseByTag.json
         #curl --request POST \
         #--url https://api.github.com/repos/${{ github.repository }}/releases \
