@@ -9,4 +9,4 @@ jobs:
     
     steps:
     - name: Test for mono
-      run: mono
+      run: mono --version
