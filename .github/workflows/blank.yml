@@ -23,32 +23,9 @@ jobs:
     #  run: dotnet build -c Release
     #- name: Test
     #  run: dotnet test -c Release -f netcoreapp3.0
-    - name: Install dependencies
-      run: |
-        sudo apt-get install xmlstarlet
     - name: Publish release
       run: |
         export REPOSITORY_NAME=$(basename ${{ github.repository }})
-        echo $REPOSITORY_NAME
-        export PACKAGE_VERSION=$(xmlstarlet sel -t -m '//VersionPrefix[1]' -v . -n <Platform.$REPOSITORY_NAME/Platform.$REPOSITORY_NAME.csproj)
-        echo $PACKAGE_VERSION
-        export PACKAGE_RELEASE_NOTES=$(xmlstarlet sel -t -m '//PackageReleaseNotes[1]' -v . -n <Platform.$REPOSITORY_NAME/Platform.$REPOSITORY_NAME.csproj)
-        echo $PACKAGE_RELEASE_NOTES
-        # ${PACKAGE_VERSION}
-        curl --request GET \
-        --url https://api.github.com/repos/${{ github.repository }}/releases/tags/0.0.8 \
-        --header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' | jq -r '.id'
-        #cat getReleaseByTag.json
-        #curl --request POST \
-        #--url https://api.github.com/repos/${{ github.repository }}/releases \
-        #--header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
-        #--header 'content-type: application/json' \
-        #--data "{
-        #  \"tag_name\": \"${PACKAGE_VERSION}\",
-        #  \"target_commitish\": \"master\",
-        #  \"name\": \"${PACKAGE_VERSION}\",
-        #  \"body\": \"${PACKAGE_RELEASE_NOTES}\",
-        #  \"draft\": false,
-        #  \"prerelease\": false
-        #  }" > createRelease.json
-        #cat createRelease.json
+        export GITHUB_TOKEN="${{ secrets.GITHUB_TOKEN }}"
+        export DEFAULT_BRANCH="master"
+        bash ./publish-release.sh
