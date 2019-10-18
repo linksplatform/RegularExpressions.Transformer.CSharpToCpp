@@ -1,17 +1,15 @@
 name: CI
 
-on:
-  push:
-    branches:
-      - master
+on: [push, pull_request]
+
+env:
+  DEFAULT_BRANCH: master
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  TOKEN: ${{ secrets.TOKEN }}
+  NUGETTOKEN: ${{ secrets.NUGETTOKEN }}
 
 jobs:
-  build:
-    env:
-      DEFAULT_BRANCH: master
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      TOKEN: ${{ secrets.TOKEN }}
-      NUGETTOKEN: ${{ secrets.NUGETTOKEN }}
+  buildAndTest:
     
     runs-on: ubuntu-latest
 
