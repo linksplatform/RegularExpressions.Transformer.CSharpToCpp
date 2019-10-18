@@ -27,7 +27,9 @@ curl --request POST \
   \"tag_name\": \"${PACKAGE_VERSION}\",
   \"target_commitish\": \"${DEFAULT_BRANCH}\",
   \"name\": \"${PACKAGE_VERSION}\",
-  \"body\": \"${PACKAGE_RELEASE_NOTES}\",
+  \"body\": \"https://www.nuget.org/packages/Platform.$REPOSITORY_NAME/${PACKAGE_VERSION}
+
+${PACKAGE_RELEASE_NOTES}\",
   \"draft\": false,
   \"prerelease\": false
   }"
