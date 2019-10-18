@@ -12,17 +12,17 @@ jobs:
     
     steps:
     - uses: actions/checkout@v1
-    - uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: '3.0.100'
-    - name: Where am I?
-      run: |
-        cd ${{ github.workspace }}
-        ls
-    - name: Build
-      run: dotnet build -c Release
-    - name: Test
-      run: dotnet test -c Release -f netcoreapp3.0
+    #- uses: actions/setup-dotnet@v1
+    #  with:
+    #    dotnet-version: '3.0.100'
+    #- name: Where am I?
+    #  run: |
+    #    cd ${{ github.workspace }}
+    #    ls
+    #- name: Build
+    #  run: dotnet build -c Release
+    #- name: Test
+    #  run: dotnet test -c Release -f netcoreapp3.0
     - name: Install dependencies
       run: |
         sudo apt-get install xmlstarlet
@@ -36,7 +36,7 @@ jobs:
         echo $PACKAGE_RELEASE_NOTES
         curl --request GET \
         --url https://api.github.com/repos/${{ github.repository }}/releases/tags/${PACKAGE_VERSION} \
-        --header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' > ./jq .id
+        --header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' | jq -r '.name'
         #cat getReleaseByTag.json
         #curl --request POST \
         #--url https://api.github.com/repos/${{ github.repository }}/releases \
