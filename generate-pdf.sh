@@ -2,7 +2,7 @@
 set -e # Exit with nonzero exit code if anything fails
 
 # Pull requests and commits to other branches shouldn't try to deploy, just build to verify
-if [[ ( "$TRAVIS_PULL_REQUEST" != "false" ) || ( "$TRAVIS_BRANCH" != "$SOURCE_BRANCH" ) ]]; then
+if [[ ( "$GITHUB_EVENT_NAME" != "push" ) || ( "$CURRENT_BRANCH" != "$DEFAULT_BRANCH" ) ]]; then
     echo "Skipping pdf generation."
     exit 0
 fi
@@ -21,7 +21,7 @@ dvips document.dvi
 
 # Copy pdf to publish location (with be used in the next script)
 mkdir _site
-cp document.pdf "_site/Platform.${TRAVIS_REPO_NAME}.pdf"
+cp document.pdf "_site/Platform.$REPOSITORY_NAME.pdf"
 
 # Clean up
 rm document.tex

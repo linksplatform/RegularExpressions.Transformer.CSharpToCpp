@@ -2,7 +2,7 @@
 set -e # Exit with nonzero exit code if anything fails
 
 # Pull requests and commits to other branches shouldn't try to deploy, just build to verify
-if [[ ( "$TRAVIS_PULL_REQUEST" != "false" ) || ( "$TRAVIS_BRANCH" != "$SOURCE_BRANCH" ) ]]; then
+if [[ ( "$GITHUB_EVENT_NAME" != "push" ) || ( "$CURRENT_BRANCH" != "$DEFAULT_BRANCH" ) ]]; then
     echo "Skipping documentation deploy."
     exit 0
 fi
@@ -12,11 +12,11 @@ TARGET_BRANCH="gh-pages"
 SHA=$(git rev-parse --verify HEAD)
 COMMIT_USER_NAME="linksplatform-docs"
 COMMIT_USER_EMAIL="konard@yandex.ru"
-REPOSITORY="github.com/linksplatform/${TRAVIS_REPO_NAME}"
+REPOSITORY="github.com/linksplatform/$REPOSITORY_NAME"
 
 # Insert repository name into DocFX's configuration files
-sed -i "s/\$TRAVIS_REPO_NAME/${TRAVIS_REPO_NAME}/g" toc.yml
-sed -i "s/\$TRAVIS_REPO_NAME/${TRAVIS_REPO_NAME}/g" docfx.json
+sed -i "s/\$REPOSITORY_NAME/$REPOSITORY_NAME/g" toc.yml
+sed -i "s/\$REPOSITORY_NAME/$REPOSITORY_NAME/g" docfx.json
 
 # DocFX installation
 nuget install docfx.console
@@ -49,7 +49,7 @@ git remote add origin "https://$COMMIT_USER_NAME:$TOKEN@$REPOSITORY.git"
 # Commit the "changes", i.e. the new version.
 # The delta will show diffs between new and old versions.
 git add --all
-git commit -m "Deploy to GitHub Pages: ${SHA}"
+git commit -m "Deploy to GitHub Pages: $SHA"
 
 # Now that we're all set up, we can push.
 git push "https://$COMMIT_USER_NAME:$TOKEN@$REPOSITORY.git" "$TARGET_BRANCH"

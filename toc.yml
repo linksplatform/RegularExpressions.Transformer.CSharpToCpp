@@ -2,4 +2,4 @@
   href: README.md
 - name: API Documentation
   href: obj/api/
-  homepage: api/Platform.$TRAVIS_REPO_NAME.html
+  homepage: api/Platform.$REPOSITORY_NAME.html
