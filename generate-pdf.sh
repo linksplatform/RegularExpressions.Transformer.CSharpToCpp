@@ -1,12 +1,6 @@
 #!/bin/bash
 set -e # Exit with nonzero exit code if anything fails
 
-# Pull requests and commits to other branches shouldn't try to deploy, just build to verify
-if [[ ( "$GITHUB_EVENT_NAME" != "push" ) || ( "$CURRENT_BRANCH" != "$DEFAULT_BRANCH" ) ]]; then
-    echo "Skipping pdf generation."
-    exit 0
-fi
-
 sudo apt-get install -y texlive texlive-lang-cyrillic texlive-latex-extra python-pygments ghostscript
 
 # Generate tex file
