@@ -15,4 +15,7 @@ jobs:
       run: |
         export REPOSITORY_NAME=$(basename ${{ github.repository }})
         echo $REPOSITORY_NAME
-        xmlstarlet sel -t -m '//VersionPrefix[1]' -v . -n <Platform.$REPOSITORY_NAME/Platform.$REPOSITORY_NAME.csproj
+        export PACKAGE_VERSION=$(xmlstarlet sel -t -m '//VersionPrefix[1]' -v . -n <Platform.$REPOSITORY_NAME/Platform.$REPOSITORY_NAME.csproj)
+        echo $PACKAGE_VERSION
+        export PACKAGE_RELEASE_NOTES=$(xmlstarlet sel -t -m '//PackageReleaseNotes[1]' -v . -n <Platform.$REPOSITORY_NAME/Platform.$REPOSITORY_NAME.csproj)
+        echo $PACKAGE_RELEASE_NOTES
