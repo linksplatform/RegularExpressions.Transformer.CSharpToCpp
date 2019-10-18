@@ -13,5 +13,9 @@ jobs:
         dotnet-version: '3.0.100'
     - name: Where am I?
       run: ls
+    - name: What is the GITHUB_WORKSPACE equal to?
+      run: |
+        $GITHUB_WORKSPACE
+        ls $GITHUB_WORKSPACE
     - name: Build
-      run: dotnet build -c Release
+      run: dotnet build -c Release $GITHUB_WORKSPACE
