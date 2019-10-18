@@ -9,8 +9,8 @@ fi
 
 sudo apt-get install xmlstarlet
 
-PACKAGE_VERSION=$(xmlstarlet sel -t -m '//VersionPrefix[1]' -v . -n <Platform.$REPOSITORY_NAME/Platform.$REPOSITORY_NAME.csproj)
-PACKAGE_RELEASE_NOTES=$(xmlstarlet sel -t -m '//PackageReleaseNotes[1]' -v . -n <Platform.$REPOSITORY_NAME/Platform.$REPOSITORY_NAME.csproj)
+PACKAGE_VERSION=$(xmlstarlet sel -t -m '//VersionPrefix[1]' -v . -n <"Platform.$REPOSITORY_NAME/Platform.$REPOSITORY_NAME.csproj")
+PACKAGE_RELEASE_NOTES=$(xmlstarlet sel -t -m '//PackageReleaseNotes[1]' -v . -n <"Platform.$REPOSITORY_NAME/Platform.$REPOSITORY_NAME.csproj")
 
 TAG_ID=$(curl --request GET --url "https://api.github.com/repos/${GITHUB_REPOSITORY}/releases/tags/${PACKAGE_VERSION}" --header "authorization: Bearer ${GITHUB_TOKEN}" | jq -r '.id')
 
@@ -20,7 +20,7 @@ if [ "$TAG_ID" != "null" ]; then
 fi
 
 curl --request POST \
---url https://api.github.com/repos/${GITHUB_REPOSITORY}/releases \
+--url "https://api.github.com/repos/$GITHUB_REPOSITORY/releases" \
 --header "authorization: Bearer ${GITHUB_TOKEN}" \
 --header 'content-type: application/json' \
 --data "{
