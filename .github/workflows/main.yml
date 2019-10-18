@@ -1,9 +1,12 @@
-name: CI
+name: CI and CD
 
-on: [push, pull_request]
+on:
+  push:
+    branches: master
+  pull_request:
+    branches: master
 
 env:
-  DEFAULT_BRANCH: master
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   TOKEN: ${{ secrets.TOKEN }}
   NUGETTOKEN: ${{ secrets.NUGETTOKEN }}
@@ -20,22 +23,22 @@ jobs:
     - name: Test
       run: dotnet test -c Release -f netcoreapp3.0
     - name: Generate PDF with code
-      if: github.event_name == 'push' && endsWith(github.ref, '/master')
+      if: github.event_name == 'push'
       run: |
         export REPOSITORY_NAME=$(basename ${{ github.repository }})
         bash ./generate-pdf.sh
     - name: Publish documentation to gh-pages branch
-      if: github.event_name == 'push' && endsWith(github.ref, '/master')
+      if: github.event_name == 'push'
       run: |
         export REPOSITORY_NAME=$(basename ${{ github.repository }})
         bash ./publish-docs.sh
     - name: Publish NuGet package
-      if: github.event_name == 'push' && endsWith(github.ref, '/master')
+      if: github.event_name == 'push'
       run: |
         export REPOSITORY_NAME=$(basename ${{ github.repository }})
         bash ./push-nuget.sh
     - name: Publish release
-      if: github.event_name == 'push' && endsWith(github.ref, '/master')
+      if: github.event_name == 'push'
       run: |
         export REPOSITORY_NAME=$(basename ${{ github.repository }})
         bash ./publish-release.sh
