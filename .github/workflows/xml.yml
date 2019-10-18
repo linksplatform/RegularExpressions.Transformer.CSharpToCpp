@@ -11,11 +11,13 @@ jobs:
     - uses: actions/checkout@v1
     - name: Install xmlstarlet
       run: sudo apt-get install xmlstarlet
-    - name: Reading from xml
+    - name: Read data from xml project file
       run: |
         export REPOSITORY_NAME=$(basename ${{ github.repository }})
         echo $REPOSITORY_NAME
         export PACKAGE_VERSION=$(xmlstarlet sel -t -m '//VersionPrefix[1]' -v . -n <Platform.$REPOSITORY_NAME/Platform.$REPOSITORY_NAME.csproj)
         echo $PACKAGE_VERSION
+        echo $PACKAGE_VERSION > PACKAGE_VERSION.txt
         export PACKAGE_RELEASE_NOTES=$(xmlstarlet sel -t -m '//PackageReleaseNotes[1]' -v . -n <Platform.$REPOSITORY_NAME/Platform.$REPOSITORY_NAME.csproj)
         echo $PACKAGE_RELEASE_NOTES
+        echo $PACKAGE_RELEASE_NOTES > PACKAGE_RELEASE_NOTES.txt
