@@ -16,11 +16,5 @@ jobs:
       run: |
         cd ${{ github.workspace }}
         ls
-        cd ..
-        ls
-        cd ..
-        ls
-        cd ..
-        ls
     - name: Build
-      run: dotnet build -c Release ${{ github.workspace }}/Platform.RegularExpressions.Transformer.CSharpToCpp.sln
+      run: dotnet build -c Release
