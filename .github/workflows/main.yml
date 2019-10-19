@@ -12,14 +12,12 @@ env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
-  buildTestAndDeploy:
+  testAndDeploy:
     
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v1
-    - name: Build
-      run: dotnet build -c Release
     - name: Test
       run: dotnet test -c Release -f netcoreapp3.0
     - name: Generate PDF with code
