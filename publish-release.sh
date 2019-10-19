@@ -13,6 +13,9 @@ if [ "$TAG_ID" != "null" ]; then
     exit 0
 fi
 
+PACKAGE_RELEASE_NOTES_STRING=$(jq -aR . <<< "https://www.nuget.org/packages/Platform.$REPOSITORY_NAME/$PACKAGE_VERSION\n\n$PACKAGE_RELEASE_NOTES")
+echo $PACKAGE_RELEASE_NOTES_STRING
+
 curl --request POST \
 --url "https://api.github.com/repos/$GITHUB_REPOSITORY/releases" \
 --header "authorization: Bearer ${GITHUB_TOKEN}" \
@@ -21,7 +24,7 @@ curl --request POST \
   \"tag_name\": \"${PACKAGE_VERSION}\",
   \"target_commitish\": \"${DEFAULT_BRANCH}\",
   \"name\": \"${PACKAGE_VERSION}\",
-  \"body\": \"https://www.nuget.org/packages/Platform.$REPOSITORY_NAME/${PACKAGE_VERSION}\n\n${PACKAGE_RELEASE_NOTES}\",
+  \"body\": $PACKAGE_RELEASE_NOTES_STRING,
   \"draft\": false,
   \"prerelease\": false
   }"
