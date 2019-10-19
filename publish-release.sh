@@ -13,7 +13,8 @@ if [ "$TAG_ID" != "null" ]; then
     exit 0
 fi
 
-PACKAGE_RELEASE_NOTES_STRING=$(jq -aR . <<< "https://www.nuget.org/packages/Platform.$REPOSITORY_NAME/$PACKAGE_VERSION\n\n$PACKAGE_RELEASE_NOTES")
+SEPARATOR='\n\n'
+PACKAGE_RELEASE_NOTES_STRING=$(jq -saR . <<< "https://www.nuget.org/packages/Platform.$REPOSITORY_NAME/$PACKAGE_VERSION$SEPARATOR$PACKAGE_RELEASE_NOTES")
 echo $PACKAGE_RELEASE_NOTES_STRING
 
 curl --request POST \
