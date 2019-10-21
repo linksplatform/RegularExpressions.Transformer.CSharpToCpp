@@ -13,7 +13,9 @@ if [ "$TAG_ID" != "null" ]; then
     exit 0
 fi
 
-SEPARATOR='\n\n'
+SEPARATOR="
+
+"
 PACKAGE_RELEASE_NOTES_STRING=$(jq -saR . <<< "https://www.nuget.org/packages/Platform.$REPOSITORY_NAME/$PACKAGE_VERSION$SEPARATOR$PACKAGE_RELEASE_NOTES")
 echo $PACKAGE_RELEASE_NOTES_STRING
 
