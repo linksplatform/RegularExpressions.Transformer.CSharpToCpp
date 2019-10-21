@@ -19,13 +19,13 @@ references:
   commentId: M:Platform.RegularExpressions.Transformer.CSharpToCpp.CSharpToCppTransformer.#ctor
   fullName: Platform.RegularExpressions.Transformer.CSharpToCpp.CSharpToCppTransformer.CSharpToCppTransformer()
   nameWithType: CSharpToCppTransformer.CSharpToCppTransformer()
-- uid: Platform.RegularExpressions.Transformer.CSharpToCpp.CSharpToCppTransformer.#ctor(System.Collections.Generic.IList{Platform.RegularExpressions.Transformer.ISubstitutionRule})
+- uid: Platform.RegularExpressions.Transformer.CSharpToCpp.CSharpToCppTransformer.#ctor(IList{ISubstitutionRule})
   name: CSharpToCppTransformer(IList<ISubstitutionRule>)
-  href: api/Platform.RegularExpressions.Transformer.CSharpToCpp.CSharpToCppTransformer.html#Platform_RegularExpressions_Transformer_CSharpToCpp_CSharpToCppTransformer__ctor_System_Collections_Generic_IList_Platform_RegularExpressions_Transformer_ISubstitutionRule__
-  commentId: M:Platform.RegularExpressions.Transformer.CSharpToCpp.CSharpToCppTransformer.#ctor(System.Collections.Generic.IList{Platform.RegularExpressions.Transformer.ISubstitutionRule})
+  href: api/Platform.RegularExpressions.Transformer.CSharpToCpp.CSharpToCppTransformer.html#Platform_RegularExpressions_Transformer_CSharpToCpp_CSharpToCppTransformer__ctor_IList_ISubstitutionRule__
+  commentId: M:Platform.RegularExpressions.Transformer.CSharpToCpp.CSharpToCppTransformer.#ctor(IList{ISubstitutionRule})
   name.vb: CSharpToCppTransformer(IList(Of ISubstitutionRule))
-  fullName: Platform.RegularExpressions.Transformer.CSharpToCpp.CSharpToCppTransformer.CSharpToCppTransformer(System.Collections.Generic.IList<Platform.RegularExpressions.Transformer.ISubstitutionRule>)
-  fullName.vb: Platform.RegularExpressions.Transformer.CSharpToCpp.CSharpToCppTransformer.CSharpToCppTransformer(System.Collections.Generic.IList(Of Platform.RegularExpressions.Transformer.ISubstitutionRule))
+  fullName: Platform.RegularExpressions.Transformer.CSharpToCpp.CSharpToCppTransformer.CSharpToCppTransformer(IList<ISubstitutionRule>)
+  fullName.vb: Platform.RegularExpressions.Transformer.CSharpToCpp.CSharpToCppTransformer.CSharpToCppTransformer(IList(Of ISubstitutionRule))
   nameWithType: CSharpToCppTransformer.CSharpToCppTransformer(IList<ISubstitutionRule>)
   nameWithType.vb: CSharpToCppTransformer.CSharpToCppTransformer(IList(Of ISubstitutionRule))
 - uid: Platform.RegularExpressions.Transformer.CSharpToCpp.CSharpToCppTransformer.#ctor*
