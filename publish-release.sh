@@ -17,7 +17,6 @@ SEPARATOR="
 
 "
 PACKAGE_RELEASE_NOTES_STRING=$(jq -saR . <<< "https://www.nuget.org/packages/Platform.$REPOSITORY_NAME/$PACKAGE_VERSION$SEPARATOR$PACKAGE_RELEASE_NOTES")
-echo $PACKAGE_RELEASE_NOTES_STRING
 
 curl --request POST \
 --url "https://api.github.com/repos/$GITHUB_REPOSITORY/releases" \
