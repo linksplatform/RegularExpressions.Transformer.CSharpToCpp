@@ -13,9 +13,7 @@ env:
 
 jobs:
   testAndDeploy:
-    
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v1
     - name: Test
