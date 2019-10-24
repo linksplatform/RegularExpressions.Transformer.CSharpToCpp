@@ -29,6 +29,9 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta2-19367-01" PrivateAssets="All"/>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Platform.RegularExpressions.Transformer" Version="0.0.3" />
   </ItemGroup>
 
