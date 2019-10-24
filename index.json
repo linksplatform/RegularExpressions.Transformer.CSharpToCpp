@@ -1,4 +1,9 @@
 {
+  "api/Platform.RegularExpressions.Transformer.CSharpToCpp.html": {
+    "href": "api/Platform.RegularExpressions.Transformer.CSharpToCpp.html",
+    "title": "Namespace Platform.RegularExpressions.Transformer.CSharpToCpp | LinksPlatform's Platform.RegularExpressions.Transformer.CSharpToCpp Library",
+    "keywords": "Namespace Platform.RegularExpressions.Transformer.CSharpToCpp Classes CSharpToCppTransformer"
+  },
   "README.html": {
     "href": "README.html",
     "title": "RegularExpressions.Transformer.CSharpToCpp | LinksPlatform's Platform.RegularExpressions.Transformer.CSharpToCpp Library",
@@ -9,11 +14,6 @@
     "title": "Class CSharpToCppTransformerTests | LinksPlatform's Platform.RegularExpressions.Transformer.CSharpToCpp Library",
     "keywords": "Class CSharpToCppTransformerTests Inheritance Object CSharpToCppTransformerTests Namespace : Platform.RegularExpressions.Transformer.CSharpToCpp.Tests Assembly : Platform.RegularExpressions.Transformer.CSharpToCpp.Tests.dll Syntax public class CSharpToCppTransformerTests : object Methods | Improve this Doc View Source HelloWorldTest() Declaration public void HelloWorldTest()"
   },
-  "api/Platform.RegularExpressions.Transformer.CSharpToCpp.html": {
-    "href": "api/Platform.RegularExpressions.Transformer.CSharpToCpp.html",
-    "title": "Namespace Platform.RegularExpressions.Transformer.CSharpToCpp | LinksPlatform's Platform.RegularExpressions.Transformer.CSharpToCpp Library",
-    "keywords": "Namespace Platform.RegularExpressions.Transformer.CSharpToCpp Classes CSharpToCppTransformer"
-  },
   "api/Platform.RegularExpressions.Transformer.CSharpToCpp.Tests.html": {
     "href": "api/Platform.RegularExpressions.Transformer.CSharpToCpp.Tests.html",
     "title": "Namespace Platform.RegularExpressions.Transformer.CSharpToCpp.Tests | LinksPlatform's Platform.RegularExpressions.Transformer.CSharpToCpp Library",
@@ -22,6 +22,6 @@
   "api/Platform.RegularExpressions.Transformer.CSharpToCpp.CSharpToCppTransformer.html": {
     "href": "api/Platform.RegularExpressions.Transformer.CSharpToCpp.CSharpToCppTransformer.html",
     "title": "Class CSharpToCppTransformer | LinksPlatform's Platform.RegularExpressions.Transformer.CSharpToCpp Library",
-    "keywords": "Class CSharpToCppTransformer Inheritance Object CSharpToCppTransformer Namespace : Platform.RegularExpressions.Transformer.CSharpToCpp Assembly : Platform.RegularExpressions.Transformer.CSharpToCpp.dll Syntax public class CSharpToCppTransformer : Transformer Constructors | Improve this Doc View Source CSharpToCppTransformer() Declaration public CSharpToCppTransformer() | Improve this Doc View Source CSharpToCppTransformer(IList<ISubstitutionRule>) Declaration public CSharpToCppTransformer(IList<ISubstitutionRule> extraRules) Parameters Type Name Description IList < ISubstitutionRule > extraRules Fields | Improve this Doc View Source FirstStage Declaration public static readonly IList<ISubstitutionRule> FirstStage Field Value Type Description IList < ISubstitutionRule > | Improve this Doc View Source LastStage Declaration public static readonly IList<ISubstitutionRule> LastStage Field Value Type Description IList < ISubstitutionRule >"
+    "keywords": "Class CSharpToCppTransformer Inheritance Object Platform.RegularExpressions.Transformer.Transformer CSharpToCppTransformer Implements Platform.RegularExpressions.Transformer.ITransformer Inherited Members Platform.RegularExpressions.Transformer.Transformer.Transform(System.String, Platform.RegularExpressions.Transformer.IContext) Object.Equals(Object) Object.Equals(Object, Object) Object.GetHashCode() Object.GetType() Object.MemberwiseClone() Object.ReferenceEquals(Object, Object) Object.ToString() Namespace : Platform.RegularExpressions.Transformer.CSharpToCpp Assembly : Platform.RegularExpressions.Transformer.CSharpToCpp.dll Syntax public class CSharpToCppTransformer : Transformer, ITransformer Constructors | Improve this Doc View Source CSharpToCppTransformer() Declaration public CSharpToCppTransformer() | Improve this Doc View Source CSharpToCppTransformer(IList<ISubstitutionRule>) Declaration public CSharpToCppTransformer(IList<ISubstitutionRule> extraRules) Parameters Type Name Description IList < Platform.RegularExpressions.Transformer.ISubstitutionRule > extraRules Fields | Improve this Doc View Source FirstStage Declaration public static readonly IList<ISubstitutionRule> FirstStage Field Value Type Description IList < Platform.RegularExpressions.Transformer.ISubstitutionRule > | Improve this Doc View Source LastStage Declaration public static readonly IList<ISubstitutionRule> LastStage Field Value Type Description IList < Platform.RegularExpressions.Transformer.ISubstitutionRule > Implements Platform.RegularExpressions.Transformer.ITransformer"
   }
 }
