@@ -47,28 +47,3 @@ references:
   commentId: F:Platform.RegularExpressions.Transformer.CSharpToCpp.CSharpToCppTransformer.LastStage
   fullName: Platform.RegularExpressions.Transformer.CSharpToCpp.CSharpToCppTransformer.LastStage
   nameWithType: CSharpToCppTransformer.LastStage
-- uid: Platform.RegularExpressions.Transformer.CSharpToCpp.Tests
-  name: Platform.RegularExpressions.Transformer.CSharpToCpp.Tests
-  href: api/Platform.RegularExpressions.Transformer.CSharpToCpp.Tests.html
-  commentId: N:Platform.RegularExpressions.Transformer.CSharpToCpp.Tests
-  fullName: Platform.RegularExpressions.Transformer.CSharpToCpp.Tests
-  nameWithType: Platform.RegularExpressions.Transformer.CSharpToCpp.Tests
-- uid: Platform.RegularExpressions.Transformer.CSharpToCpp.Tests.CSharpToCppTransformerTests
-  name: CSharpToCppTransformerTests
-  href: api/Platform.RegularExpressions.Transformer.CSharpToCpp.Tests.CSharpToCppTransformerTests.html
-  commentId: T:Platform.RegularExpressions.Transformer.CSharpToCpp.Tests.CSharpToCppTransformerTests
-  fullName: Platform.RegularExpressions.Transformer.CSharpToCpp.Tests.CSharpToCppTransformerTests
-  nameWithType: CSharpToCppTransformerTests
-- uid: Platform.RegularExpressions.Transformer.CSharpToCpp.Tests.CSharpToCppTransformerTests.HelloWorldTest
-  name: HelloWorldTest()
-  href: api/Platform.RegularExpressions.Transformer.CSharpToCpp.Tests.CSharpToCppTransformerTests.html#Platform_RegularExpressions_Transformer_CSharpToCpp_Tests_CSharpToCppTransformerTests_HelloWorldTest
-  commentId: M:Platform.RegularExpressions.Transformer.CSharpToCpp.Tests.CSharpToCppTransformerTests.HelloWorldTest
-  fullName: Platform.RegularExpressions.Transformer.CSharpToCpp.Tests.CSharpToCppTransformerTests.HelloWorldTest()
-  nameWithType: CSharpToCppTransformerTests.HelloWorldTest()
-- uid: Platform.RegularExpressions.Transformer.CSharpToCpp.Tests.CSharpToCppTransformerTests.HelloWorldTest*
-  name: HelloWorldTest
-  href: api/Platform.RegularExpressions.Transformer.CSharpToCpp.Tests.CSharpToCppTransformerTests.html#Platform_RegularExpressions_Transformer_CSharpToCpp_Tests_CSharpToCppTransformerTests_HelloWorldTest_
-  commentId: Overload:Platform.RegularExpressions.Transformer.CSharpToCpp.Tests.CSharpToCppTransformerTests.HelloWorldTest
-  isSpec: "True"
-  fullName: Platform.RegularExpressions.Transformer.CSharpToCpp.Tests.CSharpToCppTransformerTests.HelloWorldTest
-  nameWithType: CSharpToCppTransformerTests.HelloWorldTest

@@ -30,31 +30,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Platform.RegularExpressions.Transformer.CSharpToCpp.CSharpToCppTransformer.html",
-          "hash": "5LRyn58FG2+bDxZA6cefaw=="
-        }
-      },
-      "is_incremental": false,
-      "version": ""
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "obj/api/Platform.RegularExpressions.Transformer.CSharpToCpp.Tests.CSharpToCppTransformerTests.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/Platform.RegularExpressions.Transformer.CSharpToCpp.Tests.CSharpToCppTransformerTests.html",
-          "hash": "rmLjeHkN2iskAYMh+pykvQ=="
-        }
-      },
-      "is_incremental": false,
-      "version": ""
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "obj/api/Platform.RegularExpressions.Transformer.CSharpToCpp.Tests.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/Platform.RegularExpressions.Transformer.CSharpToCpp.Tests.html",
-          "hash": "RGQD5Wgh5HN/Kkmb7YB3Jg=="
+          "hash": "UtcyEmyPo5+G5FcNXZ2n1g=="
         }
       },
       "is_incremental": false,
@@ -78,7 +54,7 @@
       "output": {
         ".html": {
           "relative_path": "api/toc.html",
-          "hash": "ZsMPA/0BcVV5pANn1+x06Q=="
+          "hash": "17UF/1XTsCpNE+cWWZyvWQ=="
         }
       },
       "is_incremental": false,
@@ -127,7 +103,7 @@
         "ManagedReferenceDocumentProcessor": {
           "can_incremental": false,
           "incrementalPhase": "build",
-          "total_file_count": 4,
+          "total_file_count": 2,
           "skipped_file_count": 0
         }
       }
