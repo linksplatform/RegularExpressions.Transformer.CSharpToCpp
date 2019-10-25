@@ -31,6 +31,7 @@ jobs:
       if: github.event_name == 'push'
       run: |
         export REPOSITORY_NAME=$(basename ${{ github.repository }})
+        wget "$SCRIPTS_BASE_URL/docfx.json"
         wget "$SCRIPTS_BASE_URL/toc.yml"
         wget "$SCRIPTS_BASE_URL/publish-docs.sh"
         bash ./publish-docs.sh
