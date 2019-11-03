@@ -4,7 +4,7 @@
     <Description>LinksPlatform's Platform.RegularExpressions.Transformer.CSharpToCpp Class Library</Description>
     <Copyright>Konstantin Diachenko</Copyright>
     <AssemblyTitle>Platform.RegularExpressions.Transformer.CSharpToCpp</AssemblyTitle>
-    <VersionPrefix>0.0.9</VersionPrefix>
+    <VersionPrefix>0.0.10</VersionPrefix>
     <Authors>Konstantin Diachenko</Authors>
     <TargetFrameworks>net471;netstandard2.0;netstandard2.1</TargetFrameworks>
     <AssemblyName>Platform.RegularExpressions.Transformer.CSharpToCpp</AssemblyName>
@@ -24,9 +24,9 @@
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <LangVersion>latest</LangVersion>
-    <PackageReleaseNotes>Added support for .NET Framework 4.7.1 and .NET Standard 2.0.
-Platform.RegularExpressions.Transformer dependency updated from 0.0.3 to 0.0.4.
-Source link enabled.</PackageReleaseNotes>
+    <PackageReleaseNotes>Removal of attributes does not break formatting anymore.
+Added rule for accessing all methods in the methods bodies by this reference.
+Fixed rules for constants, inline methods, and array initialization.</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup Condition="$(TargetFramework.StartsWith('net4')) AND '$(MSBuildRuntimeType)' == 'Core' AND '$(OS)' != 'Windows_NT'">
