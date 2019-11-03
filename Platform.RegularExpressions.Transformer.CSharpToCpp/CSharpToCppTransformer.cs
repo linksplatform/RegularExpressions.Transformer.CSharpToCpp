@@ -46,7 +46,7 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             (new Regex(@"Action<([a-zA-Z0-9]+)> ([a-zA-Z0-9]+)"), "std::function<void($1)> $2", null, 0),
             // private const int MaxPath = 92;
             // static const int MaxPath = 92;
-            (new Regex(@"private const ([a-zA-Z0-9]+) ([_a-zA-Z0-9]+) = ([a-zA-Z0-9]+);"), "static const $1 $2 = $3;", null, 0),
+            (new Regex(@"private (const|static readonly) ([a-zA-Z0-9]+) ([_a-zA-Z0-9]+) = ([^;]+);"), "static const $2 $3 = $4;", null, 0),
             // protected virtual
             // virtual
             (new Regex(@"protected virtual"), "virtual", null, 0),
@@ -70,7 +70,10 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             (new Regex(@"(\W)(private|protected|public|internal) "), "$1", null, 0),
             // SizeBalancedTree(int capacity) => a = b;
             // SizeBalancedTree(int capacity) { a = b; }
-            (new Regex(@"(^\s+)(override )?(void )?([a-zA-Z0-9]+)\(([^\(]+)\)\s+=>\s+([^;]+);"), "$1$2$3$4($5) { $6; }", null, 0),
+            (new Regex(@"(^\s+)(override )?(void )?([a-zA-Z0-9]+)\(([^\(]*)\)\s+=>\s+([^;]+);"), "$1$2$3$4($5) { $6; }", null, 0),
+            // int SizeBalancedTree(int capacity) => a;
+            // int SizeBalancedTree(int capacity) { return a; }
+            (new Regex(@"(^\s+)(override )?([a-zA-Z0-9]+ )([a-zA-Z0-9]+)\(([^\(]*)\)\s+=>\s+([^;]+);"), "$1$2$3$4($5) { return $6; }", null, 0),
             // () => Integer<TElement>.Zero,
             // () { return Integer<TElement>.Zero; },
             (new Regex(@"\(\)\s+=>\s+([^\r\n,;]+?),"), "() { return $1; },", null, 0),
@@ -149,8 +152,8 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             //  ref TElement 
             //  TElement* 
             (new Regex(@"( |\()ref ([a-zA-Z0-9]+) "), "$1$2* ", null, 0),
-            // ref sizeBalancedTree2.Root
-            // &sizeBalancedTree2->Root
+            // ref sizeBalancedTree.Root
+            // &sizeBalancedTree->Root
             (new Regex(@"ref ([a-zA-Z0-9]+)\.([a-zA-Z0-9\*]+)"), "&$1->$2", null, 0),
             // ref GetElement(node).Right
             // &GetElement(node)->Right
@@ -175,7 +178,7 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             (new Regex(@"(\r?\n[\t ]+)([a-zA-Z0-9]+) ([_a-zA-Z0-9]+)\[([_a-zA-Z0-9]+)\];"), "$1$2 $3[$4] = { {0} };", null, 0),
             // auto path = new TElement[MaxPath];
             // TElement path[MaxPath] = { {0} };
-            (new Regex(@"(\r?\n[\t ]+)[a-zA-Z0-9]+ ([a-zA-Z0-9]+) = new ([a-zA-Z0-9]+)\[([a-zA-Z0-9]+)\];"), "$1$3 $2[$4] = { {0} };", null, 0),
+            (new Regex(@"(\r?\n[\t ]+)[a-zA-Z0-9]+ ([a-zA-Z0-9]+) = new ([a-zA-Z0-9]+)\[([_a-zA-Z0-9]+)\];"), "$1$3 $2[$4] = { {0} };", null, 0),
             // Insert scope borders.
             // auto added = new HashSet<TElement>();
             // ~!added!~std::unordered_set<TElement> added;
@@ -207,6 +210,23 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // ~!random!~
             // 
             (new Regex(@"~!(?<pointer>[a-zA-Z0-9]+)!~"), "", null, 5),
+            // Insert method body scope starts.
+            // void PrintNodes(TElement node, StringBuilder sb, int level) {
+            // void PrintNodes(TElement node, StringBuilder sb, int level) {/*method-start*/
+            (new Regex(@"(?<start>\r?\n[\t ]+)(?<prefix>((virtual )?[a-zA-Z0-9:_]+ )?)(?<method>[a-zA-Z][a-zA-Z0-9]*)\((?<arguments>[^\)]*)\)(?<override>( override)?)(?<separator>[ \t\r\n]*)\{(?<end>[^~])"), "${start}${prefix}${method}(${arguments})${override}${separator}{/*method-start*/${end}", null, 0),
+            // Insert method body scope ends.
+            // {/*method-start*/...}
+            // {/*method-start*/.../*method-end*/}
+            (new Regex(@"\{/\*method-start\*/(?<body>((?<bracket>\{)|(?<-bracket>\})|[^\{\}]*)+)\}"), "{/*method-start*/${body}/*method-end*/}", null, 0),
+            // Inside method bodies replace:
+            // GetFirst(
+            // this->GetFirst(
+            //(new Regex(@"(?<separator>(\(|, |([\W]) |return ))(?<!(->|\* ))(?<method>(?!sizeof)[a-zA-Z0-9]+)\((?!\) \{)"), "${separator}this->${method}(", null, 1),
+            (new Regex(@"(?<scope>/\*method-start\*/)(?<before>((?<!/\*method-end\*/)(.|\n))*?)(?<separator>[\W](?<!(::|\.|->)))(?<method>(?!sizeof)[a-zA-Z0-9]+)\((?!\) \{)(?<after>(.|\n)*?)(?<scopeEnd>/\*method-end\*/)"), "${scope}${before}${separator}this->${method}(${after}${scopeEnd}", null, 100),
+            // Remove scope borders.
+            // /*method-start*/
+            // 
+            (new Regex(@"/\*method-(start|end)\*/"), "", null, 0),
         }.Cast<ISubstitutionRule>().ToList();
 
         public static readonly IList<ISubstitutionRule> LastStage = new List<SubstitutionRule>
@@ -231,7 +251,7 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             (new Regex(@"#if [a-zA-Z0-9]+\s+#endif"), "", null, 0),
             // [Fact]
             // 
-            (new Regex(@"(?<firstNewLine>\r?\n|\A)(?<indent>[\t ]+)\[[a-zA-Z0-9]+(\((?<expression>((?<parenthesis>\()|(?<-parenthesis>\))|[^()]*)+)(?(parenthesis)(?!))\))?\]\s*(\r?\n\k<indent>)?"), "${firstNewLine}${indent}", null, 5),
+            (new Regex(@"(?<firstNewLine>\r?\n|\A)(?<indent>[\t ]+)\[[a-zA-Z0-9]+(\((?<expression>((?<parenthesis>\()|(?<-parenthesis>\))|[^()]*)+)(?(parenthesis)(?!))\))?\][ \t]*(\r?\n\k<indent>)?"), "${firstNewLine}${indent}", null, 5),
             // \n ... namespace
             // namespace
             (new Regex(@"(\S[\r\n]{1,2})?[\r\n]+namespace"), "$1namespace", null, 0),
