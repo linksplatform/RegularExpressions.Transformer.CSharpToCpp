@@ -1,13 +1,13 @@
 {
-  "README.html": {
-    "href": "README.html",
-    "title": "RegularExpressions.Transformer.CSharpToCpp | LinksPlatform's Platform.RegularExpressions.Transformer.CSharpToCpp Library",
-    "keywords": "RegularExpressions.Transformer.CSharpToCpp LinksPlatform's Platform.RegularExpressions.Transformer.CSharpToCpp Class Library. Namespace: Platform.RegularExpressions.Transformer.CSharpToCpp Forked from: LinksPlatform/Collections.Methods/CSharpToCppTranslator NuGet package: Platform.RegularExpressions.Transformer.CSharpToCpp Documentation PDF file with code for e-readers. Depend on Platform.RegularExpressions.Transformer"
-  },
   "api/Platform.RegularExpressions.Transformer.CSharpToCpp.CSharpToCppTransformer.html": {
     "href": "api/Platform.RegularExpressions.Transformer.CSharpToCpp.CSharpToCppTransformer.html",
     "title": "Class CSharpToCppTransformer | LinksPlatform's Platform.RegularExpressions.Transformer.CSharpToCpp Library",
     "keywords": "Class CSharpToCppTransformer Inheritance Object CSharpToCppTransformer Namespace : Platform.RegularExpressions.Transformer.CSharpToCpp Assembly : Platform.RegularExpressions.Transformer.CSharpToCpp.dll Syntax public class CSharpToCppTransformer : Transformer Constructors | Improve this Doc View Source CSharpToCppTransformer() Declaration public CSharpToCppTransformer() | Improve this Doc View Source CSharpToCppTransformer(IList<ISubstitutionRule>) Declaration public CSharpToCppTransformer(IList<ISubstitutionRule> extraRules) Parameters Type Name Description IList < ISubstitutionRule > extraRules Fields | Improve this Doc View Source FirstStage Declaration public static readonly IList<ISubstitutionRule> FirstStage Field Value Type Description IList < ISubstitutionRule > | Improve this Doc View Source LastStage Declaration public static readonly IList<ISubstitutionRule> LastStage Field Value Type Description IList < ISubstitutionRule >"
+  },
+  "README.html": {
+    "href": "README.html",
+    "title": "RegularExpressions.Transformer.CSharpToCpp | LinksPlatform's Platform.RegularExpressions.Transformer.CSharpToCpp Library",
+    "keywords": "RegularExpressions.Transformer.CSharpToCpp LinksPlatform's Platform.RegularExpressions.Transformer.CSharpToCpp Class Library. Namespace: Platform.RegularExpressions.Transformer.CSharpToCpp Forked from: LinksPlatform/Collections.Methods/CSharpToCppTranslator NuGet package: Platform.RegularExpressions.Transformer.CSharpToCpp Documentation PDF file with code for e-readers. Depend on Platform.RegularExpressions.Transformer"
   },
   "api/Platform.RegularExpressions.Transformer.CSharpToCpp.html": {
     "href": "api/Platform.RegularExpressions.Transformer.CSharpToCpp.html",
