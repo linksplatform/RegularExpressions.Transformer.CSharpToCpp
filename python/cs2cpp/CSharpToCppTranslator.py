@@ -12,7 +12,6 @@ class CSharpToCppTranslator(Translator):
             codeString {str} -- source code on C# (default: {""})
             extra {list} -- include your own rules (default: {[]})
         """
-        Translator.__init__(self, codeString, rules)
         self.codeString = codeString
         self.extra = extra
         self.Transform = self.compile = self.translate # callable objects
@@ -23,6 +22,7 @@ class CSharpToCppTranslator(Translator):
             self.rules.append(rule)
         for i in CSharpToCppTranslator.LAST_RULES:
             self.rules.append(i)
+        Translator.__init__(self, codeString, self.rules)
 
     # Rules for translate code
     FIRST_RULES = [
