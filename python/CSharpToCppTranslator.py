@@ -118,7 +118,7 @@ class CSharpToCppTranslator:
         # Inside the scope of ~!root!~ replace:
         # root
         # *root
-        (r"(?P<definition>~!(?P<pointer>[a-zA-Z0-9]+)!~ref [a-zA-Z0-9]+ (?P<pointer>[a-zA-Z0-9]+)(?=\)|, | =))(?P<before>((?<!~!(?P=pointer)!~)(.|\n))*?)(?P<prefix>(\W |\())(?P=pointer)(?P<suffix>( |\)|;|,))", r'\{definition}\{before}\{prefix}*\{pointer}\{suffix}', None, 70),
+        (r"(?P<definition>~!(?P<pointer>[a-zA-Z0-9]+)!~ref [a-zA-Z0-9]+ (?P=pointer)(?=\)|, | =))(?P<before>((?<!~!(?P=pointer)!~)(.|\n))*?)(?P<prefix>(\W |\())(?P=pointer)(?P<suffix>( |\)|;|,))", r'\{definition}\{before}\{prefix}*\{pointer}\{suffix}', None, 70),
         # Remove scope borders.
         # ~!root!~
         # 
