@@ -4,13 +4,15 @@
 import re
 
 class CSharpToCppTranslator:
-    def __init__(self, codeString=""):
+    def __init__(self, codeString="", extra=[]):
         """initialize class
         
         Keyword Arguments:
             codeString {str} -- source code on C# (default: {""})
+            extra {list} -- include your own rules (default: {[]})
         """
         self.codeString = codeString
+        self.extra = extra
         self.Transform = self.compile = self.translate # callable objects
 
     def translate(self, src=None):
@@ -26,14 +28,27 @@ class CSharpToCppTranslator:
             current = src[:] # copy string
         else:
             current = self.codeString[:]
-        for i in CSharpToCppTranslator.RULES:
+
+        rules = CSharpToCppTranslator.FIRST_RULES[:]
+        for rule in self.extra:
+            rules.append(rule)
+        for i in CSharpToCppTranslator.LAST_RULES:
+            rules.append(i)
+
+        for i in rules:
             matchPattern = i[0]
             substitutionPattern = i[1]
-            pathPattern = i[2]
-            maximumRepeatCount = i[3]
+            if len(i) < 3:
+                pathPattern = None
+                maximumRepeatCount = 0
+            elif len(i) < 4:
+                pathPattern = i[2]
+                maximumRepeatCount = 0
+            else:
+                pathPattern = i[2]
+                maximumRepeatCount = i[3]
             if pathPattern == None: # or pathPattern.IsMatch(context.Path)
                 replaceCount = 0
-                #print(matchPattern)
                 current = re.sub(matchPattern, substitutionPattern, current)
                 while re.match(matchPattern, current):
                     if replaceCount+1 > maximumRepeatCount:
@@ -50,7 +65,7 @@ class CSharpToCppTranslator:
         self.codeString += "\n%s" % (string)
 
     # Rules for translate code
-    RULES = [
+    FIRST_RULES = [
         # // ...
         #
         (r'(\r?\n)?[ \t]+//+.+"', r"", None, 0),
@@ -253,4 +268,34 @@ class CSharpToCppTranslator:
         # /*method-start*/
         # 
         (r"/\*method-(start|end)\*/", r'', None, 0)
+    ]
+
+    LAST_RULES = [
+        # (expression)
+        # expression
+        (r"(\(| )\(([a-zA-Z0-9_\*:]+)\)(,| |;|\))", r"\1\2\3", None, 0),
+        # (method(expression))
+        # method(expression)
+        # !!ERROR!! (r"(?P<firstSeparator>(\(| ))\((?P<method>[a-zA-Z0-9_\->\*:]+)\((?P<expression>((?P<parenthesis>\()|(?<-parenthesis>\))|[a-zA-Z0-9_\->\*:]*)+)(?(parenthesis)(?!))\)\)(?P<lastSeparator>(,| |;|\)))", r"\{firstSeparator}\{method}(\{expression})\{lastSeparator}", None, 0),
+        # return ref _elements[node];
+        # return &_elements[node];
+        (r"return ref ([_a-zA-Z0-9]+)\[([_a-zA-Z0-9\*]+)\];", r"return &\1[\2];", None, 0),
+        # default
+        # 0
+        (r"(\W)default(\W)", r"\{1}0\2", None, 0),
+        # //#define ENABLE_TREE_AUTO_DEBUG_AND_VALIDATION
+        #
+        (r"\/\/[ \t]*\#define[ \t]+[_a-zA-Z0-9]+[ \t]*", r"", None, 0),
+        # #if USEARRAYPOOL\r\n#endif
+        #
+        (r"#if [a-zA-Z0-9]+\s+#endif", r"", None, 0),
+        # [Fact]
+        # 
+        # !!ERROR!! (r"(?P<firstNewLine>\r?\n|\A)(?P<indent>[\t ]+)\[[a-zA-Z0-9]+(\((?P<expression>((?P<parenthesis>\()|(?<-parenthesis>\))|[^()]*)+)(?(parenthesis)(?!))\))?\][ \t]*(\r?\n(?P=indent))?", r"\{firstNewLine}\{indent}", None, 5),
+        # \n ... namespace
+        # namespace
+        (r"(\S[\r\n]{1,2})?[\r\n]+namespace", r"\1namespace", None, 0),
+        # \n ... class
+        # class
+        (r"(\S[\r\n]{1,2})?[\r\n]+class", r"\1class", None, 0)
     ]
