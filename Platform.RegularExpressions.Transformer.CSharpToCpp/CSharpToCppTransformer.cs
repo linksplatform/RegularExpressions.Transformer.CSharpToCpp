@@ -23,6 +23,9 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // Platform.Collections.Methods.Lists
             // Platform::Collections::Methods::Lists
             (new Regex(@"(namespace[^\r\n]+?)\.([^\r\n]+?)"), "$1::$2", null, 20),
+            // out TProduct
+            // TProduct
+            (new Regex(@"(?<before>(<|, ))(in|out) (?<typeParameter>[a-zA-Z0-9]+)(?<after>(>|,))"), "${before}${typeParameter}${after}", null, 10),
             // public abstract class
             // class
             (new Regex(@"(public abstract|static) class"), "class", null, 0),
@@ -35,6 +38,12 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // static void TestMultipleCreationsAndDeletions<TElement>(SizedBinaryTreeMethodsBase<TElement> tree, TElement* root)
             // template<typename T> static void TestMultipleCreationsAndDeletions<TElement>(SizedBinaryTreeMethodsBase<TElement> tree, TElement* root)
             (new Regex(@"static ([a-zA-Z0-9]+) ([a-zA-Z0-9]+)<([a-zA-Z0-9]+)>\(([^\)]+)\)"), "template <typename $3> static $1 $2($4)", null, 0),
+            // interface IFactory<out TProduct> {
+            // template <typename TProduct> class IFactory { public:
+            (new Regex(@"interface (?<interface>[a-zA-Z0-9]+)<(?<typeParameters>[a-zA-Z0-9 ,]+)>(?<whitespace>[^{]+){"), "template <typename ${typeParameters}> class ${interface}${whitespace}{" + Environment.NewLine + "    public:", null, 0),
+            // template <typename TObject, TProperty, TValue>
+            // template <typename TObject, typename TProperty, TValue>
+            (new Regex(@"(?<before>template <((, )?typename [a-zA-Z0-9]+)+, )(?<typeParameter>[a-zA-Z0-9]+)(?<after>(,|>))"), "${before}typename ${typeParameter}${after}", null, 10),
             // (this 
             // (
             (new Regex(@"\(this "), "(", null, 0),
@@ -53,6 +62,9 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // protected abstract TElement GetFirst();
             // virtual TElement GetFirst() = 0;
             (new Regex(@"protected abstract ([^;]+);"), "virtual $1 = 0;", null, 0),
+            // protected abstract TElement GetFirst();
+            // virtual TElement GetFirst() = 0;
+            (new Regex(@"([a-zA-Z0-9]+ [a-zA-Z0-9]+\([^\)]*\));"), "virtual $1 = 0;", null, 0),
             // public virtual
             // virtual
             (new Regex(@"public virtual"), "virtual", null, 0),
@@ -128,6 +140,9 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // class SizedBinaryTreeMethodsBase : GenericCollectionMethodsBase
             // class SizedBinaryTreeMethodsBase : public GenericCollectionMethodsBase
             (new Regex(@"class ([a-zA-Z0-9]+) : ([a-zA-Z0-9]+)"), "class $1 : public $2", null, 0),
+            // class IProperty : ISetter<TValue, TObject>, IProvider<TValue, TObject>
+            // class IProperty : public ISetter<TValue, TObject>, IProvider<TValue, TObject>
+            (new Regex(@"(?<before>class [a-zA-Z0-9]+ : ((public [a-zA-Z0-9]+(<[a-zA-Z0-9 ,]+>)?, )+)?)(?<inheritedType>(?!public)[a-zA-Z0-9]+(<[a-zA-Z0-9 ,]+>)?)(?<after>(, [a-zA-Z0-9]+(?!>)|[ \r\n]+))"), "${before}public ${inheritedType}${after}", null, 10),
             // Insert scope borders.
             // ref TElement root
             // ~!root!~ref TElement root
