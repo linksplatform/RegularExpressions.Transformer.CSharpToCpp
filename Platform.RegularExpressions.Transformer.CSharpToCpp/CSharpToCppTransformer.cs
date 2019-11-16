@@ -62,9 +62,9 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // protected abstract TElement GetFirst();
             // virtual TElement GetFirst() = 0;
             (new Regex(@"protected abstract ([^;]+);"), "virtual $1 = 0;", null, 0),
-            // protected abstract TElement GetFirst();
+            // TElement GetFirst();
             // virtual TElement GetFirst() = 0;
-            (new Regex(@"([a-zA-Z0-9]+ [a-zA-Z0-9]+\([^\)]*\));"), "virtual $1 = 0;", null, 0),
+            (new Regex(@"([\r\n]+[ ]+)([a-zA-Z0-9]+ [a-zA-Z0-9]+\([^\)]*\))(;[ ]*[\r\n]+)"), "$1virtual $2 = 0$3", null, 0),
             // public virtual
             // virtual
             (new Regex(@"public virtual"), "virtual", null, 0),
