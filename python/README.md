@@ -10,7 +10,7 @@ from cs2cpp import CSharpToCppTranslator
 ```python
 cscpp = CSharpToCpp()
 sourceCode = """using System;
- // This is hello world program.
+// This is hello world program.
 class Program
 {
     public static void Main(string[] args)
@@ -20,5 +20,5 @@ class Program
         Console.WriteLine("Hello, world!");
     }
 }"""
- print(cscpp.Transform(sourceCode)) # translate code from C# to C++!
+print(cscpp.Transform(sourceCode)) # translate code from C# to C++!
 ```
