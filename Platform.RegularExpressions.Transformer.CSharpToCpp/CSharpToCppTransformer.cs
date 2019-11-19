@@ -128,6 +128,9 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // char*[] args
             // char* args[]
             (new Regex(@"([_a-zA-Z0-9:\*]?)\[\] ([a-zA-Z0-9]+)"), "$1 $2[]", null, 0),
+            // @object
+            // object
+            (new Regex(@"@([_a-zA-Z0-9]+)"), "$1", null, 0),
             // using Platform.Numbers;
             // 
             (new Regex(@"([\r\n]{2}|^)\s*?using [\.a-zA-Z0-9]+;\s*?$"), "", null, 0),
