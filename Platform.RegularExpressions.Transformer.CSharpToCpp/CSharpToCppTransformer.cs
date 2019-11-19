@@ -249,6 +249,9 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
 
         public static readonly IList<ISubstitutionRule> LastStage = new List<SubstitutionRule>
         {
+            // ICounter<int, int> c1;
+            // ICounter<int, int>* c1;
+            (new Regex(@"(?<abstractType>I[A-Z][a-zA-Z0-9]+(<[^>\r\n]+>)?) (?<variable>[_a-zA-Z0-9]+);"), "${abstractType}* ${variable};", null, 0),
             // (expression)
             // expression
             (new Regex(@"(\(| )\(([a-zA-Z0-9_\*:]+)\)(,| |;|\))"), "$1$2$3", null, 0),
