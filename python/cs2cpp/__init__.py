@@ -3,6 +3,6 @@
 
 from .CSharpToCpp import CSharpToCpp
 
-__version__ = "0.0.7"
+__version__ = "0.0.8"
 __copyright__ = "2019"
 __authors__ = ["Ethosa", "Konard"]
