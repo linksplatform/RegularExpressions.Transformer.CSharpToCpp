@@ -1,6 +1,6 @@
 import cs2cpp
 
-cpp = cs2cpp.CSharpToCppTranslator(extra=[(r"class", r'абрикосокласс')])
+cpp = cs2cpp.CSharpToCpp(useRegex=1)
 
 print(cpp.Transform("""using System;
 
