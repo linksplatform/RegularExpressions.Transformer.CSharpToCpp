@@ -121,7 +121,7 @@ class CSharpToCpp(Translator):
         (r"\$\"\"", r"\"", None, 0),
         # Console.WriteLine("...")
         # printf("...\n")
-        (r"Console\.WriteLine\(\"([^\"\"]+)\"\)", r"printf(\"\1\\n\")", None, 0),
+        (r"Console\.WriteLine\(\"([^\"]+)\"\)", r"printf(\"\1\\n\")", None, 0),
         # throw new InvalidOperationException
         # throw std::exception
         (r"throw new (InvalidOperationException|Exception)", r"throw std::exception", None, 0),
