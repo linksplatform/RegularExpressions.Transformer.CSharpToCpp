@@ -148,7 +148,7 @@ class CSharpToCpp(Translator):
         (r"(struct|class) ([a-zA-Z0-9]+)(\s+){([\sa-zA-Z0-9;:_]+?)}([^;])", r"\1 \2\3{\4};\5", None, 0),
         # class Program { }
         # class Program { };
-        (r"(struct|class) ([a-zA-Z0-9]+[^\r\n]*)([\r\n]+(?<indentLevel>[\t ]*)?)\{([\S\s]+?[\r\n]+\k<indentLevel>)\}([^;]|$)", r"\1 \2\3{\4};\5", None, 0),
+        (r"(struct|class) ([a-zA-Z0-9]+[^\r\n]*)([\r\n]+(?<indentLevel>[\t ]*)?)\{([\S\s]+?[\r\n]+\k<indentLevel>)\}([^;]|$)", r"\1 \2\3{\4\5};\6", None, 0),
         # class SizedBinaryTreeMethodsBase : GenericCollectionMethodsBase
         # class SizedBinaryTreeMethodsBase : public GenericCollectionMethodsBase
         (r"class ([a-zA-Z0-9]+) : ([a-zA-Z0-9]+)", r"class \1 : public \2", None, 0),
