@@ -248,6 +248,19 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // /*method-start*/
             // 
             (new Regex(@"/\*method-(start|end)\*/"), "", null, 0),
+            // throw new ArgumentNullException(argumentName, message);
+            // throw std::invalid_argument(((std::string)"Argument ").append(argumentName).append(" is null: ").append(message).append("."));
+            (new Regex(@"throw new ArgumentNullException\((?<argument>[a-zA-Z]*[Aa]rgument[a-zA-Z]*), (?<message>[a-zA-Z]*[Mm]essage[a-zA-Z]*)\);"), "throw std::invalid_argument(((std::string)\"Argument \").append(${argument}).append(\" is null: \").append(${message}).append(\".\"));", null, 0),
+            // throw new ArgumentException(message, argumentName);
+            // throw std::invalid_argument(((std::string)"Invalid ").append(argumentName).append(" argument: ").append(message).append("."));
+            (new Regex(@"throw new ArgumentException\((?<message>[a-zA-Z]*[Mm]essage[a-zA-Z]*), (?<argument>[a-zA-Z]*[Aa]rgument[a-zA-Z]*)\);"), "throw std::invalid_argument(((std::string)\"Invalid \").append(${argument}).append(\" argument: \").append(${message}).append(\".\"));", null, 0),
+            // throw new NotSupportedException();
+            // throw std::logic_error("Not supported exception.");
+            (new Regex(@"throw new NotSupportedException\(\);"), "throw std::logic_error(\"Not supported exception.\");", null, 0),
+            // throw new NotImplementedException();
+            // throw std::logic_error("Not implemented exception.");
+            (new Regex(@"throw new NotImplementedException\(\);"), "throw std::logic_error(\"Not implemented exception.\");", null, 0),
+
         }.Cast<ISubstitutionRule>().ToList();
 
         public static readonly IList<ISubstitutionRule> LastStage = new List<SubstitutionRule>
