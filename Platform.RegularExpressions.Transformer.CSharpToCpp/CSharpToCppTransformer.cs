@@ -26,6 +26,9 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // out TProduct
             // TProduct
             (new Regex(@"(?<before>(<|, ))(in|out) (?<typeParameter>[a-zA-Z0-9]+)(?<after>(>|,))"), "${before}${typeParameter}${after}", null, 10),
+            // static class Ensure ... public static readonly EnsureAlwaysExtensionRoot Always = new EnsureAlwaysExtensionRoot(); ... } }
+            // static class Ensure ... static EnsureAlwaysExtensionRoot Always; ... } EnsureAlwaysExtensionRoot Ensure::Always; }
+            (new Regex(@"static class (?<class>[a-zA-Z0-9]+)(?<before>[\s\S\r\n]+)public static readonly (?<type>[a-zA-Z0-9]+) (?<name>[a-zA-Z0-9_]+) = new \k<type>\(\);(?<after>[\s\S]+[\r\n]+)(?<indent>[ ]+)}(?<ending>[a-zA-Z:; \r\n]+}[ \r\n]+$)"), "static class ${class}${before}static ${type} ${name};${after}${indent}}\r\n${indent}${type} ${class}::${name};${ending}", null, 10),
             // public abstract class
             // class
             (new Regex(@"(public abstract|static) class"), "class", null, 0),
