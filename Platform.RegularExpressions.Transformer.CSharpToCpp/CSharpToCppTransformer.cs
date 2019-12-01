@@ -56,6 +56,9 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // Action<TElement> free
             // std::function<void(TElement)> free
             (new Regex(@"Action<([a-zA-Z0-9]+)> ([a-zA-Z0-9]+)"), "std::function<void($1)> $2", null, 0),
+            // Predicate<TArgument> predicate
+            // std::function<bool(TArgument)> predicate
+            (new Regex(@"Predicate<([a-zA-Z0-9]+)> ([a-zA-Z0-9]+)"), "std::function<bool($1)> $2", null, 0),
             // private const int MaxPath = 92;
             // static const int MaxPath = 92;
             (new Regex(@"private (const|static readonly) ([a-zA-Z0-9]+) ([_a-zA-Z0-9]+) = ([^;]+);"), "static const $2 $3 = $4;", null, 0),
