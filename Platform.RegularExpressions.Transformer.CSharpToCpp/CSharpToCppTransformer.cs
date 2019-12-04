@@ -26,9 +26,6 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // out TProduct
             // TProduct
             (new Regex(@"(?<before>(<|, ))(in|out) (?<typeParameter>[a-zA-Z0-9]+)(?<after>(>|,))"), "${before}${typeParameter}${after}", null, 10),
-            // static class Ensure ... public static readonly EnsureAlwaysExtensionRoot Always = new EnsureAlwaysExtensionRoot(); ... } }
-            // static class Ensure ... static EnsureAlwaysExtensionRoot Always; ... } EnsureAlwaysExtensionRoot Ensure::Always; }
-            (new Regex(@"static class (?<class>[a-zA-Z0-9]+)(?<before>[\s\S\r\n]+)public static readonly (?<type>[a-zA-Z0-9]+) (?<name>[a-zA-Z0-9_]+) = new \k<type>\(\);(?<after>[\s\S]+[\r\n]+)(?<indent>[ ]+)}(?<ending>[a-zA-Z:; \r\n]+}[ \r\n]+$)"), "static class ${class}${before}static ${type} ${name};${after}${indent}}\r\n${indent}${type} ${class}::${name};${ending}", null, 10),
             // public abstract class
             // class
             (new Regex(@"(public abstract|static) class"), "class", null, 0),
@@ -59,6 +56,12 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // Predicate<TArgument> predicate
             // std::function<bool(TArgument)> predicate
             (new Regex(@"Predicate<([a-zA-Z0-9]+)> ([a-zA-Z0-9]+)"), "std::function<bool($1)> $2", null, 0),
+            // public static readonly EnsureAlwaysExtensionRoot Always = new EnsureAlwaysExtensionRoot();
+            // inline static EnsureAlwaysExtensionRoot Always;
+            (new Regex(@"public static readonly (?<type>[a-zA-Z0-9]+) (?<name>[a-zA-Z0-9_]+) = new \k<type>\(\);"), "inline static ${type} ${name};", null, 0),
+            // public static readonly string ExceptionContentsSeparator = "---";
+            // inline static const char* ExceptionContentsSeparator = "---";
+            (new Regex(@"public static readonly string (?<name>[a-zA-Z0-9_]+) = ""(?<string>(\""|[^""])+)"";"), "inline static const char* ${name} = \"${string}\";", null, 0),
             // private const int MaxPath = 92;
             // static const int MaxPath = 92;
             (new Regex(@"private (const|static readonly) ([a-zA-Z0-9]+) ([_a-zA-Z0-9]+) = ([^;]+);"), "static const $2 $3 = $4;", null, 0),
