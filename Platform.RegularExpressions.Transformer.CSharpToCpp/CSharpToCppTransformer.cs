@@ -123,8 +123,14 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // printf("...\n")
             (new Regex(@"Console\.WriteLine\(""([^""\r\n]+)""\)"), "printf(\"$1\\n\")", null, 0),
             // throw new InvalidOperationException
-            // throw std::exception
-            (new Regex(@"throw new (InvalidOperationException|Exception)"), "throw std::exception", null, 0),
+            // throw std::runtime_error
+            (new Regex(@"throw new (InvalidOperationException|Exception)"), "throw std::runtime_error", null, 0),
+            // void RaiseExceptionIgnoredEvent(Exception exception)
+            // void RaiseExceptionIgnoredEvent(const std::exception& exception)
+            (new Regex(@"(\(|, )(System\.Exception|Exception)( |\))"), "$1const std::exception&$3", null, 0),
+            // EventHandler<Exception>
+            // EventHandler<std::exception>
+            (new Regex(@"(\W)(System\.Exception|Exception)(\W)"), "$1std::exception$3", null, 0),
             // override void PrintNode(TElement node, StringBuilder sb, int level)
             // void PrintNode(TElement node, StringBuilder sb, int level) override
             (new Regex(@"override ([a-zA-Z0-9 \*\+]+)(\([^\)\r\n]+?\))"), "$1$2 override", null, 0),
