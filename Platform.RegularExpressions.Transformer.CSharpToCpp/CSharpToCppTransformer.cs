@@ -92,12 +92,15 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // private
             // 
             (new Regex(@"(\W)(private|protected|public|internal) "), "$1", null, 0),
+            // static void NotImplementedException(ThrowExtensionRoot root) => throw new NotImplementedException();
+            // static void NotImplementedException(ThrowExtensionRoot root) { return throw new NotImplementedException(); }
+            (new Regex(@"(^\s+)(template \<[^>\r\n]+\> )?(static )?(override )?([a-zA-Z0-9]+ )([a-zA-Z0-9]+)\(([^\(\r\n]*)\)\s+=>\s+throw([^;\r\n]+);"), "$1$2$3$4$5$6($7) { throw$8; }", null, 0),
             // SizeBalancedTree(int capacity) => a = b;
             // SizeBalancedTree(int capacity) { a = b; }
-            (new Regex(@"(^\s+)(override )?(void )?([a-zA-Z0-9]+)\(([^\(\r\n]*)\)\s+=>\s+([^;\r\n]+);"), "$1$2$3$4($5) { $6; }", null, 0),
+            (new Regex(@"(^\s+)(template \<[^>\r\n]+\> )?(static )?(override )?(void )?([a-zA-Z0-9]+)\(([^\(\r\n]*)\)\s+=>\s+([^;\r\n]+);"), "$1$2$3$4$5$6($7) { $8; }", null, 0),
             // int SizeBalancedTree(int capacity) => a;
             // int SizeBalancedTree(int capacity) { return a; }
-            (new Regex(@"(^\s+)(override )?([a-zA-Z0-9]+ )([a-zA-Z0-9]+)\(([^\(\r\n]*)\)\s+=>\s+([^;\r\n]+);"), "$1$2$3$4($5) { return $6; }", null, 0),
+            (new Regex(@"(^\s+)(template \<[^>\r\n]+\> )?(static )?(override )?([a-zA-Z0-9]+ )([a-zA-Z0-9]+)\(([^\(\r\n]*)\)\s+=>\s+([^;\r\n]+);"), "$1$2$3$4$5$6($7) { return $8; }", null, 0),
             // () => Integer<TElement>.Zero,
             // () { return Integer<TElement>.Zero; },
             (new Regex(@"\(\)\s+=>\s+([^,;\r\n]+?),"), "() { return $1; },", null, 0),
