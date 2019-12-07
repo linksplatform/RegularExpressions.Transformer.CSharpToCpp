@@ -47,15 +47,6 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // (this 
             // (
             (new Regex(@"\(this "), "(", null, 0),
-            // Func<TElement> treeCount
-            // std::function<TElement()> treeCount
-            (new Regex(@"Func<([a-zA-Z0-9]+)> ([a-zA-Z0-9]+)"), "std::function<$1()> $2", null, 0),
-            // Action<TElement> free
-            // std::function<void(TElement)> free
-            (new Regex(@"Action<([a-zA-Z0-9]+)> ([a-zA-Z0-9]+)"), "std::function<void($1)> $2", null, 0),
-            // Predicate<TArgument> predicate
-            // std::function<bool(TArgument)> predicate
-            (new Regex(@"Predicate<([a-zA-Z0-9]+)> ([a-zA-Z0-9]+)"), "std::function<bool($1)> $2", null, 0),
             // public static readonly EnsureAlwaysExtensionRoot Always = new EnsureAlwaysExtensionRoot();
             // inline static EnsureAlwaysExtensionRoot Always;
             (new Regex(@"public static readonly (?<type>[a-zA-Z0-9]+) (?<name>[a-zA-Z0-9_]+) = new \k<type>\(\);"), "inline static ${type} ${name};", null, 0),
@@ -113,6 +104,15 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // Count => GetSizeOrZero(Root);
             // GetCount() { return GetSizeOrZero(Root); }
             (new Regex(@"([A-Z][a-z]+)\s+=>\s+([^;\r\n]+);"), "Get$1() { return $2; }", null, 0),
+            // Func<TElement> treeCount
+            // std::function<TElement()> treeCount
+            (new Regex(@"Func<([a-zA-Z0-9]+)> ([a-zA-Z0-9]+)"), "std::function<$1()> $2", null, 0),
+            // Action<TElement> free
+            // std::function<void(TElement)> free
+            (new Regex(@"Action<([a-zA-Z0-9]+)> ([a-zA-Z0-9]+)"), "std::function<void($1)> $2", null, 0),
+            // Predicate<TArgument> predicate
+            // std::function<bool(TArgument)> predicate
+            (new Regex(@"Predicate<([a-zA-Z0-9]+)> ([a-zA-Z0-9]+)"), "std::function<bool($1)> $2", null, 0),
             // var
             // auto
             (new Regex(@"(\W)var(\W)"), "$1auto$2", null, 0),
