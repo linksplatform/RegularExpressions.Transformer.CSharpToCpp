@@ -103,7 +103,7 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             (new Regex(@", \(\) { return ([^;\r\n]+); }"), ", [&]()-> auto { return $1; }", null, 0),
             // Count => GetSizeOrZero(Root);
             // GetCount() { return GetSizeOrZero(Root); }
-            (new Regex(@"([A-Z][a-z]+)\s+=>\s+([^;\r\n]+);"), "Get$1() { return $2; }", null, 0),
+            (new Regex(@"(\W)([A-Z][a-zA-Z]+)\s+=>\s+([^;\r\n]+);"), "$1Get$2() { return $3; }", null, 0),
             // Func<TElement> treeCount
             // std::function<TElement()> treeCount
             (new Regex(@"Func<([a-zA-Z0-9]+)> ([a-zA-Z0-9]+)"), "std::function<$1()> $2", null, 0),
