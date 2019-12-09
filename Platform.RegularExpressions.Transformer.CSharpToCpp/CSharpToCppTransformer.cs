@@ -298,6 +298,9 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // default
             // 0
             (new Regex(@"(\W)default(\W)"), "${1}0$2", null, 0),
+            // #region Always
+            // 
+            (new Regex(@"(^|\r?\n)[ \t]*\#(region|endregion)[^\r\n]*(\r?\n|$)"), "", null, 0),
             // //#define ENABLE_TREE_AUTO_DEBUG_AND_VALIDATION
             //
             (new Regex(@"\/\/[ \t]*\#define[ \t]+[_a-zA-Z0-9]+[ \t]*"), "", null, 0),
