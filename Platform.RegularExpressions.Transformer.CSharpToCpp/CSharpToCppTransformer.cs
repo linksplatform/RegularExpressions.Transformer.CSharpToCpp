@@ -119,6 +119,9 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // unchecked
             // 
             (new Regex(@"[\r\n]{2}\s*?unchecked\s*?$"), "", null, 0),
+            // $"Argument {argumentName} is null."
+            // ((std::string)"Argument ").append(argumentName).append(" is null.")
+            (new Regex(@"\$""(?<left>(\\""|[^""\r\n])*){(?<expression>[_a-zA-Z0-9]+)}(?<right>(\\""|[^""\r\n])*)"""), "((std::string)$\"${left}\").append(${expression}).append(\"${right}\")", null, 10),
             // $"
             // "
             (new Regex(@"\$"""), "\"", null, 0),
