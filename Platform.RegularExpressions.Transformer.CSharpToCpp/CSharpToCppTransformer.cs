@@ -297,10 +297,10 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             (new Regex(@"return ref ([_a-zA-Z0-9]+)\[([_a-zA-Z0-9\*]+)\];"), "return &$1[$2];", null, 0),
             // null
             // NULL
-            (new Regex(@"(\W)null(\W)"), "$1NULL$2", null, 0),
+            (new Regex(@"(?<before>\r?\n[^""\r\n]*(""(\\""|[^""\r\n])*""[^""\r\n]*)*)(?<=\W)null(?<after>\W)"), "${before}NULL${after}", null, 10),
             // default
             // 0
-            (new Regex(@"(\W)default(\W)"), "${1}0$2", null, 0),
+            (new Regex(@"(?<before>\r?\n[^""\r\n]*(""(\\""|[^""\r\n])*""[^""\r\n]*)*)(?<=\W)default(?<after>\W)"), "${before}0${after}", null, 10),
             // #region Always
             // 
             (new Regex(@"(^|\r?\n)[ \t]*\#(region|endregion)[^\r\n]*(\r?\n|$)"), "", null, 0),
