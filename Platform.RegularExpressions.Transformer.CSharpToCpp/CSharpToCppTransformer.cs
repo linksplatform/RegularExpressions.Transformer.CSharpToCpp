@@ -295,6 +295,9 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // return ref _elements[node];
             // return &_elements[node];
             (new Regex(@"return ref ([_a-zA-Z0-9]+)\[([_a-zA-Z0-9\*]+)\];"), "return &$1[$2];", null, 0),
+            // null
+            // NULL
+            (new Regex(@"(\W)null(\W)"), "$1NULL$2", null, 0),
             // default
             // 0
             (new Regex(@"(\W)default(\W)"), "${1}0$2", null, 0),
