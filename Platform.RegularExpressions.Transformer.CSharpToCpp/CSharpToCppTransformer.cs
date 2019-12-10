@@ -57,8 +57,8 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // static const int MaxPath = 92;
             (new Regex(@"private (const|static readonly) ([a-zA-Z0-9]+) ([_a-zA-Z0-9]+) = ([^;\r\n]+);"), "static const $2 $3 = $4;", null, 0),
             //  ArgumentNotNull(EnsureAlwaysExtensionRoot root, TArgument argument) where TArgument : class
-            //  ArgumentNotNull(EnsureAlwaysExtensionRoot root, TArgument& argument)
-            (new Regex(@"(?<before> [a-zA-Z]+\(([a-zA-Z *,]+, |))(?<type>[a-zA-Z]+)(?<after>(| [a-zA-Z *,]+)\))[ \r\n]+where \k<type> : class"), "${before}${type}&${after}", null, 0),
+            //  ArgumentNotNull(EnsureAlwaysExtensionRoot root, TArgument* argument)
+            (new Regex(@"(?<before> [a-zA-Z]+\(([a-zA-Z *,]+, |))(?<type>[a-zA-Z]+)(?<after>(| [a-zA-Z *,]+)\))[ \r\n]+where \k<type> : class"), "${before}${type}*${after}", null, 0),
             // protected virtual
             // virtual
             (new Regex(@"protected virtual"), "virtual", null, 0),
