@@ -132,8 +132,8 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // void PrintNode(TElement node, StringBuilder sb, int level) override
             (new Regex(@"override ([a-zA-Z0-9 \*\+]+)(\([^\)\r\n]+?\))"), "$1$2 override", null, 0),
             // string
-            // char*
-            (new Regex(@"(\W)string(\W)"), "$1char*$2", null, 0),
+            // std::string
+            (new Regex(@"(\W)string(\W)"), "$1std::string$2", null, 0),
             // sbyte
             // std::int8_t
             (new Regex(@"(\W)sbyte(\W)"), "$1std::int8_t$2", null, 0),
