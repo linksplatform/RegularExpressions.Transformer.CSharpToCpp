@@ -119,15 +119,6 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // unchecked
             // 
             (new Regex(@"[\r\n]{2}\s*?unchecked\s*?$"), "", null, 0),
-            // $"Argument {argumentName} is null."
-            // ((std::string)"Argument ").append(argumentName).append(" is null.")
-            (new Regex(@"\$""(?<left>(\\""|[^""\r\n])*){(?<expression>[_a-zA-Z0-9]+)}(?<right>(\\""|[^""\r\n])*)"""), "((std::string)$\"${left}\").append(${expression}).append(\"${right}\")", null, 10),
-            // $"
-            // "
-            (new Regex(@"\$"""), "\"", null, 0),
-            // Console.WriteLine("...")
-            // printf("...\n")
-            (new Regex(@"Console\.WriteLine\(""([^""\r\n]+)""\)"), "printf(\"$1\\n\")", null, 0),
             // throw new InvalidOperationException
             // throw std::runtime_error
             (new Regex(@"throw new (InvalidOperationException|Exception)"), "throw std::runtime_error", null, 0),
@@ -212,6 +203,15 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // Assert.Equal
             // Assert::AreEqual
             (new Regex(@"Assert\.Equal"), "Assert::AreEqual", null, 0),
+            // $"Argument {argumentName} is null."
+            // ((std::string)"Argument ").append(argumentName).append(" is null.")
+            (new Regex(@"\$""(?<left>(\\""|[^""\r\n])*){(?<expression>[_a-zA-Z0-9]+)}(?<right>(\\""|[^""\r\n])*)"""), "((std::string)$\"${left}\").append(${expression}).append(\"${right}\")", null, 10),
+            // $"
+            // "
+            (new Regex(@"\$"""), "\"", null, 0),
+            // Console.WriteLine("...")
+            // printf("...\n")
+            (new Regex(@"Console\.WriteLine\(""([^""\r\n]+)""\)"), "printf(\"$1\\n\")", null, 0),
             // TElement Root;
             // TElement Root = 0;
             (new Regex(@"(\r?\n[\t ]+)([a-zA-Z0-9:_]+(?<!return)) ([_a-zA-Z0-9]+);"), "$1$2 $3 = 0;", null, 0),
