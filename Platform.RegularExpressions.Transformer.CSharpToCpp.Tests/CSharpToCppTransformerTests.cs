@@ -18,7 +18,7 @@ class Program
             const string expectedResult = @"class Program
 {
     public:
-    static void Main(char* args[])
+    static void Main(const char* args[])
     {
         printf(""Hello, world!\n"");
     }

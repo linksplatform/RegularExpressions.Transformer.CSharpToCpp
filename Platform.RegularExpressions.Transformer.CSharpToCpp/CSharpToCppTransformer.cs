@@ -132,8 +132,8 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // void PrintNode(TElement node, StringBuilder sb, int level) override
             (new Regex(@"override ([a-zA-Z0-9 \*\+]+)(\([^\)\r\n]+?\))"), "$1$2 override", null, 0),
             // string
-            // std::string
-            (new Regex(@"(\W)string(\W)"), "$1std::string$2", null, 0),
+            // const char*
+            (new Regex(@"(\W)string(\W)"), "$1const char*$2", null, 0),
             // sbyte
             // std::int8_t
             (new Regex(@"(\W)sbyte(\W)"), "$1std::int8_t$2", null, 0),
@@ -204,8 +204,8 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // Assert::AreEqual
             (new Regex(@"Assert\.Equal"), "Assert::AreEqual", null, 0),
             // $"Argument {argumentName} is null."
-            // ((std::string)"Argument ").append(argumentName).append(" is null.")
-            (new Regex(@"\$""(?<left>(\\""|[^""\r\n])*){(?<expression>[_a-zA-Z0-9]+)}(?<right>(\\""|[^""\r\n])*)"""), "((std::string)$\"${left}\").append(${expression}).append(\"${right}\")", null, 10),
+            // ((std::string)"Argument ").append(argumentName).append(" is null.").data()
+            (new Regex(@"\$""(?<left>(\\""|[^""\r\n])*){(?<expression>[_a-zA-Z0-9]+)}(?<right>(\\""|[^""\r\n])*)"""), "((std::string)$\"${left}\").append(${expression}).append(\"${right}\").data()", null, 10),
             // $"
             // "
             (new Regex(@"\$"""), "\"", null, 0),
