@@ -224,10 +224,10 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // Insert scope borders.
             // auto added = new StringBuilder();
             // /*~sb~*/std::string added;
-            (new Regex(@"auto (?<variable>[a-zA-Z0-9]+) = new StringBuilder\(\);"), "/*~${variable}~*/std::string ${variable};", null, 0),
+            (new Regex(@"(auto|(System\.Text\.)?StringBuilder) (?<variable>[a-zA-Z0-9]+) = new (System\.Text\.)?StringBuilder\(\);"), "/*~${variable}~*/std::string ${variable};", null, 0),
             // static void Indent(StringBuilder sb, int level)
             // static void Indent(/*~sb~*/StringBuilder sb, int level)
-            (new Regex(@"(?<start>, |\()StringBuilder (?<variable>[a-zA-Z0-9]+)(?<end>,|\))"), "${start}/*~${variable}~*/std::string ${variable}${end}", null, 0),
+            (new Regex(@"(?<start>, |\()(System\.Text\.)?StringBuilder (?<variable>[a-zA-Z0-9]+)(?<end>,|\))"), "${start}/*~${variable}~*/std::string ${variable}${end}", null, 0),
             // Inside the scope of ~!added!~ replace:
             // sb.ToString()
             // sb.data()
