@@ -222,6 +222,30 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // TElement path[MaxPath] = { {0} };
             (new Regex(@"(\r?\n[\t ]+)[a-zA-Z0-9]+ ([a-zA-Z0-9]+) = new ([a-zA-Z0-9]+)\[([_a-zA-Z0-9]+)\];"), "$1$3 $2[$4] = { {0} };", null, 0),
             // Insert scope borders.
+            // auto added = new StringBuilder();
+            // /*~sb~*/std::string added;
+            (new Regex(@"auto (?<variable>[a-zA-Z0-9]+) = new StringBuilder\(\);"), "/*~${variable}~*/std::string ${variable};", null, 0),
+            // static void Indent(StringBuilder sb, int level)
+            // static void Indent(/*~sb~*/StringBuilder sb, int level)
+            (new Regex(@"(?<start>, |\()StringBuilder (?<variable>[a-zA-Z0-9]+)(?<end>,|\))"), "${start}/*~${variable}~*/std::string ${variable}${end}", null, 0),
+            // Inside the scope of ~!added!~ replace:
+            // sb.ToString()
+            // sb.data()
+            (new Regex(@"(?<scope>/\*~(?<variable>[a-zA-Z0-9]+)~\*/)(?<separator>.|\n)(?<before>((?<!/\*~\k<variable>~\*/)(.|\n))*?)\k<variable>\.ToString\(\)"), "${scope}${separator}${before}${variable}.data()", null, 10),
+            // sb.AppendLine(argument)
+            // sb.append(argument).append('\n')
+            (new Regex(@"(?<scope>/\*~(?<variable>[a-zA-Z0-9]+)~\*/)(?<separator>.|\n)(?<before>((?<!/\*~\k<variable>~\*/)(.|\n))*?)\k<variable>\.AppendLine\((?<argument>[^\),\r\n]+)\)"), "${scope}${separator}${before}${variable}.append(${argument}).append('\\n')", null, 10),
+            // sb.Append('\t', level);
+            // sb.append(level, '\t');
+            (new Regex(@"(?<scope>/\*~(?<variable>[a-zA-Z0-9]+)~\*/)(?<separator>.|\n)(?<before>((?<!/\*~\k<variable>~\*/)(.|\n))*?)\k<variable>\.Append\('(?<character>[^'\r\n]+)', (?<count>[^\),\r\n]+)\)"), "${scope}${separator}${before}${variable}.append(${count}, '${character}')", null, 10),
+            // sb.Append(argument)
+            // sb.append(argument)
+            (new Regex(@"(?<scope>/\*~(?<variable>[a-zA-Z0-9]+)~\*/)(?<separator>.|\n)(?<before>((?<!/\*~\k<variable>~\*/)(.|\n))*?)\k<variable>\.Append\((?<argument>[^\),\r\n]+)\)"), "${scope}${separator}${before}${variable}.append(${argument})", null, 10),
+            // Remove scope borders.
+            // /*~sb~*/
+            // 
+            (new Regex(@"/\*~(?<pointer>[a-zA-Z0-9]+)~\*/"), "", null, 0),
+            // Insert scope borders.
             // auto added = new HashSet<TElement>();
             // ~!added!~std::unordered_set<TElement> added;
             (new Regex(@"auto (?<variable>[a-zA-Z0-9]+) = new HashSet<(?<element>[a-zA-Z0-9]+)>\(\);"), "~!${variable}!~std::unordered_set<${element}> ${variable};", null, 0),
