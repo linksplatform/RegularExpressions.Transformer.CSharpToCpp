@@ -305,7 +305,6 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // throw new NotImplementedException();
             // throw std::logic_error("Not implemented exception.");
             (new Regex(@"throw new NotImplementedException\(\);"), "throw std::logic_error(\"Not implemented exception.\");", null, 0),
-
         }.Cast<ISubstitutionRule>().ToList();
 
         public static readonly IList<ISubstitutionRule> LastStage = new List<SubstitutionRule>
