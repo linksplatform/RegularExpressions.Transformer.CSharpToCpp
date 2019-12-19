@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="cs2cpp",
-    version="0.0.8",
+    version="0.0.10",
     author="Ethosa",
     author_email="social.ethosa@gmail.com",
     description="Csharp to Cpp code translator",
@@ -26,8 +26,8 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     project_urls={
-        "Github" : "https://github.com/linksplatform/RegularExpressions.Transformer.CSharpToCpp/tree/master/python",
-        "Documentation" : "https://github.com/linksplatform/RegularExpressions.Transformer.CSharpToCpp/tree/master/python",
+        "Github": "https://github.com/linksplatform/RegularExpressions.Transformer.CSharpToCpp/tree/master/python",
+        "Documentation": "https://github.com/linksplatform/RegularExpressions.Transformer.CSharpToCpp/tree/master/python",
     },
     python_requires=">=3",
     install_requires=["retranslator"]
