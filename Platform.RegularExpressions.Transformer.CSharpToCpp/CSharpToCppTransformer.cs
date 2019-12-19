@@ -26,6 +26,9 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // out TProduct
             // TProduct
             (new Regex(@"(?<before>(<|, ))(in|out) (?<typeParameter>[a-zA-Z0-9]+)(?<after>(>|,))"), "${before}${typeParameter}${after}", null, 10),
+            // public static bool CollectExceptions { get; set; }
+            // public static bool CollectExceptions;
+            (new Regex(@"(?<before>(private|protected|public)( static?) [^\r\n]+ )(?<name>[a-zA-Z0-9]+) {[^;}]*(?<=\W)get;[^;}]*(?<=\W)set;[^;}]*}"), "${before}${name};", null, 0),
             // public abstract class
             // class
             (new Regex(@"(public abstract|static) class"), "class", null, 0),
