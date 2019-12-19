@@ -44,6 +44,19 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // template <typename TObject, TProperty, TValue>
             // template <typename TObject, typename TProperty, TValue>
             (new Regex(@"(?<before>template <((, )?typename [a-zA-Z0-9]+)+, )(?<typeParameter>[a-zA-Z0-9]+)(?<after>(,|>))"), "${before}typename ${typeParameter}${after}", null, 10),
+            // Insert markers
+            // private static void BuildExceptionString(this StringBuilder sb, Exception exception, int level)
+            // /*~extensionMethod~BuildExceptionString~*/private static void BuildExceptionString(this StringBuilder sb, Exception exception, int level)
+            (new Regex(@"private static [^\r\n]+ (?<name>[a-zA-Z0-9]+)\(this [^\)\r\n]+\)"), "/*~extensionMethod~${name}~*/$0", null, 0),
+            // Move all markers to the beginning of the file.
+            (new Regex(@"\A(?<before>[^\r\n]+\r?\n(.|\n)+)(?<marker>/\*~extensionMethod~(?<name>[a-zA-Z0-9]+)~\*/)"), "${marker}${before}", null, 10),
+            // /*~extensionMethod~BuildExceptionString~*/...sb.BuildExceptionString(exception.InnerException, level + 1);
+            // /*~extensionMethod~BuildExceptionString~*/...BuildExceptionString(sb, exception.InnerException, level + 1);
+            (new Regex(@"(?<before>/\*~extensionMethod~(?<name>[a-zA-Z0-9]+)~\*/(.|\n)+\W)(?<variable>[_a-zA-Z0-9]+)\.\k<name>\("), "${before}${name}(${variable}, ", null, 50),
+            // Remove markers
+            // /*~extensionMethod~BuildExceptionString~*/
+            // 
+            (new Regex(@"/\*~extensionMethod~[a-zA-Z0-9]+~\*/"), "", null, 0),
             // (this 
             // (
             (new Regex(@"\(this "), "(", null, 0),
