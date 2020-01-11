@@ -26,31 +26,31 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // out TProduct
             // TProduct
             (new Regex(@"(?<before>(<|, ))(in|out) (?<typeParameter>[a-zA-Z0-9]+)(?<after>(>|,))"), "${before}${typeParameter}${after}", null, 10),
-            // public static bool CollectExceptions { get; set; }
-            // public static bool CollectExceptions;
-            (new Regex(@"(?<before>(private|protected|public)( static?) [^\r\n]+ )(?<name>[a-zA-Z0-9]+) {[^;}]*(?<=\W)get;[^;}]*(?<=\W)set;[^;}]*}"), "${before}${name};", null, 0),
+            // public ...
+            // public: ...
+            (new Regex(@"(?<newLineAndIndent>\r?\n?[ \t]*)(?<before>[^\{\(\r\n]*)(?<access>private|protected|public)[ \t]+(?![^\{\(\r\n]*(interface|class|struct)[^\{\(\r\n]*[\{\(\r\n])"), "${newLineAndIndent}${access}: ${before}", null, 0),
+            // public: static bool CollectExceptions { get; set; }
+            // public: static bool CollectExceptions;
+            (new Regex(@"(?<before>(private|protected|public): (static )?[^\r\n]+ )(?<name>[a-zA-Z0-9]+) {[^;}]*(?<=\W)get;[^;}]*(?<=\W)set;[^;}]*}"), "${before}${name};", null, 0),
             // public abstract class
             // class
-            (new Regex(@"(public abstract|static) class"), "class", null, 0),
-            // class GenericCollectionMethodsBase {
-            // class GenericCollectionMethodsBase { public:
-            (new Regex(@"class ([a-zA-Z0-9]+)(\s+){"), "class $1$2{" + Environment.NewLine + "    public:", null, 0),
+            (new Regex(@"((public|protected|private|internal|abstract|static) )*(?<category>interface|class|struct)"), "${category}", null, 0),
             // class GenericCollectionMethodsBase<TElement> {
-            // template <typename TElement> class GenericCollectionMethodsBase { public:
-            (new Regex(@"class ([a-zA-Z0-9]+)<([a-zA-Z0-9]+)>([^{]+){"), "template <typename $2> class $1$3{" + Environment.NewLine + "    public:", null, 0),
+            // template <typename TElement> class GenericCollectionMethodsBase {
+            (new Regex(@"class ([a-zA-Z0-9]+)<([a-zA-Z0-9]+)>([^{]+){"), "template <typename $2> class $1$3{", null, 0),
             // static void TestMultipleCreationsAndDeletions<TElement>(SizedBinaryTreeMethodsBase<TElement> tree, TElement* root)
             // template<typename T> static void TestMultipleCreationsAndDeletions<TElement>(SizedBinaryTreeMethodsBase<TElement> tree, TElement* root)
             (new Regex(@"static ([a-zA-Z0-9]+) ([a-zA-Z0-9]+)<([a-zA-Z0-9]+)>\(([^\)\r\n]+)\)"), "template <typename $3> static $1 $2($4)", null, 0),
             // interface IFactory<out TProduct> {
-            // template <typename TProduct> class IFactory { public:
-            (new Regex(@"interface (?<interface>[a-zA-Z0-9]+)<(?<typeParameters>[a-zA-Z0-9 ,]+)>(?<whitespace>[^{]+){"), "template <typename...> class ${interface}; template <typename ${typeParameters}> class ${interface}<${typeParameters}>${whitespace}{" + Environment.NewLine + "    public:", null, 0),
+            // template <typename TProduct> class IFactory {
+            (new Regex(@"interface (?<interface>[a-zA-Z0-9]+)<(?<typeParameters>[a-zA-Z0-9 ,]+)>(?<whitespace>[^{]+){"), "template <typename...> class ${interface}; template <typename ${typeParameters}> class ${interface}<${typeParameters}>${whitespace}{", null, 0),
             // template <typename TObject, TProperty, TValue>
             // template <typename TObject, typename TProperty, TValue>
             (new Regex(@"(?<before>template <((, )?typename [a-zA-Z0-9]+)+, )(?<typeParameter>[a-zA-Z0-9]+)(?<after>(,|>))"), "${before}typename ${typeParameter}${after}", null, 10),
             // Insert markers
-            // private static void BuildExceptionString(this StringBuilder sb, Exception exception, int level)
-            // /*~extensionMethod~BuildExceptionString~*/private static void BuildExceptionString(this StringBuilder sb, Exception exception, int level)
-            (new Regex(@"private static [^\r\n]+ (?<name>[a-zA-Z0-9]+)\(this [^\)\r\n]+\)"), "/*~extensionMethod~${name}~*/$0", null, 0),
+            // private: static void BuildExceptionString(this StringBuilder sb, Exception exception, int level)
+            // /*~extensionMethod~BuildExceptionString~*/private: static void BuildExceptionString(this StringBuilder sb, Exception exception, int level)
+            (new Regex(@"private: static [^\r\n]+ (?<name>[a-zA-Z0-9]+)\(this [^\)\r\n]+\)"), "/*~extensionMethod~${name}~*/$0", null, 0),
             // Move all markers to the beginning of the file.
             (new Regex(@"\A(?<before>[^\r\n]+\r?\n(.|\n)+)(?<marker>/\*~extensionMethod~(?<name>[a-zA-Z0-9]+)~\*/)"), "${marker}${before}", null, 10),
             // /*~extensionMethod~BuildExceptionString~*/...sb.BuildExceptionString(exception.InnerException, level + 1);
@@ -63,51 +63,42 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // (this 
             // (
             (new Regex(@"\(this "), "(", null, 0),
-            // public static readonly EnsureAlwaysExtensionRoot Always = new EnsureAlwaysExtensionRoot();
-            // inline static EnsureAlwaysExtensionRoot Always;
-            (new Regex(@"public static readonly (?<type>[a-zA-Z0-9]+) (?<name>[a-zA-Z0-9_]+) = new \k<type>\(\);"), "inline static ${type} ${name};", null, 0),
-            // public static readonly string ExceptionContentsSeparator = "---";
-            // inline static const char* ExceptionContentsSeparator = "---";
-            (new Regex(@"public static readonly string (?<name>[a-zA-Z0-9_]+) = ""(?<string>(\""|[^""\r\n])+)"";"), "inline static const char* ${name} = \"${string}\";", null, 0),
-            // private const int MaxPath = 92;
-            // static const int MaxPath = 92;
-            (new Regex(@"private (const|static readonly) ([a-zA-Z0-9]+) ([_a-zA-Z0-9]+) = ([^;\r\n]+);"), "static const $2 $3 = $4;", null, 0),
+            // public: static readonly EnsureAlwaysExtensionRoot Always = new EnsureAlwaysExtensionRoot();
+            // public:inline static EnsureAlwaysExtensionRoot Always;
+            (new Regex(@"(?<access>(private|protected|public): )?static readonly (?<type>[a-zA-Z0-9]+) (?<name>[a-zA-Z0-9_]+) = new \k<type>\(\);"), "${access}inline static ${type} ${name};", null, 0),
+            // public: static readonly string ExceptionContentsSeparator = "---";
+            // public: inline static const char* ExceptionContentsSeparator = "---";
+            (new Regex(@"(?<access>(private|protected|public): )?static readonly string (?<name>[a-zA-Z0-9_]+) = ""(?<string>(\""|[^""\r\n])+)"";"), "${access}inline static const char* ${name} = \"${string}\";", null, 0),
+            // private: const int MaxPath = 92;
+            // private: static const int MaxPath = 92;
+            (new Regex(@"(?<access>(private|protected|public): )?(const|static readonly) (?<type>[a-zA-Z0-9]+) (?<name>[_a-zA-Z0-9]+) = (?<value>[^;\r\n]+);"), "${access}static const ${type} ${name} = ${value};", null, 0),
             //  ArgumentNotNull(EnsureAlwaysExtensionRoot root, TArgument argument) where TArgument : class
             //  ArgumentNotNull(EnsureAlwaysExtensionRoot root, TArgument* argument)
             (new Regex(@"(?<before> [a-zA-Z]+\(([a-zA-Z *,]+, |))(?<type>[a-zA-Z]+)(?<after>(| [a-zA-Z *,]+)\))[ \r\n]+where \k<type> : class"), "${before}${type}*${after}", null, 0),
-            // protected virtual
-            // virtual
-            (new Regex(@"protected virtual"), "virtual", null, 0),
-            // protected abstract TElement GetFirst();
-            // virtual TElement GetFirst() = 0;
-            (new Regex(@"protected abstract ([^;\r\n]+);"), "virtual $1 = 0;", null, 0),
+            // protected: abstract TElement GetFirst();
+            // protected: virtual TElement GetFirst() = 0;
+            (new Regex(@"(?<access>(private|protected|public): )?abstract (?<method>[^;\r\n]+);"), "${access}virtual ${method} = 0;", null, 0),
             // TElement GetFirst();
             // virtual TElement GetFirst() = 0;
             (new Regex(@"([\r\n]+[ ]+)((?!return)[a-zA-Z0-9]+ [a-zA-Z0-9]+\([^\)\r\n]*\))(;[ ]*[\r\n]+)"), "$1virtual $2 = 0$3", null, 1),
-            // public virtual
-            // virtual
-            (new Regex(@"public virtual"), "virtual", null, 0),
-            // protected readonly
+            // protected: readonly TreeElement[] _elements;
+            // protected: TreeElement _elements[N];
+            (new Regex(@"(?<access>(private|protected|public): )?readonly (?<type>[a-zA-Z<>0-9]+)([\[\]]+) (?<name>[_a-zA-Z0-9]+);"), "${access}${type} ${name}[N];", null, 0),
+            // protected: readonly TElement Zero;
+            // protected: TElement Zero;
+            (new Regex(@"(?<access>(private|protected|public): )?readonly (?<type>[a-zA-Z<>0-9]+) (?<name>[_a-zA-Z0-9]+);"), "${access}${type} ${name};", null, 0),
+            // internal
             // 
-            (new Regex(@"protected readonly "), "", null, 0),
-            // protected readonly TreeElement[] _elements;
-            // TreeElement _elements[N];
-            (new Regex(@"(protected|private) readonly ([a-zA-Z<>0-9]+)([\[\]]+) ([_a-zA-Z0-9]+);"), "$2 $4[N];", null, 0),
-            // protected readonly TElement Zero;
-            // TElement Zero;
-            (new Regex(@"(protected|private) readonly ([a-zA-Z<>0-9]+) ([_a-zA-Z0-9]+);"), "$2 $3;", null, 0),
-            // private
-            // 
-            (new Regex(@"(\W)(private|protected|public|internal) "), "$1", null, 0),
+            (new Regex(@"(\W)internal\s+"), "$1", null, 0),
             // static void NotImplementedException(ThrowExtensionRoot root) => throw new NotImplementedException();
             // static void NotImplementedException(ThrowExtensionRoot root) { return throw new NotImplementedException(); }
-            (new Regex(@"(^\s+)(template \<[^>\r\n]+\> )?(static )?(override )?([a-zA-Z0-9]+ )([a-zA-Z0-9]+)\(([^\(\r\n]*)\)\s+=>\s+throw([^;\r\n]+);"), "$1$2$3$4$5$6($7) { throw$8; }", null, 0),
+            (new Regex(@"(^\s+)(private|protected|public)?(: )?(template \<[^>\r\n]+\> )?(static )?(override )?([a-zA-Z0-9]+ )([a-zA-Z0-9]+)\(([^\(\r\n]*)\)\s+=>\s+throw([^;\r\n]+);"), "$1$2$3$4$5$6$7$8($9) { throw$10; }", null, 0),
             // SizeBalancedTree(int capacity) => a = b;
             // SizeBalancedTree(int capacity) { a = b; }
-            (new Regex(@"(^\s+)(template \<[^>\r\n]+\> )?(static )?(override )?(void )?([a-zA-Z0-9]+)\(([^\(\r\n]*)\)\s+=>\s+([^;\r\n]+);"), "$1$2$3$4$5$6($7) { $8; }", null, 0),
+            (new Regex(@"(^\s+)(private|protected|public)?(: )?(template \<[^>\r\n]+\> )?(static )?(override )?(void )?([a-zA-Z0-9]+)\(([^\(\r\n]*)\)\s+=>\s+([^;\r\n]+);"), "$1$2$3$4$5$6$7$8($9) { $10; }", null, 0),
             // int SizeBalancedTree(int capacity) => a;
             // int SizeBalancedTree(int capacity) { return a; }
-            (new Regex(@"(^\s+)(template \<[^>\r\n]+\> )?(static )?(override )?([a-zA-Z0-9]+ )([a-zA-Z0-9]+)\(([^\(\r\n]*)\)\s+=>\s+([^;\r\n]+);"), "$1$2$3$4$5$6($7) { return $8; }", null, 0),
+            (new Regex(@"(^\s+)(private|protected|public)?(: )?(template \<[^>\r\n]+\> )?(static )?(override )?([a-zA-Z0-9]+ )([a-zA-Z0-9]+)\(([^\(\r\n]*)\)\s+=>\s+([^;\r\n]+);"), "$1$2$3$4$5$6$7$8($9) { return $10; }", null, 0),
             // () => Integer<TElement>.Zero,
             // () { return Integer<TElement>.Zero; },
             (new Regex(@"\(\)\s+=>\s+([^,;\r\n]+?),"), "() { return $1; },", null, 0),
@@ -210,9 +201,9 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // GetElement(node).Right
             // GetElement(node)->Right
             (new Regex(@"([a-zA-Z0-9]+)\(([a-zA-Z0-9\*]+)\)\.([a-zA-Z0-9]+)"), "$1($2)->$3", null, 0),
-            // [Fact]\npublic static void SizeBalancedTreeMultipleAttachAndDetachTest()
-            // TEST_METHOD(SizeBalancedTreeMultipleAttachAndDetachTest)
-            (new Regex(@"\[Fact\][\s\n]+(static )?void ([a-zA-Z0-9]+)\(\)"), "TEST_METHOD($2)", null, 0),
+            // [Fact]\npublic: static void SizeBalancedTreeMultipleAttachAndDetachTest()
+            // public: TEST_METHOD(SizeBalancedTreeMultipleAttachAndDetachTest)
+            (new Regex(@"\[Fact\][\s\n]+(public: )?(static )?void ([a-zA-Z0-9]+)\(\)"), "public: TEST_METHOD($3)", null, 0),
             // class TreesTests
             // TEST_CLASS(TreesTests)
             (new Regex(@"class ([a-zA-Z0-9]+)Tests"), "TEST_CLASS($1)", null, 0),
@@ -230,10 +221,10 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             (new Regex(@"Console\.WriteLine\(""([^""\r\n]+)""\)"), "printf(\"$1\\n\")", null, 0),
             // TElement Root;
             // TElement Root = 0;
-            (new Regex(@"(\r?\n[\t ]+)([a-zA-Z0-9:_]+(?<!return)) ([_a-zA-Z0-9]+);"), "$1$2 $3 = 0;", null, 0),
+            (new Regex(@"(\r?\n[\t ]+)(private|protected|public)?(: )?([a-zA-Z0-9:_]+(?<!return)) ([_a-zA-Z0-9]+);"), "$1$2$3$4 $5 = 0;", null, 0),
             // TreeElement _elements[N];
             // TreeElement _elements[N] = { {0} };
-            (new Regex(@"(\r?\n[\t ]+)([a-zA-Z0-9]+) ([_a-zA-Z0-9]+)\[([_a-zA-Z0-9]+)\];"), "$1$2 $3[$4] = { {0} };", null, 0),
+            (new Regex(@"(\r?\n[\t ]+)(private|protected|public)?(: )?([a-zA-Z0-9]+) ([_a-zA-Z0-9]+)\[([_a-zA-Z0-9]+)\];"), "$1$2$3$4 $5[$6] = { {0} };", null, 0),
             // auto path = new TElement[MaxPath];
             // TElement path[MaxPath] = { {0} };
             (new Regex(@"(\r?\n[\t ]+)[a-zA-Z0-9]+ ([a-zA-Z0-9]+) = new ([a-zA-Z0-9]+)\[([_a-zA-Z0-9]+)\];"), "$1$3 $2[$4] = { {0} };", null, 0),
@@ -295,7 +286,7 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // Insert method body scope starts.
             // void PrintNodes(TElement node, StringBuilder sb, int level) {
             // void PrintNodes(TElement node, StringBuilder sb, int level) {/*method-start*/
-            (new Regex(@"(?<start>\r?\n[\t ]+)(?<prefix>((virtual )?[a-zA-Z0-9:_]+ )?)(?<method>[a-zA-Z][a-zA-Z0-9]*)\((?<arguments>[^\)]*)\)(?<override>( override)?)(?<separator>[ \t\r\n]*)\{(?<end>[^~])"), "${start}${prefix}${method}(${arguments})${override}${separator}{/*method-start*/${end}", null, 0),
+            (new Regex(@"(?<start>\r?\n[\t ]+)(?<prefix>((private|protected|public): )?(virtual )?[a-zA-Z0-9:_]+ )?(?<method>[a-zA-Z][a-zA-Z0-9]*)\((?<arguments>[^\)]*)\)(?<override>( override)?)(?<separator>[ \t\r\n]*)\{(?<end>[^~])"), "${start}${prefix}${method}(${arguments})${override}${separator}{/*method-start*/${end}", null, 0),
             // Insert method body scope ends.
             // {/*method-start*/...}
             // {/*method-start*/.../*method-end*/}

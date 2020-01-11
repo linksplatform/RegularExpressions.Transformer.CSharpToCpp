@@ -5,6 +5,15 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp.Tests
     public class CSharpToCppTransformerTests
     {
         [Fact]
+        public void EmptyLineTest()
+        {
+            // This test can help to test basic problems with regular expressions like incorrect syntax
+            var transformer = new CSharpToCppTransformer();
+            var actualResult = transformer.Transform("", new Context(null));
+            Assert.Equal("", actualResult);
+        }
+
+        [Fact]
         public void HelloWorldTest()
         {
             const string helloWorldCode = @"using System;
@@ -17,8 +26,7 @@ class Program
 }";
             const string expectedResult = @"class Program
 {
-    public:
-    static void Main(const char* args[])
+    public: static void Main(const char* args[])
     {
         printf(""Hello, world!\n"");
     }
