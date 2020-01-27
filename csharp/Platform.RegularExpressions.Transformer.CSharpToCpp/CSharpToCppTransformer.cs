@@ -230,7 +230,19 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             (new Regex(@"(\r?\n[\t ]+)[a-zA-Z0-9]+ ([a-zA-Z0-9]+) = new ([a-zA-Z0-9]+)\[([_a-zA-Z0-9]+)\];"), "$1$3 $2[$4] = { {0} };", null, 0),
             // public: static event EventHandler<std::exception> ExceptionIgnored = OnExceptionIgnored; ... };
             // ... public: static inline Platform::Delegates::MulticastDelegate<void(void*, const std::exception&)> ExceptionIgnored = OnExceptionIgnored; };
-            (new Regex(@"(?<begin>\r?\n(\r?\n)?(?<halfIndent>[ \t]+)\k<halfIndent>)(?<access>(private|protected|public): )?static event EventHandler<(?<argumentType>[^;\r\n]+)> (?<name>[_a-zA-Z0-9]+) = (?<defaultDelegate>[_a-zA-Z0-9]+);(?<middle>(.|\n)+)(?<end>\r?\n\k<halfIndent>};)"), "${middle}" + Environment.NewLine + "${halfIndent}${halfIndent}${access}static inline Platform::Delegates::MulticastDelegate<void(void*, const ${argumentType}&)> ${name} = ${defaultDelegate};${end}", null, 0),
+            (new Regex(@"(?<begin>\r?\n(\r?\n)?(?<halfIndent>[ \t]+)\k<halfIndent>)(?<access>(private|protected|public): )?static event EventHandler<(?<argumentType>[^;\r\n]+)> (?<name>[_a-zA-Z0-9]+) = (?<defaultDelegate>[_a-zA-Z0-9]+);(?<middle>(.|\n)+?)(?<end>\r?\n\k<halfIndent>};)"), "${middle}" + Environment.NewLine + "${halfIndent}${halfIndent}${access}static inline Platform::Delegates::MulticastDelegate<void(void*, const ${argumentType}&)> ${name} = ${defaultDelegate};${end}", null, 0),
+            // Insert scope borders.
+            // class IgnoredExceptions { ... public: static inline Platform::Delegates::MulticastDelegate<void(void*, const std::exception&)> ExceptionIgnored = OnExceptionIgnored;
+            // class IgnoredExceptions {/*~ExceptionIgnored~*/ ... public: static inline Platform::Delegates::MulticastDelegate<void(void*, const std::exception&)> ExceptionIgnored = OnExceptionIgnored;
+            (new Regex(@"(?<classDeclarationBegin>\r?\n(?<indent>[\t ]*)class [^{\r\n] \r\n[\t ]*{)(?<middle>((?!class).|\n)+?)(?<eventDeclaration>(?<access>(private|protected|public): )static inline Platform::Delegates::MulticastDelegate<(?<argumentType>[^;\r\n]+)> (?<name>[_a-zA-Z0-9]+) = (?<defaultDelegate>[_a-zA-Z0-9]+);)"), "${classDeclarationBegin}/*~${name}~*/${middle}${eventDeclaration}", null, 0),
+            // Inside the scope of ~!ExceptionIgnored!~ replace:
+            // ExceptionIgnored.Invoke(NULL, exception);
+            // ExceptionIgnored(NULL, exception);
+            (new Regex(@"(?<scope>/\*~(?<eventName>[a-zA-Z0-9]+)~\*/)(?<separator>.|\n)(?<before>((?<!/\*~\k<eventName>~\*/)(.|\n))*?)\k<eventName>\.Invoke"), "${scope}${separator}${before}${eventName}", null, 10),
+            // Remove scope borders.
+            // /*~ExceptionIgnored~*/
+            // 
+            (new Regex(@"/\*~[a-zA-Z0-9]+~\*/"), "", null, 0),
             // Insert scope borders.
             // auto added = new StringBuilder();
             // /*~sb~*/std::string added;
@@ -254,7 +266,7 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // Remove scope borders.
             // /*~sb~*/
             // 
-            (new Regex(@"/\*~(?<pointer>[a-zA-Z0-9]+)~\*/"), "", null, 0),
+            (new Regex(@"/\*~[a-zA-Z0-9]+~\*/"), "", null, 0),
             // Insert scope borders.
             // auto added = new HashSet<TElement>();
             // ~!added!~std::unordered_set<TElement> added;
@@ -273,7 +285,7 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // Remove scope borders.
             // ~!added!~
             // 
-            (new Regex(@"~!(?<pointer>[a-zA-Z0-9]+)!~"), "", null, 5),
+            (new Regex(@"~![a-zA-Z0-9]+!~"), "", null, 5),
             // Insert scope borders.
             // auto random = new System.Random(0);
             // std::srand(0);
@@ -285,7 +297,7 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // Remove scope borders.
             // ~!random!~
             // 
-            (new Regex(@"~!(?<pointer>[a-zA-Z0-9]+)!~"), "", null, 5),
+            (new Regex(@"~![a-zA-Z0-9]+!~"), "", null, 5),
             // Insert method body scope starts.
             // void PrintNodes(TElement node, StringBuilder sb, int level) {
             // void PrintNodes(TElement node, StringBuilder sb, int level) {/*method-start*/
@@ -332,8 +344,8 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // return &_elements[node];
             (new Regex(@"return ref ([_a-zA-Z0-9]+)\[([_a-zA-Z0-9\*]+)\];"), "return &$1[$2];", null, 0),
             // null
-            // NULL
-            (new Regex(@"(?<before>\r?\n[^""\r\n]*(""(\\""|[^""\r\n])*""[^""\r\n]*)*)(?<=\W)null(?<after>\W)"), "${before}NULL${after}", null, 10),
+            // nullptr
+            (new Regex(@"(?<before>\r?\n[^""\r\n]*(""(\\""|[^""\r\n])*""[^""\r\n]*)*)(?<=\W)null(?<after>\W)"), "${before}nullptr{after}", null, 10),
             // default
             // 0
             (new Regex(@"(?<before>\r?\n[^""\r\n]*(""(\\""|[^""\r\n])*""[^""\r\n]*)*)(?<=\W)default(?<after>\W)"), "${before}0${after}", null, 10),
