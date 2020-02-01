@@ -349,6 +349,18 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // /*method-start*/
             // 
             (new Regex(@"/\*method-(start|end)\*/"), "", null, 0),
+            // Insert scope borders.
+            // const std::exception& ex
+            // const std::exception& ex/*~ex~*/
+            (new Regex(@"(?<before>\(| )(?<variableDefinition>(const )?(std::)?exception&? (?<variable>[_a-zA-Z0-9]+))(?<after>\W)"), "${before}${variableDefinition}/*~${variable}~*/${after}", null, 0),
+            // Inside the scope of ~!ex!~ replace:
+            // ex.Message
+            // ex.what()
+            (new Regex(@"(?<scope>/\*~(?<variable>[_a-zA-Z0-9]+)~\*/)(?<separator>.|\n)(?<before>((?<!/\*~\k<variable>~\*/)(.|\n))*?)\k<variable>\.Message"), "${scope}${separator}${before}${variable}.what()", null, 10),
+            // Remove scope borders.
+            // /*~ex~*/
+            // 
+            (new Regex(@"/\*~[_a-zA-Z0-9]+~\*/"), "", null, 0),
             // throw new ArgumentNullException(argumentName, message);
             // throw std::invalid_argument(((std::string)"Argument ").append(argumentName).append(" is null: ").append(message).append("."));
             (new Regex(@"throw new ArgumentNullException\((?<argument>[a-zA-Z]*[Aa]rgument[a-zA-Z]*), (?<message>[a-zA-Z]*[Mm]essage[a-zA-Z]*)\);"), "throw std::invalid_argument(((std::string)\"Argument \").append(${argument}).append(\" is null: \").append(${message}).append(\".\"));", null, 0),
