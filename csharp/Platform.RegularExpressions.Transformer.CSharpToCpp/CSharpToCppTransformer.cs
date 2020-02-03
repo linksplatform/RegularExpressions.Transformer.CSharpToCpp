@@ -101,13 +101,13 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             (new Regex(@"(^\s+)(private|protected|public)?(: )?(template \<[^>\r\n]+\> )?(static )?(override )?([a-zA-Z0-9]+ )([a-zA-Z0-9]+)\(([^\(\r\n]*)\)\s+=>\s+([^;\r\n]+);"), "$1$2$3$4$5$6$7$8($9) { return $10; }", null, 0),
             // () => Integer<TElement>.Zero,
             // () { return Integer<TElement>.Zero; },
-            (new Regex(@"\(\)\s+=>\s+(?<expression>[^(),;\r\n]+((?<parenthesis>\()|(?<-parenthesis>\))|[^();\r\n]*)*[^(),;\r\n]*)(?<after>,|\);)"), "() { return ${expression}; }${after}", null, 0),
+            (new Regex(@"\(\)\s+=>\s+(?<expression>[^(),;\r\n]+((?<parenthesis>\()|(?<-parenthesis>\))|[^();\r\n]*?)*?[^(),;\r\n]*)(?<after>,|\);)"), "() { return ${expression}; }${after}", null, 0),
             // => Integer<TElement>.Zero;
             // { return Integer<TElement>.Zero; }
             (new Regex(@"\)\s+=>\s+([^;\r\n]+?);"), ") { return $1; }", null, 0),
             // () { return avlTree.Count; }
             // [&]()-> auto { return avlTree.Count; }
-            (new Regex(@", \(\) { return ([^;\r\n]+); }"), ", [&]()-> auto { return $1; }", null, 0),
+            (new Regex(@"(?<before>, |\()\(\) { return (?<expression>[^;\r\n]+); }"), "${before}[&]()-> auto { return ${expression}; }", null, 0),
             // Count => GetSizeOrZero(Root);
             // GetCount() { return GetSizeOrZero(Root); }
             (new Regex(@"(\W)([A-Z][a-zA-Z]+)\s+=>\s+([^;\r\n]+);"), "$1Get$2() { return $3; }", null, 0),
