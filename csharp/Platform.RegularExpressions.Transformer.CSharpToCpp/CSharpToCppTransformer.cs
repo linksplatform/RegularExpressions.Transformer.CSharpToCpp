@@ -209,7 +209,10 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             (new Regex(@"class ([a-zA-Z0-9]+)Tests"), "TEST_CLASS($1)", null, 0),
             // Assert.Equal
             // Assert::AreEqual
-            (new Regex(@"Assert\.Equal"), "Assert::AreEqual", null, 0),
+            (new Regex(@"(Assert)\.Equal"), "$1::AreEqual", null, 0),
+            // Assert.Throws
+            // Assert::ExpectException
+            (new Regex(@"(Assert)\.Throws"), "$1::ExpectException", null, 0),
             // $"Argument {argumentName} is null."
             // ((std::string)"Argument ").append(argumentName).append(" is null.").data()
             (new Regex(@"\$""(?<left>(\\""|[^""\r\n])*){(?<expression>[_a-zA-Z0-9]+)}(?<right>(\\""|[^""\r\n])*)"""), "((std::string)$\"${left}\").append(${expression}).append(\"${right}\").data()", null, 10),
@@ -398,6 +401,12 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // object x
             // void *x
             (new Regex(@"(?<before>\r?\n[^""\r\n]*(""(\\""|[^""\r\n])*""[^""\r\n]*)*)(?<=\W)([O|o]bject|System\.Object) (?<after>\w)"), "${before}void *${after}", null, 10),
+            // <object>
+            // <void*>
+            (new Regex(@"(?<before>\r?\n[^""\r\n]*(""(\\""|[^""\r\n])*""[^""\r\n]*)*)(?<=\W)([O|o]bject|System\.Object)(?<after>\w)"), "${before}void*${after}", null, 10),
+            // ArgumentNullException
+            // std::invalid_argument
+            (new Regex(@"(?<before>\r?\n[^""\r\n]*(""(\\""|[^""\r\n])*""[^""\r\n]*)*)(?<=\W)(System\.)?ArgumentNullException(?<after>\w)"), "${before}std::invalid_argument${after}", null, 10),
             // #region Always
             // 
             (new Regex(@"(^|\r?\n)[ \t]*\#(region|endregion)[^\r\n]*(\r?\n|$)"), "", null, 0),
