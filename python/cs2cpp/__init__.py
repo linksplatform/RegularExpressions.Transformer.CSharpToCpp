@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
-# author: Ethosa
+# authors: Konard, Ethosa
 
 from .CSharpToCpp import CSharpToCpp
 
-__version__ = "0.0.10"
+__version__ = "0.1.0"
 __copyright__ = "2019"
 __authors__ = ["Ethosa", "Konard"]
+
+if __name__ == '__main__':
+    print(CSharpToCpp)

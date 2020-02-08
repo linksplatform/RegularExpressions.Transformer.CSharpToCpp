@@ -1,6 +1,6 @@
 import cs2cpp
 
-cpp = cs2cpp.CSharpToCpp(useRegex=1)
+cpp = cs2cpp.CSharpToCpp(useRegex=1, debug=True)
 
 print(cpp.Transform("""namespace Platform.Interfaces
 {

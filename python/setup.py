@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="cs2cpp",
-    version="0.0.10",
+    version="0.1.0",
     author="Ethosa",
     author_email="social.ethosa@gmail.com",
     description="Csharp to Cpp code translator",
@@ -16,7 +16,7 @@ setuptools.setup(
     license="LGPLv3",
     keywords="csharp cpp cs2cpp platform ethosa konard",
     classifiers=[
-        "Development Status :: 3 - Alpha",
+        "Development Status :: 4 - Beta",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.4",
         "Programming Language :: Python :: 3.5",
