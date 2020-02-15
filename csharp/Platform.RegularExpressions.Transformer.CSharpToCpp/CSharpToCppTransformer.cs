@@ -143,10 +143,76 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             (new Regex(@"(\W)string(\W)"), "$1const char*$2", null, 0),
             // sbyte
             // std::int8_t
-            (new Regex(@"(\W)sbyte(\W)"), "$1std::int8_t$2", null, 0),
+            (new Regex(@"(?<before>\W)((System\.)?SB|sb)yte(?!\s*=)(?<after>\W)"), "${before}std::int8_t${after}", null, 0),
+            // sbyte.MinValue
+            // INT8_MIN
+            (new Regex(@"(?<before>\W)std::int8_t\.MinValue(?<after>\W)"), "${before}INT8_MIN${after}", null, 0),
+            // sbyte.MaxValue
+            // INT8_MAX
+            (new Regex(@"(?<before>\W)std::int8_t\.MaxValue(?<after>\W)"), "${before}INT8_MAX${after}", null, 0),
+            // short
+            // std::int16_t
+            (new Regex(@"(?<before>\W)((System\.)?Int16|short)(?!\s*=)(?<after>\W)"), "${before}std::int16_t${after}", null, 0),
+            // short.MinValue
+            // INT16_MIN
+            (new Regex(@"(?<before>\W)std::int16_t\.MinValue(?<after>\W)"), "${before}INT16_MIN${after}", null, 0),
+            // short.MaxValue
+            // INT16_MAX
+            (new Regex(@"(?<before>\W)std::int16_t\.MaxValue(?<after>\W)"), "${before}INT16_MAX${after}", null, 0),
+            // int
+            // std::int32_t
+            (new Regex(@"(?<before>\W)((System\.)?I|i)nt(32)?(?!\s*=)(?<after>\W)"), "${before}std::int32_t${after}", null, 0),
+            // int.MinValue
+            // INT32_MIN
+            (new Regex(@"(?<before>\W)std::int32_t\.MinValue(?<after>\W)"), "${before}INT32_MIN${after}", null, 0),
+            // int.MaxValue
+            // INT32_MAX
+            (new Regex(@"(?<before>\W)std::int32_t\.MaxValue(?<after>\W)"), "${before}INT32_MAX${after}", null, 0),
+            // long
+            // std::int64_t
+            (new Regex(@"(?<before>\W)((System\.)?Int64|long)(?!\s*=)(?<after>\W)"), "${before}std::int64_t${after}", null, 0),
+            // long.MinValue
+            // INT64_MIN
+            (new Regex(@"(?<before>\W)std::int64_t\.MinValue(?<after>\W)"), "${before}INT64_MIN${after}", null, 0),
+            // long.MaxValue
+            // INT64_MAX
+            (new Regex(@"(?<before>\W)std::int64_t\.MaxValue(?<after>\W)"), "${before}INT64_MAX${after}", null, 0),
+            // byte
+            // std::uint8_t
+            (new Regex(@"(?<before>\W)((System\.)?Byte|byte)(?!\s*=)(?<after>\W)"), "${before}std::uint8_t${after}", null, 0),
+            // byte.MinValue
+            // (std::uint8_t)0
+            (new Regex(@"(?<before>\W)std::uint8_t\.MinValue(?<after>\W)"), "${before}(std::uint8_t)0${after}", null, 0),
+            // byte.MaxValue
+            // UINT8_MAX
+            (new Regex(@"(?<before>\W)std::uint8_t\.MaxValue(?<after>\W)"), "${before}UINT8_MAX${after}", null, 0),
+            // ushort
+            // std::uint16_t
+            (new Regex(@"(?<before>\W)((System\.)?UInt16|ushort)(?!\s*=)(?<after>\W)"), "${before}std::uint16_t${after}", null, 0),
+            // ushort.MinValue
+            // (std::uint16_t)0
+            (new Regex(@"(?<before>\W)std::uint16_t\.MinValue(?<after>\W)"), "${before}(std::uint16_t)0${after}", null, 0),
+            // ushort.MaxValue
+            // UINT16_MAX
+            (new Regex(@"(?<before>\W)std::uint16_t\.MaxValue(?<after>\W)"), "${before}UINT16_MAX${after}", null, 0),
             // uint
             // std::uint32_t
-            (new Regex(@"(\W)uint(\W)"), "$1std::uint32_t$2", null, 0),
+            (new Regex(@"(?<before>\W)((System\.)?UI|ui)nt(32)?(?!\s*=)(?<after>\W)"), "${before}std::uint32_t${after}", null, 0),
+            // uint.MinValue
+            // (std::uint32_t)0
+            (new Regex(@"(?<before>\W)std::uint32_t\.MinValue(?<after>\W)"), "${before}(std::uint32_t)0${after}", null, 0),
+            // uint.MaxValue
+            // UINT32_MAX
+            (new Regex(@"(?<before>\W)std::uint32_t\.MaxValue(?<after>\W)"), "${before}UINT32_MAX${after}", null, 0),
+            // ulong
+            // std::uint64_t
+            (new Regex(@"(?<before>\W)((System\.)?UInt64|ulong)(?!\s*=)(?<after>\W)"), "${before}std::uint64_t${after}", null, 0),
+            // ulong.MinValue
+            // (std::uint64_t)0
+            (new Regex(@"(?<before>\W)std::uint64_t\.MinValue(?<after>\W)"), "${before}(std::uint64_t)0${after}", null, 0),
+            // ulong.MaxValue
+            // UINT64_MAX
+            (new Regex(@"(?<before>\W)std::uint64_t\.MaxValue(?<after>\W)"), "${before}UINT64_MAX${after}", null, 0),
             // char*[] args
             // char* args[]
             (new Regex(@"([_a-zA-Z0-9:\*]?)\[\] ([a-zA-Z0-9]+)"), "$1 $2[]", null, 0),
