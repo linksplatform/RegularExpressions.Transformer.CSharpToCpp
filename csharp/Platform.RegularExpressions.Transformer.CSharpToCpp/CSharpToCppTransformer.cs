@@ -23,6 +23,9 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // Platform.Collections.Methods.Lists
             // Platform::Collections::Methods::Lists
             (new Regex(@"(namespace[^\r\n]+?)\.([^\r\n]+?)"), "$1::$2", null, 20),
+            // Comparer<TArgument>.Default.Compare(maximumArgument, minimumArgument) < 0 
+            // maximumArgument < minimumArgument
+            (new Regex(@"Comparer<[^>\n]+>\.Default\.Compare\(\s*(?<first>[^,)\n]+),\s*(?<second>[^\)\n]+)\s*\)\s*(?<comparison>[<>=]=?)\s*0"), "${first} ${comparison} ${second}", null, 0),
             // out TProduct
             // TProduct
             (new Regex(@"(?<before>(<|, ))(in|out) (?<typeParameter>[a-zA-Z0-9]+)(?<after>(>|,))"), "${before}${typeParameter}${after}", null, 10),
@@ -138,9 +141,15 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // override void PrintNode(TElement node, StringBuilder sb, int level)
             // void PrintNode(TElement node, StringBuilder sb, int level) override
             (new Regex(@"override ([a-zA-Z0-9 \*\+]+)(\([^\)\r\n]+?\))"), "$1$2 override", null, 0),
+            // return (range.Minimum, range.Maximum)
+            // return {range.Minimum, range.Maximum}
+            (new Regex(@"(?<before>return\s*)\((?<values>[^\)\n]+)\)"), "${before}{${values}}", null, 0),
             // string
             // const char*
             (new Regex(@"(\W)string(\W)"), "$1const char*$2", null, 0),
+            // System.ValueTuple
+            // std::tuple
+            (new Regex(@"(?<before>\W)(System\.)?ValueTuple(?!\s*=)(?<after>\W)"), "${before}std::tuple${after}", null, 0),
             // sbyte
             // std::int8_t
             (new Regex(@"(?<before>\W)((System\.)?SB|sb)yte(?!\s*=)(?<after>\W)"), "${before}std::int8_t${after}", null, 0),
