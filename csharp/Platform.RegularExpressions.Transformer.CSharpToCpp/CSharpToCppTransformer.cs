@@ -143,7 +143,7 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             (new Regex(@"override ([a-zA-Z0-9 \*\+]+)(\([^\)\r\n]+?\))"), "$1$2 override", null, 0),
             // return (range.Minimum, range.Maximum)
             // return {range.Minimum, range.Maximum}
-            (new Regex(@"(?<before>return\s*)\((?<values>[^\)\n]+)\)"), "${before}{${values}}", null, 0),
+            (new Regex(@"(?<before>return\s*)\((?<values>[^\)\n]+)\)(?!\()(?<after>\W)"), "${before}{${values}}", null, 0),
             // string
             // const char*
             (new Regex(@"(\W)string(\W)"), "$1const char*$2", null, 0),
