@@ -4,7 +4,7 @@
     <Description>LinksPlatform's Platform.RegularExpressions.Transformer.CSharpToCpp Class Library</Description>
     <Copyright>Konstantin Diachenko</Copyright>
     <AssemblyTitle>Platform.RegularExpressions.Transformer.CSharpToCpp</AssemblyTitle>
-    <VersionPrefix>0.1.26</VersionPrefix>
+    <VersionPrefix>0.1.27</VersionPrefix>
     <Authors>Konstantin Diachenko</Authors>
     <TargetFrameworks>net472;netstandard2.0;netstandard2.1</TargetFrameworks>
     <AssemblyName>Platform.RegularExpressions.Transformer.CSharpToCpp</AssemblyName>
@@ -24,7 +24,8 @@
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <LangVersion>latest</LangVersion>
-    <PackageReleaseNotes>Added support for translation functions inside functions.</PackageReleaseNotes>
+    <PackageReleaseNotes>Lowest supported version of .NET Framework is now 4.7.2.
+Platform.RegularExpressions.Transformer dependency updated from 0.0.5 to 0.0.8.</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup Condition="$(TargetFramework.StartsWith('net4')) AND '$(MSBuildRuntimeType)' == 'Core' AND '$(OS)' != 'Windows_NT'">
