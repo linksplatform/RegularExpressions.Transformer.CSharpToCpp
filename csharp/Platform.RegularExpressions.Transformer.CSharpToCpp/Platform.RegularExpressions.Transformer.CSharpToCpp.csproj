@@ -6,7 +6,7 @@
     <AssemblyTitle>Platform.RegularExpressions.Transformer.CSharpToCpp</AssemblyTitle>
     <VersionPrefix>0.1.26</VersionPrefix>
     <Authors>Konstantin Diachenko</Authors>
-    <TargetFrameworks>net471;netstandard2.0;netstandard2.1</TargetFrameworks>
+    <TargetFrameworks>net472;netstandard2.0;netstandard2.1</TargetFrameworks>
     <AssemblyName>Platform.RegularExpressions.Transformer.CSharpToCpp</AssemblyName>
     <PackageId>Platform.RegularExpressions.Transformer.CSharpToCpp</PackageId>
     <PackageTags>LinksPlatform;RegularExpressions.Transformer.CSharpToCpp;CSharpToCppTransformer</PackageTags>
