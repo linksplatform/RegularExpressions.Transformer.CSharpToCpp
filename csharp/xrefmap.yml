@@ -1,0 +1,49 @@
+### YamlMime:XRefMap
+sorted: true
+references:
+- uid: Platform.RegularExpressions.Transformer.CSharpToCpp
+  name: Platform.RegularExpressions.Transformer.CSharpToCpp
+  href: api/Platform.RegularExpressions.Transformer.CSharpToCpp.html
+  commentId: N:Platform.RegularExpressions.Transformer.CSharpToCpp
+  fullName: Platform.RegularExpressions.Transformer.CSharpToCpp
+  nameWithType: Platform.RegularExpressions.Transformer.CSharpToCpp
+- uid: Platform.RegularExpressions.Transformer.CSharpToCpp.CSharpToCppTransformer
+  name: CSharpToCppTransformer
+  href: api/Platform.RegularExpressions.Transformer.CSharpToCpp.CSharpToCppTransformer.html
+  commentId: T:Platform.RegularExpressions.Transformer.CSharpToCpp.CSharpToCppTransformer
+  fullName: Platform.RegularExpressions.Transformer.CSharpToCpp.CSharpToCppTransformer
+  nameWithType: CSharpToCppTransformer
+- uid: Platform.RegularExpressions.Transformer.CSharpToCpp.CSharpToCppTransformer.#ctor
+  name: CSharpToCppTransformer()
+  href: api/Platform.RegularExpressions.Transformer.CSharpToCpp.CSharpToCppTransformer.html#Platform_RegularExpressions_Transformer_CSharpToCpp_CSharpToCppTransformer__ctor
+  commentId: M:Platform.RegularExpressions.Transformer.CSharpToCpp.CSharpToCppTransformer.#ctor
+  fullName: Platform.RegularExpressions.Transformer.CSharpToCpp.CSharpToCppTransformer.CSharpToCppTransformer()
+  nameWithType: CSharpToCppTransformer.CSharpToCppTransformer()
+- uid: Platform.RegularExpressions.Transformer.CSharpToCpp.CSharpToCppTransformer.#ctor(System.Collections.Generic.IList{ISubstitutionRule})
+  name: CSharpToCppTransformer(IList<ISubstitutionRule>)
+  href: api/Platform.RegularExpressions.Transformer.CSharpToCpp.CSharpToCppTransformer.html#Platform_RegularExpressions_Transformer_CSharpToCpp_CSharpToCppTransformer__ctor_System_Collections_Generic_IList_ISubstitutionRule__
+  commentId: M:Platform.RegularExpressions.Transformer.CSharpToCpp.CSharpToCppTransformer.#ctor(System.Collections.Generic.IList{ISubstitutionRule})
+  name.vb: CSharpToCppTransformer(IList(Of ISubstitutionRule))
+  fullName: Platform.RegularExpressions.Transformer.CSharpToCpp.CSharpToCppTransformer.CSharpToCppTransformer(System.Collections.Generic.IList<ISubstitutionRule>)
+  fullName.vb: Platform.RegularExpressions.Transformer.CSharpToCpp.CSharpToCppTransformer.CSharpToCppTransformer(System.Collections.Generic.IList(Of ISubstitutionRule))
+  nameWithType: CSharpToCppTransformer.CSharpToCppTransformer(IList<ISubstitutionRule>)
+  nameWithType.vb: CSharpToCppTransformer.CSharpToCppTransformer(IList(Of ISubstitutionRule))
+- uid: Platform.RegularExpressions.Transformer.CSharpToCpp.CSharpToCppTransformer.#ctor*
+  name: CSharpToCppTransformer
+  href: api/Platform.RegularExpressions.Transformer.CSharpToCpp.CSharpToCppTransformer.html#Platform_RegularExpressions_Transformer_CSharpToCpp_CSharpToCppTransformer__ctor_
+  commentId: Overload:Platform.RegularExpressions.Transformer.CSharpToCpp.CSharpToCppTransformer.#ctor
+  isSpec: "True"
+  fullName: Platform.RegularExpressions.Transformer.CSharpToCpp.CSharpToCppTransformer.CSharpToCppTransformer
+  nameWithType: CSharpToCppTransformer.CSharpToCppTransformer
+- uid: Platform.RegularExpressions.Transformer.CSharpToCpp.CSharpToCppTransformer.FirstStage
+  name: FirstStage
+  href: api/Platform.RegularExpressions.Transformer.CSharpToCpp.CSharpToCppTransformer.html#Platform_RegularExpressions_Transformer_CSharpToCpp_CSharpToCppTransformer_FirstStage
+  commentId: F:Platform.RegularExpressions.Transformer.CSharpToCpp.CSharpToCppTransformer.FirstStage
+  fullName: Platform.RegularExpressions.Transformer.CSharpToCpp.CSharpToCppTransformer.FirstStage
+  nameWithType: CSharpToCppTransformer.FirstStage
+- uid: Platform.RegularExpressions.Transformer.CSharpToCpp.CSharpToCppTransformer.LastStage
+  name: LastStage
+  href: api/Platform.RegularExpressions.Transformer.CSharpToCpp.CSharpToCppTransformer.html#Platform_RegularExpressions_Transformer_CSharpToCpp_CSharpToCppTransformer_LastStage
+  commentId: F:Platform.RegularExpressions.Transformer.CSharpToCpp.CSharpToCppTransformer.LastStage
+  fullName: Platform.RegularExpressions.Transformer.CSharpToCpp.CSharpToCppTransformer.LastStage
+  nameWithType: CSharpToCppTransformer.LastStage
