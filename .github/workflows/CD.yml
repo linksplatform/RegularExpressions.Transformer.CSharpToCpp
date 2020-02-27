@@ -16,8 +16,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
+      with:
+        submodules: true
     - name: Test
-      run: dotnet test -c Release -f netcoreapp3.0
+      run: dotnet test -c Release -f netcoreapp3.1
     - name: Generate PDF with CSharp code
       if: github.event_name == 'push'
       run: |
@@ -35,6 +37,12 @@ jobs:
         wget "$SCRIPTS_BASE_URL/toc.yml"
         wget "$SCRIPTS_BASE_URL/publish-csharp-docs.sh"
         bash ./publish-csharp-docs.sh
+    - name: Read CSharp project information
+      if: github.event_name == 'push'
+      run: |
+        export REPOSITORY_NAME=$(basename ${{ github.repository }})
+        wget "$SCRIPTS_BASE_URL/read_csharp_package_info.sh"
+        bash ./read_csharp_package_info.sh
     - name: Publish CSharp NuGet package
       if: github.event_name == 'push'
       run: |
@@ -47,12 +55,15 @@ jobs:
         export REPOSITORY_NAME=$(basename ${{ github.repository }})
         wget "$SCRIPTS_BASE_URL/publish-release.sh"
         bash ./publish-release.sh
+
   pushCSharpNuGetToGitHubPackageRegistry:
     needs: testAndDeploy
     if: github.event_name == 'push'
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v1
+        with:
+          submodules: true
       - uses: warrenbuckley/Setup-Nuget@v1
       - name: Publish CSharp NuGet to GitHub Package Registry
         run: |
