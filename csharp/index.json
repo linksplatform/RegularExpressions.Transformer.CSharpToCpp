@@ -1,13 +1,13 @@
 {
-  "api/Platform.RegularExpressions.Transformer.CSharpToCpp.html": {
-    "href": "api/Platform.RegularExpressions.Transformer.CSharpToCpp.html",
-    "title": "Namespace Platform.RegularExpressions.Transformer.CSharpToCpp | LinksPlatform's Platform.RegularExpressions.Transformer.CSharpToCpp Library",
-    "keywords": "Namespace Platform.RegularExpressions.Transformer.CSharpToCpp Classes CSharpToCppTransformer"
-  },
   "README.html": {
     "href": "README.html",
     "title": "RegularExpressions.Transformer.CSharpToCpp | LinksPlatform's Platform.RegularExpressions.Transformer.CSharpToCpp Library",
     "keywords": "C# Python RegularExpressions.Transformer.CSharpToCpp LinksPlatform's Platform.RegularExpressions.Transformer.CSharpToCpp Class Library. Namespace: Platform.RegularExpressions.Transformer.CSharpToCpp Forked from: LinksPlatform/Collections.Methods/CSharpToCppTranslator NuGet package: Platform.RegularExpressions.Transformer.CSharpToCpp Python version: cs2cpp Documentation PDF file with code for e-readers. Depend on Platform.RegularExpressions.Transformer"
+  },
+  "api/Platform.RegularExpressions.Transformer.CSharpToCpp.html": {
+    "href": "api/Platform.RegularExpressions.Transformer.CSharpToCpp.html",
+    "title": "Namespace Platform.RegularExpressions.Transformer.CSharpToCpp | LinksPlatform's Platform.RegularExpressions.Transformer.CSharpToCpp Library",
+    "keywords": "Namespace Platform.RegularExpressions.Transformer.CSharpToCpp Classes CSharpToCppTransformer"
   },
   "api/Platform.RegularExpressions.Transformer.CSharpToCpp.CSharpToCppTransformer.html": {
     "href": "api/Platform.RegularExpressions.Transformer.CSharpToCpp.CSharpToCppTransformer.html",
