@@ -9,7 +9,7 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp.Tests
         {
             // This test can help to test basic problems with regular expressions like incorrect syntax
             var transformer = new CSharpToCppTransformer();
-            var actualResult = transformer.Transform("", new Context(null));
+            var actualResult = transformer.Transform("");
             Assert.Equal("", actualResult);
         }
 
@@ -32,7 +32,7 @@ class Program
     }
 };";
             var transformer = new CSharpToCppTransformer();
-            var actualResult = transformer.Transform(helloWorldCode, new Context(null));
+            var actualResult = transformer.Transform(helloWorldCode);
             Assert.Equal(expectedResult, actualResult);
         }
     }
