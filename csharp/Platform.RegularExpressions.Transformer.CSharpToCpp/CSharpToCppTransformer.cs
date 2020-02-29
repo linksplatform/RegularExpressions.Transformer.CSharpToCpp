@@ -307,11 +307,11 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // Insert scope borders.
             // class Range { ... public: override const char* ToString() { return ...; }
             // class Range {/*~Range~*/ ... public: override const char* ToString() { return ...; }
-            (new Regex(@"(?<classDeclarationBegin>\r?\n(?<indent>[\t ]*)(struct|class) (?<type>[a-zA-Z0-9]+(<[^{\n]+>)?)[\t ]*(\r?\n)?[\t ]*{)(?<middle>((?!class|struct).|\n)+?)(?<toStringDeclaration>(?<access>(private|protected|public): )override const char\* ToString\(\))"), "${classDeclarationBegin}/*~${type}~*/${middle}${toStringDeclaration}", 0),
+            (new Regex(@"(?<classDeclarationBegin>\r?\n(?<indent>[\t ]*)(struct|class) (?<type>[a-zA-Z0-9]+(<((?!\s*:\s*)[^{\n])+>)?)(\s*:\s*[^{\n]+)?[\t ]*(\r?\n)?[\t ]*{)(?<middle>((?!class|struct).|\n)+?)(?<toStringDeclaration>(?<access>(private|protected|public): )override const char\* ToString\(\))"), "${classDeclarationBegin}/*~${type}~*/${middle}${toStringDeclaration}", 0),
             // Inside the scope of ~!_exceptionsBag!~ replace:
             // public: override const char* ToString() { return ...; }
             // public: operator std::string() const { return ...; }\n\npublic: friend std::ostream & operator << (std::ostream &out, const A &obj) { return out << (std::string)obj; }
-            (new Regex(@"(?<scope>/\*~(?<type>[_a-zA-Z0-9<>:]+)~\*/)(?<separator>.|\n)(?<before>((?<!/\*~\k<type>~\*/)(.|\n))*?)(?<toStringDeclaration>\r?\n(?<indent>[ \t]*)(?<access>(private|protected|public): )override const char\* ToString\(\) (?<toStringMethodBody>{[^}\n]+}))"), "${scope}${separator}${before}${indent}${access}operator std::string() const ${toStringMethodBody}" + Environment.NewLine + Environment.NewLine + "${indent}${access}friend std::ostream & operator << (std::ostream &out, const ${type} &obj) { return out << (std::string)obj; }", 0),
+            (new Regex(@"(?<scope>/\*~(?<type>[_a-zA-Z0-9<>:]+)~\*/)(?<separator>.|\n)(?<before>((?<!/\*~\k<type>~\*/)(.|\n))*?)(?<toStringDeclaration>\r?\n(?<indent>[ \t]*)(?<access>(private|protected|public): )override const char\* ToString\(\) (?<toStringMethodBody>{[^}\n]+}))"), "${scope}${separator}${before}" + Environment.NewLine + "${indent}${access}operator std::string() const ${toStringMethodBody}" + Environment.NewLine + Environment.NewLine + "${indent}${access}friend std::ostream & operator << (std::ostream &out, const ${type} &obj) { return out << (std::string)obj; }", 0),
             // Remove scope borders.
             // /*~Range~*/
             // 
