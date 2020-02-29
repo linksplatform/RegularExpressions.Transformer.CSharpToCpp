@@ -4,7 +4,7 @@
     <Description>LinksPlatform's Platform.RegularExpressions.Transformer.CSharpToCpp Class Library</Description>
     <Copyright>Konstantin Diachenko</Copyright>
     <AssemblyTitle>Platform.RegularExpressions.Transformer.CSharpToCpp</AssemblyTitle>
-    <VersionPrefix>0.2.8</VersionPrefix>
+    <VersionPrefix>0.2.9</VersionPrefix>
     <Authors>Konstantin Diachenko</Authors>
     <TargetFrameworks>net472;netstandard2.0;netstandard2.1</TargetFrameworks>
     <AssemblyName>Platform.RegularExpressions.Transformer.CSharpToCpp</AssemblyName>
@@ -24,7 +24,7 @@
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <LangVersion>latest</LangVersion>
-    <PackageReleaseNotes>Remove empty lines near opened and closed curly brackets.</PackageReleaseNotes>
+    <PackageReleaseNotes>Added support for translation of ToString method.</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup Condition="$(TargetFramework.StartsWith('net4')) AND '$(MSBuildRuntimeType)' == 'Core' AND '$(OS)' != 'Windows_NT'">
