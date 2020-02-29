@@ -286,12 +286,12 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // $"Argument {argumentName} is null."
             // ((std::string)"Argument ").append(argumentName).append(" is null.").data()
             (new Regex(@"\$""(?<left>(\\""|[^""\r\n])*){(?<expression>[_a-zA-Z0-9]+)}(?<right>(\\""|[^""\r\n])*)"""), "((std::string)$\"${left}\").append(${expression}).append(\"${right}\").data()", 10),
-            // ((std::string)((std::string)"[").append(Minimum).append(", ").data()).append(Maximum).append("]").data()
-            // ((std::string)"[").append(Minimum).append(", ").append(Maximum).append("]").data()
-            (new Regex(@"\(\(std::string\)(?<begin>\(\(std::string\)""(\\""|[^""])*""\)(\.append\([^)\n]+\))+)\.data\(\)\)\.append"), "${begin}.append", 10),
             // $"
             // "
             (new Regex(@"\$"""), "\"", 0),
+            // ((std::string)((std::string)"[").append(Minimum).append(", ").data()).append(Maximum).append("]").data()
+            // ((std::string)"[").append(Minimum).append(", ").append(Maximum).append("]").data()
+            (new Regex(@"\(\(std::string\)(?<begin>\(\(std::string\)""(\\""|[^""])*""\)(\.append\([^)\n]+\))+)\.data\(\)\)\.append"), "${begin}.append", 10),
             // Console.WriteLine("...")
             // printf("...\n")
             (new Regex(@"Console\.WriteLine\(""([^""\r\n]+)""\)"), "printf(\"$1\\n\")", 0),
