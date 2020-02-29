@@ -23,6 +23,9 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // Platform.Collections.Methods.Lists
             // Platform::Collections::Methods::Lists
             (new Regex(@"(namespace[^\r\n]+?)\.([^\r\n]+?)"), "$1::$2", 20),
+            // nameof(numbers)
+            // "numbers"
+            (new Regex(@"(?<before>\W)nameof\(([^)\n]+\.)?(?<name>[a-zA-Z0-9_]+)(<[^)\n]+>)?\)"), "${before}\"${name}\"", 0),
             // Insert markers
             // EqualityComparer<T> _equalityComparer = EqualityComparer<T>.Default;
             // EqualityComparer<T> _equalityComparer = EqualityComparer<T>.Default;/*~_comparer~*/
@@ -33,7 +36,7 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // Remove markers
             // /*~_equalityComparer~*/
             // 
-            (new Regex(@"\r?\n[^\n]+/\*~[a-zA-Z0-9_]+~\*/\r\n([ \t]*\r\n)?"), Environment.NewLine, 10),
+            (new Regex(@"\r?\n[^\n]+/\*~[a-zA-Z0-9_]+~\*/"), "", 10),
             // Insert markers
             // Comparer<T> _comparer = Comparer<T>.Default;
             // Comparer<T> _comparer = Comparer<T>.Default;/*~_comparer~*/
@@ -44,10 +47,19 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // Remove markers
             // private static readonly Comparer<T> _comparer = Comparer<T>.Default;/*~_comparer~*/
             // 
-            (new Regex(@"\r?\n[^\n]+/\*~[a-zA-Z0-9_]+~\*/\r\n([ \t]*\r\n)?"), Environment.NewLine, 10),
+            (new Regex(@"\r?\n[^\n]+/\*~[a-zA-Z0-9_]+~\*/"), "", 10),
             // Comparer<TArgument>.Default.Compare(maximumArgument, minimumArgument) < 0 
             // maximumArgument < minimumArgument
             (new Regex(@"Comparer<[^>\n]+>\.Default\.Compare\(\s*(?<first>[^,)\n]+),\s*(?<second>[^\)\n]+)\s*\)\s*(?<comparison>[<>=]=?)\s*0(?<after>\D)"), "${first} ${comparison} ${second}${after}", 0),
+            // public static bool operator ==(Range<T> left, Range<T> right) => left.Equals(right);
+            // 
+            (new Regex(@"\r?\n[^\n]+bool operator ==\((?<type>[^\n]+) (?<left>[a-zA-Z0-9]+), \k<type> (?<right>[a-zA-Z0-9]+)\) => (\k<left>|\k<right>)\.Equals\((\k<left>|\k<right>)\);"), "", 10),
+            // public static bool operator !=(Range<T> left, Range<T> right) => !(left == right);
+            // 
+            (new Regex(@"\r?\n[^\n]+bool operator !=\((?<type>[^\n]+) (?<left>[a-zA-Z0-9]+), \k<type> (?<right>[a-zA-Z0-9]+)\) => !\((\k<left>|\k<right>) == (\k<left>|\k<right>)\);"), "", 10),
+            // public override bool Equals(object obj) => obj is Range<T> range ? Equals(range) : false;
+            //
+            (new Regex(@"\r?\n[^\n]+override bool Equals\((System\.)?[Oo]bject (?<this>[a-zA-Z0-9]+)\) => \k<this> is [^\n]+ (?<other>[a-zA-Z0-9]+) \? Equals\(\k<other>\) : false;"), "", 10),
             // out TProduct
             // TProduct
             (new Regex(@"(?<before>(<|, ))(in|out) (?<typeParameter>[a-zA-Z0-9]+)(?<after>(>|,))"), "${before}${typeParameter}${after}", 10),
@@ -289,6 +301,9 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // auto path = new TElement[MaxPath];
             // TElement path[MaxPath] = { {0} };
             (new Regex(@"(\r?\n[\t ]+)[a-zA-Z0-9]+ ([a-zA-Z0-9]+) = new ([a-zA-Z0-9]+)\[([_a-zA-Z0-9]+)\];"), "$1$3 $2[$4] = { {0} };", 0),
+            // bool Equals(Range<T> other) { ... }
+            // bool operator ==(const Key &other) const { ... }
+            (new Regex(@"(?<before>\r?\n[^\n]+bool )Equals\((?<type>[^\n{]+) (?<variable>[a-zA-Z0-9]+)\)(?<after>(\s|\n)*{)"), "${before}operator ==(const ${type} &${variable}) const${after}", 0),
             // private: static readonly ConcurrentBag<std::exception> _exceptionsBag = new ConcurrentBag<std::exception>();
             // private: inline static std::mutex _exceptionsBag_mutex; \n\n private: inline static std::vector<std::exception> _exceptionsBag;
             (new Regex(@"(?<begin>\r?\n?(?<indent>[ \t]+))(?<access>(private|protected|public): )?static readonly ConcurrentBag<(?<argumentType>[^;\r\n]+)> (?<name>[_a-zA-Z0-9]+) = new ConcurrentBag<\k<argumentType>>\(\);"), "${begin}private: inline static std::mutex ${name}_mutex;" + Environment.NewLine + Environment.NewLine + "${indent}${access}inline static std::vector<${argumentType}> ${name};", 0),
@@ -468,6 +483,9 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // ArgumentNullException
             // std::invalid_argument
             (new Regex(@"(?<before>\r?\n[^""\r\n]*(""(\\""|[^""\r\n])*""[^""\r\n]*)*)(?<=\W)(System\.)?ArgumentNullException(?<after>\W)"), "${before}std::invalid_argument${after}", 10),
+            // struct Range<T> : IEquatable<Range<T>> {
+            // struct Range<T> {
+            (new Regex(@"(?<before>(struct|class) (?<type>[a-zA-Z0-9]+(<[^\n]+>)?)) : IEquatable<\k<type>>(?<after>(\s|\n)*{)"), "${before}${after}", 0),
             // #region Always
             // 
             (new Regex(@"(^|\r?\n)[ \t]*\#(region|endregion)[^\r\n]*(\r?\n|$)"), "", 0),
@@ -486,6 +504,9 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // \n ... class
             // class
             (new Regex(@"(\S[\r\n]{1,2})?[\r\n]+class"), "$1class", 0),
+            // \n\n
+            // \n
+            (new Regex(@"\r?\n[ \t]*\r?\n"), Environment.NewLine, 50),
         }.Cast<ISubstitutionRule>().ToList();
 
         public CSharpToCppTransformer(IList<ISubstitutionRule> extraRules) : base(FirstStage.Concat(extraRules).Concat(LastStage).ToList()) { }
