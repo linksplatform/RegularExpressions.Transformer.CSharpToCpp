@@ -23,9 +23,31 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // Platform.Collections.Methods.Lists
             // Platform::Collections::Methods::Lists
             (new Regex(@"(namespace[^\r\n]+?)\.([^\r\n]+?)"), "$1::$2", 20),
+            // Insert markers
+            // EqualityComparer<T> _equalityComparer = EqualityComparer<T>.Default;
+            // EqualityComparer<T> _equalityComparer = EqualityComparer<T>.Default;/*~_comparer~*/
+            (new Regex(@"(?<declaration>EqualityComparer<(?<type>[^>\n]+)> (?<comparer>[a-zA-Z0-9_]+) = EqualityComparer<\k<type>>\.Default;)"), "${declaration}/*~${comparer}~*/", 0),
+            // /*~_equalityComparer~*/..._equalityComparer.Equals(Minimum, value)
+            // /*~_equalityComparer~*/...Minimum == value
+            (new Regex(@"(?<before>/\*~(?<comparer>[a-zA-Z0-9_]+)~\*/(.|\n)+\W)\k<comparer>\.Equals\((?<left>[^,\n]+), (?<right>[^)\n]+)\)"), "${before}${left} == ${right}", 50),
+            // Remove markers
+            // /*~_equalityComparer~*/
+            // 
+            (new Regex(@"\r?\n[^\n]+/\*~[a-zA-Z0-9_]+~\*/\r\n([ \t]*\r\n)?"), Environment.NewLine, 10),
+            // Insert markers
+            // Comparer<T> _comparer = Comparer<T>.Default;
+            // Comparer<T> _comparer = Comparer<T>.Default;/*~_comparer~*/
+            (new Regex(@"(?<declaration>Comparer<(?<type>[^>\n]+)> (?<comparer>[a-zA-Z0-9_]+) = Comparer<\k<type>>\.Default;)"), "${declaration}/*~${comparer}~*/", 0),
+            // /*~_comparer~*/..._comparer.Compare(Minimum, value) <= 0
+            // /*~_comparer~*/...Minimum <= value
+            (new Regex(@"(?<before>/\*~(?<comparer>[a-zA-Z0-9_]+)~\*/(.|\n)+\W)\k<comparer>\.Compare\((?<left>[^,\n]+), (?<right>[^)\n]+)\)\s*(?<comparison>[<>=]=?)\s*0(?<after>\D)"), "${before}${left} ${comparison} ${right}${after}", 50),
+            // Remove markers
+            // private static readonly Comparer<T> _comparer = Comparer<T>.Default;/*~_comparer~*/
+            // 
+            (new Regex(@"\r?\n[^\n]+/\*~[a-zA-Z0-9_]+~\*/\r\n([ \t]*\r\n)?"), Environment.NewLine, 10),
             // Comparer<TArgument>.Default.Compare(maximumArgument, minimumArgument) < 0 
             // maximumArgument < minimumArgument
-            (new Regex(@"Comparer<[^>\n]+>\.Default\.Compare\(\s*(?<first>[^,)\n]+),\s*(?<second>[^\)\n]+)\s*\)\s*(?<comparison>[<>=]=?)\s*0"), "${first} ${comparison} ${second}", 0),
+            (new Regex(@"Comparer<[^>\n]+>\.Default\.Compare\(\s*(?<first>[^,)\n]+),\s*(?<second>[^\)\n]+)\s*\)\s*(?<comparison>[<>=]=?)\s*0(?<after>\D)"), "${first} ${comparison} ${second}${after}", 0),
             // out TProduct
             // TProduct
             (new Regex(@"(?<before>(<|, ))(in|out) (?<typeParameter>[a-zA-Z0-9]+)(?<after>(>|,))"), "${before}${typeParameter}${after}", 10),
