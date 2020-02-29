@@ -506,7 +506,7 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             (new Regex(@"(\S[\r\n]{1,2})?[\r\n]+class"), "$1class", 0),
             // \n\n
             // \n
-            (new Regex(@"\r?\n[ \t]*\r?\n"), Environment.NewLine, 50),
+            (new Regex(@"\r?\n[ \t]*\r?\n[ \t]*\r?\n"), Environment.NewLine + Environment.NewLine, 50),
         }.Cast<ISubstitutionRule>().ToList();
 
         public CSharpToCppTransformer(IList<ISubstitutionRule> extraRules) : base(FirstStage.Concat(extraRules).Concat(LastStage).ToList()) { }
