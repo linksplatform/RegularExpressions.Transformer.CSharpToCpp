@@ -313,8 +313,8 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             (new Regex(@"(?<classDeclarationBegin>\r?\n(?<indent>[\t ]*)(struct|class) (?<type>[a-zA-Z0-9]+(<((?!\s*:\s*)[^{\n])+>)?)(\s*:\s*[^{\n]+)?[\t ]*(\r?\n)?[\t ]*{)(?<middle>((?!class|struct).|\n)+?)(?<toStringDeclaration>(?<access>(private|protected|public): )override const char\* ToString\(\))"), "${classDeclarationBegin}/*~${type}~*/${middle}${toStringDeclaration}", 0),
             // Inside the scope of ~!_exceptionsBag!~ replace:
             // public: override const char* ToString() { return ...; }
-            // public: operator std::string() const { return ...; }\n\npublic: friend std::ostream & operator << (std::ostream &out, const A &obj) { return out << (std::string)obj; }
-            (new Regex(@"(?<scope>/\*~(?<type>[_a-zA-Z0-9<>:]+)~\*/)(?<separator>.|\n)(?<before>((?<!/\*~\k<type>~\*/)(.|\n))*?)(?<toStringDeclaration>\r?\n(?<indent>[ \t]*)(?<access>(private|protected|public): )override const char\* ToString\(\) (?<toStringMethodBody>{[^}\n]+}))"), "${scope}${separator}${before}" + Environment.NewLine + "${indent}${access}operator std::string() const ${toStringMethodBody}" + Environment.NewLine + Environment.NewLine + "${indent}${access}friend std::ostream & operator << (std::ostream &out, const ${type} &obj) { return out << (std::string)obj; }", 0),
+            // public: operator std::string() const { return ...; }\n\npublic: friend std::ostream & operator <<(std::ostream &out, const A &obj) { return out << (std::string)obj; }
+            (new Regex(@"(?<scope>/\*~(?<type>[_a-zA-Z0-9<>:]+)~\*/)(?<separator>.|\n)(?<before>((?<!/\*~\k<type>~\*/)(.|\n))*?)(?<toStringDeclaration>\r?\n(?<indent>[ \t]*)(?<access>(private|protected|public): )override const char\* ToString\(\) (?<toStringMethodBody>{[^}\n]+}))"), "${scope}${separator}${before}" + Environment.NewLine + "${indent}${access}operator std::string() const ${toStringMethodBody}" + Environment.NewLine + Environment.NewLine + "${indent}${access}friend std::ostream & operator <<(std::ostream &out, const ${type} &obj) { return out << (std::string)obj; }", 0),
             // Remove scope borders.
             // /*~Range~*/
             // 
@@ -471,7 +471,7 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // const std::string& message
             // const std::string& message/*~message~*/
             (new Regex(@"(?<before>\(| )(?<variableDefinition>(const )?((std::)?string&?|char\*) (?<variable>[_a-zA-Z0-9]+))(?<after>\W)"), "${before}${variableDefinition}/*~${variable}~*/${after}", 0),
-            // Inside the scope of ~!message!~ replace:
+            // Inside the scope of /*~message~*/ replace:
             // Platform::Converters::To<std::string>(message)
             // message
             (new Regex(@"(?<scope>/\*~(?<variable>[_a-zA-Z0-9]+)~\*/)(?<separator>.|\n)(?<before>((?<!/\*~\k<variable>~\*/)(.|\n))*?)Platform::Converters::To<std::string>\(\k<variable>\)"), "${scope}${separator}${before}${variable}", 10),
@@ -479,6 +479,22 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // /*~ex~*/
             // 
             (new Regex(@"/\*~[_a-zA-Z0-9]+~\*/"), "", 0),
+            // Insert scope borders.
+            // class Range<T> {
+            // class Range<T> {/*~type~Range~*/
+            (new Regex(@"(?<classDeclarationBegin>\r?\n(?<indent>[\t ]*)(struct|class) (?<type>[a-zA-Z0-9]+(<((?!\s*:\s*)[^{\n])+>)?)(\s*:\s*[^{\n]+)?[\t ]*(\r?\n)?[\t ]*{)"), "${classDeclarationBegin}/*~type~${type}~*/", 0),
+            // Inside the scope of /*~type~Range<T>~*/ insert inner scope and replace:
+            // public: static implicit operator std::tuple<T, T>(Range<T> range)
+            // public: operator std::tuple<T, T>(Range<T> range) {/*~variable~Range<T>~*/
+            (new Regex(@"(?<scope>/\*~type~(?<type>[^~\n\*]+)~\*/)(?<separator>.|\n)(?<before>((?<!/\*~type~\k<type>~\*/)(.|\n))*?)(?<access>(private|protected|public): )static implicit operator (?<targetType>[^\(\n]+)\((?<argumentDeclaration>\k<type> (?<variable>[a-zA-Z0-9]+))(?<after>\)\s*\n?\s*{)"), "${scope}${separator}${before}${access}operator ${targetType}(${argumentDeclaration}${after}/*~variable~${variable}~*/", 10),
+            // Inside the scope of /*~variable~range~*/ replace:
+            // range.Minimum
+            // this->Minimum
+            (new Regex(@"(?<scope>{/\*~variable~(?<variable>[^~\n]+)~\*/)(?<separator>.|\n)(?<before>(?<beforeExpression>(?<bracket>{)|(?<-bracket>})|[^{}]|\n)*?)\k<variable>\.(?<field>[_a-zA-Z0-9]+)(?<after>(,|;|}| |\))(?<afterExpression>(?<bracket>{)|(?<-bracket>})|[^{}]|\n)*?})"), "${scope}${separator}${before}this->${field}${after}", 10),
+            // Remove scope borders.
+            // /*~ex~*/
+            // 
+            (new Regex(@"/\*~[^~\n]+~[^~\n]+~\*/"), "", 0),
         }.Cast<ISubstitutionRule>().ToList();
 
         public static readonly IList<ISubstitutionRule> LastStage = new List<SubstitutionRule>
