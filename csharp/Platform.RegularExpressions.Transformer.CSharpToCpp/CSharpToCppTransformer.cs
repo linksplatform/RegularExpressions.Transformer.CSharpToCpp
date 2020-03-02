@@ -284,14 +284,14 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // Assert::ExpectException
             (new Regex(@"(Assert)\.Throws"), "$1::ExpectException", 0),
             // $"Argument {argumentName} is null."
-            // ((std::string)"Argument ").append(argumentName).append(" is null.").data()
-            (new Regex(@"\$""(?<left>(\\""|[^""\r\n])*){(?<expression>[_a-zA-Z0-9]+)}(?<right>(\\""|[^""\r\n])*)"""), "((std::string)$\"${left}\").append(${expression}).append(\"${right}\").data()", 10),
+            // std::string("Argument ").append(Platform::Converters::To<std::string>(argumentName)).append(" is null.").data()
+            (new Regex(@"\$""(?<left>(\\""|[^""\r\n])*){(?<expression>[_a-zA-Z0-9]+)}(?<right>(\\""|[^""\r\n])*)"""), "std::string($\"${left}\").append(Platform::Converters::To<std::string>(${expression})).append(\"${right}\").data()", 10),
             // $"
             // "
             (new Regex(@"\$"""), "\"", 0),
-            // ((std::string)((std::string)"[").append(Minimum).append(", ").data()).append(Maximum).append("]").data()
-            // ((std::string)"[").append(Minimum).append(", ").append(Maximum).append("]").data()
-            (new Regex(@"\(\(std::string\)(?<begin>\(\(std::string\)""(\\""|[^""])*""\)(\.append\([^)\n]+\))+)\.data\(\)\)\.append"), "${begin}.append", 10),
+            // std::string(std::string("[").append(Platform::Converters::To<std::string>(Minimum)).append(", ").data()).append(Platform::Converters::To<std::string>(Maximum)).append("]").data()
+            // std::string("[").append(Platform::Converters::To<std::string>(Minimum)).append(", ").append(Platform::Converters::To<std::string>(Maximum)).append("]").data()
+            (new Regex(@"std::string\((?<begin>std::string\(""(\\""|[^""])*""\)(\.append\((Platform::Converters::To<std::string>\([^)\n]+\)|[^)\n]+)\))+)\.data\(\)\)\.append"), "${begin}.append", 10),
             // Console.WriteLine("...")
             // printf("...\n")
             (new Regex(@"Console\.WriteLine\(""([^""\r\n]+)""\)"), "printf(\"$1\\n\")", 0),
@@ -380,14 +380,14 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // sb.data()
             (new Regex(@"(?<scope>/\*~(?<variable>[a-zA-Z0-9]+)~\*/)(?<separator>.|\n)(?<before>((?<!/\*~\k<variable>~\*/)(.|\n))*?)\k<variable>\.ToString\(\)"), "${scope}${separator}${before}${variable}.data()", 10),
             // sb.AppendLine(argument)
-            // sb.append(argument).append('\n')
-            (new Regex(@"(?<scope>/\*~(?<variable>[a-zA-Z0-9]+)~\*/)(?<separator>.|\n)(?<before>((?<!/\*~\k<variable>~\*/)(.|\n))*?)\k<variable>\.AppendLine\((?<argument>[^\),\r\n]+)\)"), "${scope}${separator}${before}${variable}.append(${argument}).append(1, '\\n')", 10),
+            // sb.append(Platform::Converters::To<std::string>(argument)).append(1, '\n')
+            (new Regex(@"(?<scope>/\*~(?<variable>[a-zA-Z0-9]+)~\*/)(?<separator>.|\n)(?<before>((?<!/\*~\k<variable>~\*/)(.|\n))*?)\k<variable>\.AppendLine\((?<argument>[^\),\r\n]+)\)"), "${scope}${separator}${before}${variable}.append(Platform::Converters::To<std::string>(${argument})).append(1, '\\n')", 10),
             // sb.Append('\t', level);
             // sb.append(level, '\t');
             (new Regex(@"(?<scope>/\*~(?<variable>[a-zA-Z0-9]+)~\*/)(?<separator>.|\n)(?<before>((?<!/\*~\k<variable>~\*/)(.|\n))*?)\k<variable>\.Append\('(?<character>[^'\r\n]+)', (?<count>[^\),\r\n]+)\)"), "${scope}${separator}${before}${variable}.append(${count}, '${character}')", 10),
             // sb.Append(argument)
-            // sb.append(argument)
-            (new Regex(@"(?<scope>/\*~(?<variable>[a-zA-Z0-9]+)~\*/)(?<separator>.|\n)(?<before>((?<!/\*~\k<variable>~\*/)(.|\n))*?)\k<variable>\.Append\((?<argument>[^\),\r\n]+)\)"), "${scope}${separator}${before}${variable}.append(${argument})", 10),
+            // sb.append(Platform::Converters::To<std::string>(argument))
+            (new Regex(@"(?<scope>/\*~(?<variable>[a-zA-Z0-9]+)~\*/)(?<separator>.|\n)(?<before>((?<!/\*~\k<variable>~\*/)(.|\n))*?)\k<variable>\.Append\((?<argument>[^\),\r\n]+)\)"), "${scope}${separator}${before}${variable}.append(Platform::Converters::To<std::string>(${argument}))", 10),
             // Remove scope borders.
             // /*~sb~*/
             // 
@@ -459,8 +459,8 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // throw std::invalid_argument(((std::string)"Invalid ").append(argumentName).append(" argument: ").append(message).append("."));
             (new Regex(@"throw new ArgumentException\((?<message>[a-zA-Z]*[Mm]essage[a-zA-Z]*(\(\))?), (?<argument>[a-zA-Z]*[Aa]rgument[a-zA-Z]*)\);"), "throw std::invalid_argument(((std::string)\"Invalid \").append(${argument}).append(\" argument: \").append(${message}).append(\".\"));", 0),
             // throw new ArgumentOutOfRangeException(argumentName, argumentValue, messageBuilder());
-            // throw std::invalid_argument(((std::string)"Value [").append(std::to_string(argumentValue)).append("] of argument [").append(argumentName).append("] is out of range: ").append(messageBuilder()).append("."));
-            (new Regex(@"throw new ArgumentOutOfRangeException\((?<argument>[a-zA-Z]*[Aa]rgument[a-zA-Z]*([Nn]ame[a-zA-Z]*)?), (?<argumentValue>[a-zA-Z]*[Aa]rgument[a-zA-Z]*([Vv]alue[a-zA-Z]*)?), (?<message>[a-zA-Z]*[Mm]essage[a-zA-Z]*(\(\))?)\);"), "throw std::invalid_argument(((std::string)\"Value [\").append(std::to_string(${argumentValue})).append(\"] of argument [\").append(${argument}).append(\"] is out of range: \").append(${message}).append(\".\"));", 0),
+            // throw std::invalid_argument(((std::string)"Value [").append(Platform::Converters::To<std::string>(argumentValue)).append("] of argument [").append(argumentName).append("] is out of range: ").append(messageBuilder()).append("."));
+            (new Regex(@"throw new ArgumentOutOfRangeException\((?<argument>[a-zA-Z]*[Aa]rgument[a-zA-Z]*([Nn]ame[a-zA-Z]*)?), (?<argumentValue>[a-zA-Z]*[Aa]rgument[a-zA-Z]*([Vv]alue[a-zA-Z]*)?), (?<message>[a-zA-Z]*[Mm]essage[a-zA-Z]*(\(\))?)\);"), "throw std::invalid_argument(((std::string)\"Value [\").append(Platform::Converters::To<std::string>(${argumentValue})).append(\"] of argument [\").append(${argument}).append(\"] is out of range: \").append(${message}).append(\".\"));", 0),
             // throw new NotSupportedException();
             // throw std::logic_error("Not supported exception.");
             (new Regex(@"throw new NotSupportedException\(\);"), "throw std::logic_error(\"Not supported exception.\");", 0),
@@ -480,6 +480,9 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // (method(expression))
             // method(expression)
             (new Regex(@"(?<firstSeparator>(\(| ))\((?<method>[a-zA-Z0-9_\->\*:]+)\((?<expression>((?<parenthesis>\()|(?<-parenthesis>\))|[a-zA-Z0-9_\->\*:]*)+)(?(parenthesis)(?!))\)\)(?<lastSeparator>(,| |;|\)))"), "${firstSeparator}${method}(${expression})${lastSeparator}", 0),
+            // .append(".")
+            // .append(1, '.');
+            (new Regex(@"\.append\(""([^\\""]|\\[^""])""\)"), ".append(1, '$1')", 0),
             // return ref _elements[node];
             // return &_elements[node];
             (new Regex(@"return ref ([_a-zA-Z0-9]+)\[([_a-zA-Z0-9\*]+)\];"), "return &$1[$2];", 0),
