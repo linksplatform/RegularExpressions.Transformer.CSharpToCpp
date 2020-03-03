@@ -74,7 +74,7 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             (new Regex(@"((public|protected|private|internal|abstract|static) )*(?<category>interface|class|struct)"), "${category}", 0),
             // class GenericCollectionMethodsBase<TElement> {
             // template <typename TElement> class GenericCollectionMethodsBase {
-            (new Regex(@"class ([a-zA-Z0-9]+)<([a-zA-Z0-9]+)>([^{]+){"), "template <typename $2> class $1$3{", 0),
+            (new Regex(@"(class|struct) ([a-zA-Z0-9]+)<([a-zA-Z0-9]+)>([^{]+){"), "template <typename $2> class $1$3{", 0),
             // static void TestMultipleCreationsAndDeletions<TElement>(SizedBinaryTreeMethodsBase<TElement> tree, TElement* root)
             // template<typename T> static void TestMultipleCreationsAndDeletions<TElement>(SizedBinaryTreeMethodsBase<TElement> tree, TElement* root)
             (new Regex(@"static ([a-zA-Z0-9]+) ([a-zA-Z0-9]+)<([a-zA-Z0-9]+)>\(([^\)\r\n]+)\)"), "template <typename $3> static $1 $2($4)", 0),
@@ -82,7 +82,7 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // template <typename TProduct> class IFactory { public:
             (new Regex(@"interface (?<interface>[a-zA-Z0-9]+)<(?<typeParameters>[a-zA-Z0-9 ,]+)>(?<whitespace>[^{]+){"), "template <typename...> class ${interface}; template <typename ${typeParameters}> class ${interface}<${typeParameters}>${whitespace}{" + Environment.NewLine + "    public:", 0),
             // template <typename TObject, TProperty, TValue>
-            // template <typename TObject, typename TProperty, TValue>
+            // template <typename TObject, typename TProperty, typename TValue>
             (new Regex(@"(?<before>template <((, )?typename [a-zA-Z0-9]+)+, )(?<typeParameter>[a-zA-Z0-9]+)(?<after>(,|>))"), "${before}typename ${typeParameter}${after}", 10),
             // Insert markers
             // private: static void BuildExceptionString(this StringBuilder sb, Exception exception, int level)
