@@ -485,8 +485,8 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             (new Regex(@"(?<classDeclarationBegin>\r?\n(?<indent>[\t ]*)(struct|class) (?<type>[a-zA-Z0-9]+(<((?!\s*:\s*)[^{\n])+>)?)(\s*:\s*[^{\n]+)?[\t ]*(\r?\n)?[\t ]*{)"), "${classDeclarationBegin}/*~type~${type}~*/", 0),
             // Inside the scope of /*~type~Range<T>~*/ insert inner scope and replace:
             // public: static implicit operator std::tuple<T, T>(Range<T> range)
-            // public: operator std::tuple<T, T>(Range<T> range) {/*~variable~Range<T>~*/
-            (new Regex(@"(?<scope>/\*~type~(?<type>[^~\n\*]+)~\*/)(?<separator>.|\n)(?<before>((?<!/\*~type~\k<type>~\*/)(.|\n))*?)(?<access>(private|protected|public): )static implicit operator (?<targetType>[^\(\n]+)\((?<argumentDeclaration>\k<type> (?<variable>[a-zA-Z0-9]+))\)(?<after>\s*\n?\s*{)"), "${scope}${separator}${before}${access}operator ${targetType}(${argumentDeclaration}) const${after}/*~variable~${variable}~*/", 10),
+            // public: operator std::tuple<T, T>() const {/*~variable~Range<T>~*/
+            (new Regex(@"(?<scope>/\*~type~(?<type>[^~\n\*]+)~\*/)(?<separator>.|\n)(?<before>((?<!/\*~type~\k<type>~\*/)(.|\n))*?)(?<access>(private|protected|public): )static implicit operator (?<targetType>[^\(\n]+)\((?<argumentDeclaration>\k<type> (?<variable>[a-zA-Z0-9]+))\)(?<after>\s*\n?\s*{)"), "${scope}${separator}${before}${access}operator ${targetType}() const${after}/*~variable~${variable}~*/", 10),
             // Inside the scope of /*~variable~range~*/ replace:
             // range.Minimum
             // this->Minimum
