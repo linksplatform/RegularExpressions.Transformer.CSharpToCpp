@@ -309,9 +309,9 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             (new Regex(@"(?<before>\r?\n[^\n]+bool )Equals\((?<type>[^\n{]+) (?<variable>[a-zA-Z0-9]+)\)(?<after>(\s|\n)*{)"), "${before}operator ==(const ${type} &${variable}) const${after}", 0),
             // Insert scope borders.
             // class Range { ... public: override const char* ToString() { return ...; }
-            // class Range {/*~Range~*/ ... public: override const char* ToString() { return ...; }
-            (new Regex(@"(?<classDeclarationBegin>\r?\n(?<indent>[\t ]*)(struct|class) (?<type>[a-zA-Z0-9]+(<((?!\s*:\s*)[^{\n])+>)?)(\s*:\s*[^{\n]+)?[\t ]*(\r?\n)?[\t ]*{)(?<middle>((?!class|struct).|\n)+?)(?<toStringDeclaration>(?<access>(private|protected|public): )override const char\* ToString\(\))"), "${classDeclarationBegin}/*~${type}~*/${middle}${toStringDeclaration}", 0),
-            // Inside the scope of ~!_exceptionsBag!~ replace:
+            // class Range {/*~Range<T>~*/ ... public: override const char* ToString() { return ...; }
+            (new Regex(@"(?<classDeclarationBegin>\r?\n(?<indent>[\t ]*)template <typename (?<typeParameter>[^\n]+)> (struct|class) (?<type>[a-zA-Z0-9]+)(\s*:\s*[^{\n]+)?[\t ]*(\r?\n)?[\t ]*{)(?<middle>((?!class|struct).|\n)+?)(?<toStringDeclaration>(?<access>(private|protected|public): )override const char\* ToString\(\))"), "${classDeclarationBegin}/*~${type}<${typeParameter}>~*/${middle}${toStringDeclaration}", 0),
+            // Inside the scope of ~!Range!~ replace:
             // public: override const char* ToString() { return ...; }
             // public: operator std::string() const { return ...; }\n\npublic: friend std::ostream & operator <<(std::ostream &out, const A &obj) { return out << (std::string)obj; }
             (new Regex(@"(?<scope>/\*~(?<type>[_a-zA-Z0-9<>:]+)~\*/)(?<separator>.|\n)(?<before>((?<!/\*~\k<type>~\*/)(.|\n))*?)(?<toStringDeclaration>\r?\n(?<indent>[ \t]*)(?<access>(private|protected|public): )override const char\* ToString\(\) (?<toStringMethodBody>{[^}\n]+}))"), "${scope}${separator}${before}" + Environment.NewLine + "${indent}${access}operator std::string() const ${toStringMethodBody}" + Environment.NewLine + Environment.NewLine + "${indent}${access}friend std::ostream & operator <<(std::ostream &out, const ${type} &obj) { return out << (std::string)obj; }", 0),
@@ -481,8 +481,8 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             (new Regex(@"/\*~[_a-zA-Z0-9]+~\*/"), "", 0),
             // Insert scope borders.
             // class Range<T> {
-            // class Range<T> {/*~type~Range~*/
-            (new Regex(@"(?<classDeclarationBegin>\r?\n(?<indent>[\t ]*)(struct|class) (?<type>[a-zA-Z0-9]+(<((?!\s*:\s*)[^{\n])+>)?)(\s*:\s*[^{\n]+)?[\t ]*(\r?\n)?[\t ]*{)"), "${classDeclarationBegin}/*~type~${type}~*/", 0),
+            // class Range<T> {/*~type~Range<T>~*/
+            (new Regex(@"(?<classDeclarationBegin>\r?\n(?<indent>[\t ]*)template <typename (?<typeParameter>[^\n]+)> (struct|class) (?<type>[a-zA-Z0-9]+(<((?!\s*:\s*)[^{\n])+>)?)(\s*:\s*[^{\n]+)?[\t ]*(\r?\n)?[\t ]*{)"), "${classDeclarationBegin}/*~type~${type}<${typeParameter}>~*/", 0),
             // Inside the scope of /*~type~Range<T>~*/ insert inner scope and replace:
             // public: static implicit operator std::tuple<T, T>(Range<T> range)
             // public: operator std::tuple<T, T>() const {/*~variable~Range<T>~*/
@@ -529,9 +529,9 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // ArgumentNullException
             // std::invalid_argument
             (new Regex(@"(?<before>\r?\n[^""\r\n]*(""(\\""|[^""\r\n])*""[^""\r\n]*)*)(?<=\W)(System\.)?ArgumentNullException(?<after>\W)"), "${before}std::invalid_argument${after}", 10),
-            // struct Range<T> : IEquatable<Range<T>> {
-            // struct Range<T> {
-            (new Regex(@"(?<before>(struct|class) (?<type>[a-zA-Z0-9]+(<[^\n]+>)?)) : IEquatable<\k<type>>(?<after>(\s|\n)*{)"), "${before}${after}", 0),
+            // template <typename T> struct Range : IEquatable<Range<T>>
+            // template <typename T> struct Range {
+            (new Regex(@"(?<before>template <typename (?<typeParameter>[^\n]+)> (struct|class) (?<type>[a-zA-Z0-9]+)) : IEquatable<\k<type><\k<typeParameter>>>(?<after>(\s|\n)*{)"), "${before}${after}", 0),
             // #region Always
             // 
             (new Regex(@"(^|\r?\n)[ \t]*\#(region|endregion)[^\r\n]*(\r?\n|$)"), "", 0),
