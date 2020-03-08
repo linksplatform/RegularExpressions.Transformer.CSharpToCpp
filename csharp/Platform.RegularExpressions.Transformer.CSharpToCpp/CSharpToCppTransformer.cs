@@ -480,6 +480,18 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // 
             (new Regex(@"/\*~[_a-zA-Z0-9]+~\*/"), "", 0),
             // Insert scope borders.
+            // std::tuple<T, T> tuple
+            // std::tuple<T, T> tuple/*~tuple~*/
+            (new Regex(@"(?<before>\(| )(?<variableDefinition>(const )?(std::)?tuple<[^\n]+>&? (?<variable>[_a-zA-Z0-9]+))(?<after>\W)"), "${before}${variableDefinition}/*~${variable}~*/${after}", 0),
+            // Inside the scope of ~!ex!~ replace:
+            // tuple.Item1
+            // std::get<1-1>(tuple)
+            (new Regex(@"(?<scope>/\*~(?<variable>[_a-zA-Z0-9]+)~\*/)(?<separator>.|\n)(?<before>((?<!/\*~\k<variable>~\*/)(.|\n))*?)\k<variable>\.Item(?<itemNumber>\d+)(?<after>\W)"), "${scope}${separator}${before}std::get<${itemNumber}-1>(${variable})${after}", 10),
+            // Remove scope borders.
+            // /*~ex~*/
+            // 
+            (new Regex(@"/\*~[_a-zA-Z0-9]+~\*/"), "", 0),
+            // Insert scope borders.
             // class Range<T> {
             // class Range<T> {/*~type~Range<T>~*/
             (new Regex(@"(?<classDeclarationBegin>\r?\n(?<indent>[\t ]*)template <typename (?<typeParameter>[^\n]+)> (struct|class) (?<type>[a-zA-Z0-9]+(<((?!\s*:\s*)[^{\n])+>)?)(\s*:\s*[^{\n]+)?[\t ]*(\r?\n)?[\t ]*{)"), "${classDeclarationBegin}/*~type~${type}<${typeParameter}>~*/", 0),
@@ -487,6 +499,10 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // public: static implicit operator std::tuple<T, T>(Range<T> range)
             // public: operator std::tuple<T, T>() const {/*~variable~Range<T>~*/
             (new Regex(@"(?<scope>/\*~type~(?<type>[^~\n\*]+)~\*/)(?<separator>.|\n)(?<before>((?<!/\*~type~\k<type>~\*/)(.|\n))*?)(?<access>(private|protected|public): )static implicit operator (?<targetType>[^\(\n]+)\((?<argumentDeclaration>\k<type> (?<variable>[a-zA-Z0-9]+))\)(?<after>\s*\n?\s*{)"), "${scope}${separator}${before}${access}operator ${targetType}() const${after}/*~variable~${variable}~*/", 10),
+            // Inside the scope of /*~type~Range<T>~*/ replace:
+            // public: static implicit operator Range<T>(std::tuple<T, T> tuple) { return new Range<T>(std::get<1-1>(tuple), std::get<2-1>(tuple)); }
+            // public: Range(std::tuple<T, T> tuple) : Range(std::get<1-1>(tuple), std::get<2-1>(tuple)) { }
+            (new Regex(@"(?<scope>/\*~type~(?<type>(?<typeName>[_a-zA-Z0-9]+)[^~\n\*]*)~\*/)(?<separator>.|\n)(?<before>((?<!/\*~type~\k<type>~\*/)(.|\n))*?)(?<access>(private|protected|public): )static implicit operator \k<type>\((?<arguments>[^{}\n]+)\)(\s|\n)*{(\s|\n)*return (new )?\k<type>\((?<passedArguments>[^\n]+)\);(\s|\n)*}"), "${scope}${separator}${before}${access}${typeName}(${arguments}) : ${typeName}(${passedArguments}) { }", 10),
             // Inside the scope of /*~variable~range~*/ replace:
             // range.Minimum
             // this->Minimum
