@@ -65,7 +65,7 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             (new Regex(@"(?<before>(<|, ))(in|out) (?<typeParameter>[a-zA-Z0-9]+)(?<after>(>|,))"), "${before}${typeParameter}${after}", 10),
             // public ...
             // public: ...
-            (new Regex(@"(?<newLineAndIndent>\r?\n?[ \t]*)(?<before>[^\{\(\r\n]*)(?<access>private|protected|public)[ \t]+(?![^\{\(\r\n]*(interface|class|struct)[^\{\(\r\n]*[\{\(\r\n])"), "${newLineAndIndent}${access}: ${before}", 0),
+            (new Regex(@"(?<newLineAndIndent>\r?\n?[ \t]*)(?<before>[^\{\(\r\n]*)(?<access>private|protected|public)[ \t]+(?![^\{\(\r\n]*((?<=\s)|\W)(interface|class|struct)(\W)[^\{\(\r\n]*[\{\(\r\n])"), "${newLineAndIndent}${access}: ${before}", 0),
             // public: static bool CollectExceptions { get; set; }
             // public: inline static bool CollectExceptions;
             (new Regex(@"(?<access>(private|protected|public): )(?<before>(static )?[^\r\n]+ )(?<name>[a-zA-Z0-9]+) {[^;}]*(?<=\W)get;[^;}]*(?<=\W)set;[^;}]*}"), "${access}inline ${before}${name};", 0),
@@ -169,9 +169,9 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // unchecked
             // 
             (new Regex(@"[\r\n]{2}\s*?unchecked\s*?$"), "", 0),
-            // throw new InvalidOperationException
-            // throw std::runtime_error
-            (new Regex(@"throw new (InvalidOperationException|Exception)"), "throw std::runtime_error", 0),
+            // throw new
+            // throw
+            (new Regex(@"(\W)throw new(\W)"), "$1throw$2", 0),
             // void RaiseExceptionIgnoredEvent(Exception exception)
             // void RaiseExceptionIgnoredEvent(const std::exception& exception)
             (new Regex(@"(\(|, )(System\.Exception|Exception)( |\))"), "$1const std::exception&$3", 0),
@@ -220,12 +220,9 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // @object
             // object
             (new Regex(@"@([_a-zA-Z0-9]+)"), "$1", 0),
-            // std::int32_t.MinValue
-            // std::numeric_limits<float>::min()
-            (new Regex(@"(?<before>\W)(?<type>std::[a-z0-9_]+)\.MinValue(?<after>\W)"), "${before}std::numeric_limits<${type}>::min()${after}", 0),
             // float.MinValue
             // std::numeric_limits<float>::lowest()
-            (new Regex(@"(?<before>\W)(?<type>float|double)\.MinValue(?<after>\W)"), "${before}std::numeric_limits<${type}>::lowest()${after}", 0),
+            (new Regex(@"(?<before>\W)(?<type>std::[a-z0-9_]+|float|double)\.MinValue(?<after>\W)"), "${before}std::numeric_limits<${type}>::lowest()${after}", 0),
             // double.MaxValue
             // std::numeric_limits<float>::max()
             (new Regex(@"(?<before>\W)(?<type>std::[a-z0-9_]+|float|double)\.MaxValue(?<after>\W)"), "${before}std::numeric_limits<${type}>::max()${after}", 0),
@@ -282,13 +279,22 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             (new Regex(@"\[Fact\][\s\n]+(public: )?(static )?void ([a-zA-Z0-9]+)\(\)"), "public: TEST_METHOD($3)", 0),
             // class TreesTests
             // TEST_CLASS(TreesTests)
-            (new Regex(@"class ([a-zA-Z0-9]+)Tests"), "TEST_CLASS($1)", 0),
+            (new Regex(@"class ([a-zA-Z0-9]+Tests)"), "TEST_CLASS($1)", 0),
             // Assert.Equal
             // Assert::AreEqual
             (new Regex(@"(Assert)\.Equal"), "$1::AreEqual", 0),
+            // Assert.NotEqual
+            // Assert::AreNotEqual
+            (new Regex(@"(Assert)\.NotEqual"), "$1::AreNotEqual", 0),
             // Assert.Throws
             // Assert::ExpectException
             (new Regex(@"(Assert)\.Throws"), "$1::ExpectException", 0),
+            // Assert.True
+            // Assert::IsTrue
+            (new Regex(@"(Assert)\.True"), "$1::IsTrue", 0),
+            // Assert.False
+            // Assert::IsFalse
+            (new Regex(@"(Assert)\.False"), "$1::IsFalse", 0),
             // $"Argument {argumentName} is null."
             // std::string("Argument ").append(Platform::Converters::To<std::string>(argumentName)).append(" is null.").data()
             (new Regex(@"\$""(?<left>(\\""|[^""\r\n])*){(?<expression>[_a-zA-Z0-9]+)}(?<right>(\\""|[^""\r\n])*)"""), "std::string($\"${left}\").append(Platform::Converters::To<std::string>(${expression})).append(\"${right}\").data()", 10),
@@ -441,7 +447,7 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // GetFirst(
             // this->GetFirst(
             //(new Regex(@"(?<separator>(\(|, |([\W]) |return ))(?<!(->|\* ))(?<method>(?!sizeof)[a-zA-Z0-9]+)\((?!\) \{)"), "${separator}this->${method}(", 1),
-            (new Regex(@"(?<scope>/\*method-start\*/)(?<before>((?<!/\*method-end\*/)(.|\n))*?)(?<separator>[\W](?<!(::|\.|->)))(?<method>(?!sizeof)[a-zA-Z0-9]+)\((?!\) \{)(?<after>(.|\n)*?)(?<scopeEnd>/\*method-end\*/)"), "${scope}${before}${separator}this->${method}(${after}${scopeEnd}", 100),
+            (new Regex(@"(?<scope>/\*method-start\*/)(?<before>((?<!/\*method-end\*/)(.|\n))*?)(?<separator>[\W](?<!(::|\.|->|throw\s+)))(?<method>(?!sizeof)[a-zA-Z0-9]+)\((?!\) \{)(?<after>(.|\n)*?)(?<scopeEnd>/\*method-end\*/)"), "${scope}${before}${separator}this->${method}(${after}${scopeEnd}", 100),
             // Remove scope borders.
             // /*method-start*/
             // 
@@ -458,21 +464,21 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // /*~ex~*/
             // 
             (new Regex(@"/\*~[_a-zA-Z0-9]+~\*/"), "", 0),
-            // throw new ArgumentNullException(argumentName, message);
+            // throw ArgumentNullException(argumentName, message);
             // throw std::invalid_argument(std::string("Argument ").append(argumentName).append(" is null: ").append(message).append("."));
-            (new Regex(@"throw new ArgumentNullException\((?<argument>[a-zA-Z]*[Aa]rgument[a-zA-Z]*), (?<message>[a-zA-Z]*[Mm]essage[a-zA-Z]*(\(\))?)\);"), "throw std::invalid_argument(std::string(\"Argument \").append(${argument}).append(\" is null: \").append(${message}).append(\".\"));", 0),
-            // throw new ArgumentException(message, argumentName);
+            (new Regex(@"throw ArgumentNullException\((?<argument>[a-zA-Z]*[Aa]rgument[a-zA-Z]*), (?<message>[a-zA-Z]*[Mm]essage[a-zA-Z]*(\(\))?)\);"), "throw std::invalid_argument(std::string(\"Argument \").append(${argument}).append(\" is null: \").append(${message}).append(\".\"));", 0),
+            // throw ArgumentException(message, argumentName);
             // throw std::invalid_argument(std::string("Invalid ").append(argumentName).append(" argument: ").append(message).append("."));
-            (new Regex(@"throw new ArgumentException\((?<message>[a-zA-Z]*[Mm]essage[a-zA-Z]*(\(\))?), (?<argument>[a-zA-Z]*[Aa]rgument[a-zA-Z]*)\);"), "throw std::invalid_argument(std::string(\"Invalid \").append(${argument}).append(\" argument: \").append(${message}).append(\".\"));", 0),
-            // throw new ArgumentOutOfRangeException(argumentName, argumentValue, messageBuilder());
+            (new Regex(@"throw ArgumentException\((?<message>[a-zA-Z]*[Mm]essage[a-zA-Z]*(\(\))?), (?<argument>[a-zA-Z]*[Aa]rgument[a-zA-Z]*)\);"), "throw std::invalid_argument(std::string(\"Invalid \").append(${argument}).append(\" argument: \").append(${message}).append(\".\"));", 0),
+            // throw ArgumentOutOfRangeException(argumentName, argumentValue, messageBuilder());
             // throw std::invalid_argument(std::string("Value [").append(Platform::Converters::To<std::string>(argumentValue)).append("] of argument [").append(argumentName).append("] is out of range: ").append(messageBuilder()).append("."));
-            (new Regex(@"throw new ArgumentOutOfRangeException\((?<argument>[a-zA-Z]*[Aa]rgument[a-zA-Z]*([Nn]ame[a-zA-Z]*)?), (?<argumentValue>[a-zA-Z]*[Aa]rgument[a-zA-Z]*([Vv]alue[a-zA-Z]*)?), (?<message>[a-zA-Z]*[Mm]essage[a-zA-Z]*(\(\))?)\);"), "throw std::invalid_argument(std::string(\"Value [\").append(Platform::Converters::To<std::string>(${argumentValue})).append(\"] of argument [\").append(${argument}).append(\"] is out of range: \").append(${message}).append(\".\"));", 0),
-            // throw new NotSupportedException();
+            (new Regex(@"throw ArgumentOutOfRangeException\((?<argument>[a-zA-Z]*[Aa]rgument[a-zA-Z]*([Nn]ame[a-zA-Z]*)?), (?<argumentValue>[a-zA-Z]*[Aa]rgument[a-zA-Z]*([Vv]alue[a-zA-Z]*)?), (?<message>[a-zA-Z]*[Mm]essage[a-zA-Z]*(\(\))?)\);"), "throw std::invalid_argument(std::string(\"Value [\").append(Platform::Converters::To<std::string>(${argumentValue})).append(\"] of argument [\").append(${argument}).append(\"] is out of range: \").append(${message}).append(\".\"));", 0),
+            // throw NotSupportedException();
             // throw std::logic_error("Not supported exception.");
-            (new Regex(@"throw new NotSupportedException\(\);"), "throw std::logic_error(\"Not supported exception.\");", 0),
-            // throw new NotImplementedException();
+            (new Regex(@"throw NotSupportedException\(\);"), "throw std::logic_error(\"Not supported exception.\");", 0),
+            // throw NotImplementedException();
             // throw std::logic_error("Not implemented exception.");
-            (new Regex(@"throw new NotImplementedException\(\);"), "throw std::logic_error(\"Not implemented exception.\");", 0),
+            (new Regex(@"throw NotImplementedException\(\);"), "throw std::logic_error(\"Not implemented exception.\");", 0),
             // Insert scope borders.
             // const std::string& message
             // const std::string& message/*~message~*/
@@ -536,6 +542,12 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // return ref _elements[node];
             // return &_elements[node];
             (new Regex(@"return ref ([_a-zA-Z0-9]+)\[([_a-zA-Z0-9\*]+)\];"), "return &$1[$2];", 0),
+            // ((1, 2))
+            // ({1, 2})
+            (new Regex(@"(?<before>\(|, )\((?<first>[^\n()]+), (?<second>[^\n()]+)\)(?<after>\)|, )"), "${before}{${first}, ${second}}${after}", 10),
+            // new
+            // 
+            (new Regex(@"(?<before>\r?\n[^""\r\n]*(""(\\""|[^""\r\n])*""[^""\r\n]*)*)(?<=\W)new\s+"), "${before}", 10),
             // null
             // nullptr
             (new Regex(@"(?<before>\r?\n[^""\r\n]*(""(\\""|[^""\r\n])*""[^""\r\n]*)*)(?<=\W)null(?<after>\W)"), "${before}nullptr${after}", 10),
@@ -551,6 +563,12 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // ArgumentNullException
             // std::invalid_argument
             (new Regex(@"(?<before>\r?\n[^""\r\n]*(""(\\""|[^""\r\n])*""[^""\r\n]*)*)(?<=\W)(System\.)?ArgumentNullException(?<after>\W)"), "${before}std::invalid_argument${after}", 10),
+            // InvalidOperationException
+            // std::runtime_error
+            (new Regex(@"(\W)(InvalidOperationException|Exception)(\W)"), "$1std::runtime_error$3", 0),
+            // ArgumentException
+            // std::invalid_argument
+            (new Regex(@"(\W)(ArgumentException|ArgumentOutOfRangeException)(\W)"), "$1std::invalid_argument$3", 0),
             // template <typename T> struct Range : IEquatable<Range<T>>
             // template <typename T> struct Range {
             (new Regex(@"(?<before>template <typename (?<typeParameter>[^\n]+)> (struct|class) (?<type>[a-zA-Z0-9]+<[^\n]+>)) : (public )?IEquatable<\k<type>>(?<after>(\s|\n)*{)"), "${before}${after}", 0),
