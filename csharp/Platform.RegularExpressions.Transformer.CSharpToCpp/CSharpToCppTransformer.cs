@@ -74,13 +74,13 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             (new Regex(@"((public|protected|private|internal|abstract|static) )*(?<category>interface|class|struct)"), "${category}", 0),
             // class GenericCollectionMethodsBase<TElement> {
             // template <typename TElement> class GenericCollectionMethodsBase {
-            (new Regex(@"(class|struct) ([a-zA-Z0-9]+)<([a-zA-Z0-9]+)>([^{]+){"), "template <typename $3> $1 $2$4{", 0),
+            (new Regex(@"(?<before>\r?\n)(?<indent>[ \t]*)(?<type>class|struct) (?<typeName>[a-zA-Z0-9]+)<(?<typeParameters>[a-zA-Z0-9 ,]+)>(?<typeDefinitionEnding>[^{]+){"), "${before}${indent}template <typename ...> ${type} ${typeName};" + Environment.NewLine + "${indent}template <typename ${typeParameters}> ${type} ${typeName}<${typeParameters}>${typeDefinitionEnding}{", 0),
             // static void TestMultipleCreationsAndDeletions<TElement>(SizedBinaryTreeMethodsBase<TElement> tree, TElement* root)
             // template<typename T> static void TestMultipleCreationsAndDeletions<TElement>(SizedBinaryTreeMethodsBase<TElement> tree, TElement* root)
             (new Regex(@"static ([a-zA-Z0-9]+) ([a-zA-Z0-9]+)<([a-zA-Z0-9]+)>\(([^\)\r\n]+)\)"), "template <typename $3> static $1 $2($4)", 0),
             // interface IFactory<out TProduct> {
-            // template <typename TProduct> class IFactory { public:
-            (new Regex(@"interface (?<interface>[a-zA-Z0-9]+)<(?<typeParameters>[a-zA-Z0-9 ,]+)>(?<whitespace>[^{]+){"), "template <typename...> class ${interface}; template <typename ${typeParameters}> class ${interface}<${typeParameters}>${whitespace}{" + Environment.NewLine + "    public:", 0),
+            // template <typename...> class IFactory;\ntemplate <typename TProduct> class IFactory<TProduct>
+            (new Regex(@"(?<before>\r?\n)(?<indent>[ \t]*)interface (?<interface>[a-zA-Z0-9]+)<(?<typeParameters>[a-zA-Z0-9 ,]+)>(?<typeDefinitionEnding>[^{]+){"), "${before}${indent}template <typename ...> class ${interface};" + Environment.NewLine + "${indent}template <typename ${typeParameters}> class ${interface}<${typeParameters}>${typeDefinitionEnding}{" + Environment.NewLine + "    public:", 0),
             // template <typename TObject, TProperty, TValue>
             // template <typename TObject, typename TProperty, typename TValue>
             (new Regex(@"(?<before>template <((, )?typename [a-zA-Z0-9]+)+, )(?<typeParameter>[a-zA-Z0-9]+)(?<after>(,|>))"), "${before}typename ${typeParameter}${after}", 10),
@@ -101,8 +101,11 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // (
             (new Regex(@"\(this "), "(", 0),
             // public: static readonly EnsureAlwaysExtensionRoot Always = new EnsureAlwaysExtensionRoot();
-            // public:inline static EnsureAlwaysExtensionRoot Always;
-            (new Regex(@"(?<access>(private|protected|public): )?static readonly (?<type>[a-zA-Z0-9]+) (?<name>[a-zA-Z0-9_]+) = new \k<type>\(\);"), "${access}inline static ${type} ${name};", 0),
+            // public: inline static EnsureAlwaysExtensionRoot Always;
+            (new Regex(@"(?<access>(private|protected|public): )?static readonly (?<type>[a-zA-Z0-9]+(<[a-zA-Z0-9]+>)?) (?<name>[a-zA-Z0-9_]+) = new \k<type>\(\);"), "${access}inline static ${type} ${name};", 0),
+            // public: static readonly Range<int> SByte = new Range<int>(std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
+            // public: inline static Range<int> SByte = Range<int>(std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
+            (new Regex(@"(?<access>(private|protected|public): )?static readonly (?<type>[a-zA-Z0-9]+(<[a-zA-Z0-9]+>)?) (?<name>[a-zA-Z0-9_]+) = new \k<type>\((?<arguments>[^\n]+)\);"), "${access}inline static ${type} ${name} = ${type}(${arguments});", 0),
             // public: static readonly string ExceptionContentsSeparator = "---";
             // public: inline static const char* ExceptionContentsSeparator = "---";
             (new Regex(@"(?<access>(private|protected|public): )?(const|static readonly) string (?<name>[a-zA-Z0-9_]+) = ""(?<string>(\""|[^""\r\n])+)"";"), "${access}inline static const char* ${name} = \"${string}\";", 0),
@@ -186,40 +189,43 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             (new Regex(@"(\W)string(\W)"), "$1const char*$2", 0),
             // System.ValueTuple
             // std::tuple
-            (new Regex(@"(?<before>\W)(System\.)?ValueTuple(?!\s*=)(?<after>\W)"), "${before}std::tuple${after}", 0),
+            (new Regex(@"(?<before>\W)(System\.)?ValueTuple(?!\s*=|\()(?<after>\W)"), "${before}std::tuple${after}", 0),
             // sbyte
             // std::int8_t
-            (new Regex(@"(?<before>\W)((System\.)?SB|sb)yte(?!\s*=)(?<after>\W)"), "${before}std::int8_t${after}", 0),
+            (new Regex(@"(?<before>\W)((System\.)?SB|sb)yte(?!\s*=|\()(?<after>\W)"), "${before}std::int8_t${after}", 0),
             // short
             // std::int16_t
-            (new Regex(@"(?<before>\W)((System\.)?Int16|short)(?!\s*=)(?<after>\W)"), "${before}std::int16_t${after}", 0),
+            (new Regex(@"(?<before>\W)((System\.)?Int16|short)(?!\s*=|\()(?<after>\W)"), "${before}std::int16_t${after}", 0),
             // int
             // std::int32_t
-            (new Regex(@"(?<before>\W)((System\.)?I|i)nt(32)?(?!\s*=)(?<after>\W)"), "${before}std::int32_t${after}", 0),
+            (new Regex(@"(?<before>\W)((System\.)?I|i)nt(32)?(?!\s*=|\()(?<after>\W)"), "${before}std::int32_t${after}", 0),
             // long
             // std::int64_t
-            (new Regex(@"(?<before>\W)((System\.)?Int64|long)(?!\s*=)(?<after>\W)"), "${before}std::int64_t${after}", 0),
+            (new Regex(@"(?<before>\W)((System\.)?Int64|long)(?!\s*=|\()(?<after>\W)"), "${before}std::int64_t${after}", 0),
             // byte
             // std::uint8_t
-            (new Regex(@"(?<before>\W)((System\.)?Byte|byte)(?!\s*=)(?<after>\W)"), "${before}std::uint8_t${after}", 0),
+            (new Regex(@"(?<before>\W)((System\.)?Byte|byte)(?!\s*=|\()(?<after>\W)"), "${before}std::uint8_t${after}", 0),
             // ushort
             // std::uint16_t
-            (new Regex(@"(?<before>\W)((System\.)?UInt16|ushort)(?!\s*=)(?<after>\W)"), "${before}std::uint16_t${after}", 0),
+            (new Regex(@"(?<before>\W)((System\.)?UInt16|ushort)(?!\s*=|\()(?<after>\W)"), "${before}std::uint16_t${after}", 0),
             // uint
             // std::uint32_t
-            (new Regex(@"(?<before>\W)((System\.)?UI|ui)nt(32)?(?!\s*=)(?<after>\W)"), "${before}std::uint32_t${after}", 0),
+            (new Regex(@"(?<before>\W)((System\.)?UI|ui)nt(32)?(?!\s*=|\()(?<after>\W)"), "${before}std::uint32_t${after}", 0),
             // ulong
             // std::uint64_t
-            (new Regex(@"(?<before>\W)((System\.)?UInt64|ulong)(?!\s*=)(?<after>\W)"), "${before}std::uint64_t${after}", 0),
+            (new Regex(@"(?<before>\W)((System\.)?UInt64|ulong)(?!\s*=|\()(?<after>\W)"), "${before}std::uint64_t${after}", 0),
             // char*[] args
             // char* args[]
             (new Regex(@"([_a-zA-Z0-9:\*]?)\[\] ([a-zA-Z0-9]+)"), "$1 $2[]", 0),
             // @object
             // object
             (new Regex(@"@([_a-zA-Z0-9]+)"), "$1", 0),
-            // float.MinValue
+            // std::int32_t.MinValue
             // std::numeric_limits<float>::min()
-            (new Regex(@"(?<before>\W)(?<type>std::[a-z0-9_]+|float|double)\.MinValue(?<after>\W)"), "${before}std::numeric_limits<${type}>::min()${after}", 0),
+            (new Regex(@"(?<before>\W)(?<type>std::[a-z0-9_]+)\.MinValue(?<after>\W)"), "${before}std::numeric_limits<${type}>::min()${after}", 0),
+            // float.MinValue
+            // std::numeric_limits<float>::lowest()
+            (new Regex(@"(?<before>\W)(?<type>float|double)\.MinValue(?<after>\W)"), "${before}std::numeric_limits<${type}>::lowest()${after}", 0),
             // double.MaxValue
             // std::numeric_limits<float>::max()
             (new Regex(@"(?<before>\W)(?<type>std::[a-z0-9_]+|float|double)\.MaxValue(?<after>\W)"), "${before}std::numeric_limits<${type}>::max()${after}", 0),
@@ -234,10 +240,10 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             (new Regex(@"(struct|class) ([a-zA-Z0-9]+[^\r\n]*)([\r\n]+(?<indentLevel>[\t ]*)?)\{([\S\s]+?[\r\n]+\k<indentLevel>)\}([^;]|$)"), "$1 $2$3{$4};$5", 0),
             // class SizedBinaryTreeMethodsBase : GenericCollectionMethodsBase
             // class SizedBinaryTreeMethodsBase : public GenericCollectionMethodsBase
-            (new Regex(@"class ([a-zA-Z0-9]+) : ([a-zA-Z0-9]+)"), "class $1 : public $2", 0),
+            (new Regex(@"(struct|class) ([a-zA-Z0-9]+)(<[a-zA-Z0-9 ,]+>)? : ([a-zA-Z0-9]+)"), "$1 $2$3 : public $4", 0),
             // class IProperty : ISetter<TValue, TObject>, IProvider<TValue, TObject>
-            // class IProperty : public ISetter<TValue, TObject>, IProvider<TValue, TObject>
-            (new Regex(@"(?<before>class [a-zA-Z0-9]+ : ((public [a-zA-Z0-9]+(<[a-zA-Z0-9 ,]+>)?, )+)?)(?<inheritedType>(?!public)[a-zA-Z0-9]+(<[a-zA-Z0-9 ,]+>)?)(?<after>(, [a-zA-Z0-9]+(?!>)|[ \r\n]+))"), "${before}public ${inheritedType}${after}", 10),
+            // class IProperty : public ISetter<TValue, TObject>, public IProvider<TValue, TObject>
+            (new Regex(@"(?<before>(struct|class) [a-zA-Z0-9]+ : ((public [a-zA-Z0-9]+(<[a-zA-Z0-9 ,]+>)?, )+)?)(?<inheritedType>(?!public)[a-zA-Z0-9]+(<[a-zA-Z0-9 ,]+>)?)(?<after>(, [a-zA-Z0-9]+(?!>)|[ \r\n]+))"), "${before}public ${inheritedType}${after}", 10),
             // Insert scope borders.
             // ref TElement root
             // ~!root!~ref TElement root
@@ -310,7 +316,7 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // Insert scope borders.
             // class Range { ... public: override const char* ToString() { return ...; }
             // class Range {/*~Range<T>~*/ ... public: override const char* ToString() { return ...; }
-            (new Regex(@"(?<classDeclarationBegin>\r?\n(?<indent>[\t ]*)template <typename (?<typeParameter>[^\n]+)> (struct|class) (?<type>[a-zA-Z0-9]+)(\s*:\s*[^{\n]+)?[\t ]*(\r?\n)?[\t ]*{)(?<middle>((?!class|struct).|\n)+?)(?<toStringDeclaration>(?<access>(private|protected|public): )override const char\* ToString\(\))"), "${classDeclarationBegin}/*~${type}<${typeParameter}>~*/${middle}${toStringDeclaration}", 0),
+            (new Regex(@"(?<classDeclarationBegin>\r?\n(?<indent>[\t ]*)template <typename (?<typeParameter>[^<>\n]+)> (struct|class) (?<type>[a-zA-Z0-9]+<\k<typeParameter>>)(\s*:\s*[^{\n]+)?[\t ]*(\r?\n)?[\t ]*{)(?<middle>((?!class|struct).|\n)+?)(?<toStringDeclaration>(?<access>(private|protected|public): )override const char\* ToString\(\))"), "${classDeclarationBegin}/*~${type}~*/${middle}${toStringDeclaration}", 0),
             // Inside the scope of ~!Range!~ replace:
             // public: override const char* ToString() { return ...; }
             // public: operator std::string() const { return ...; }\n\npublic: friend std::ostream & operator <<(std::ostream &out, const A &obj) { return out << (std::string)obj; }
@@ -319,9 +325,9 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // /*~Range~*/
             // 
             (new Regex(@"/\*~[_a-zA-Z0-9<>:]+~\*/"), "", 0),
-            // private: static readonly ConcurrentBag<std::exception> _exceptionsBag = new ConcurrentBag<std::exception>();
+            // private: inline static ConcurrentBag<std::exception> _exceptionsBag;
             // private: inline static std::mutex _exceptionsBag_mutex; \n\n private: inline static std::vector<std::exception> _exceptionsBag;
-            (new Regex(@"(?<begin>\r?\n?(?<indent>[ \t]+))(?<access>(private|protected|public): )?static readonly ConcurrentBag<(?<argumentType>[^;\r\n]+)> (?<name>[_a-zA-Z0-9]+) = new ConcurrentBag<\k<argumentType>>\(\);"), "${begin}private: inline static std::mutex ${name}_mutex;" + Environment.NewLine + Environment.NewLine + "${indent}${access}inline static std::vector<${argumentType}> ${name};", 0),
+            (new Regex(@"(?<begin>\r?\n?(?<indent>[ \t]+))(?<access>(private|protected|public): )?inline static ConcurrentBag<(?<argumentType>[^;\r\n]+)> (?<name>[_a-zA-Z0-9]+);"), "${begin}private: inline static std::mutex ${name}_mutex;" + Environment.NewLine + Environment.NewLine + "${indent}${access}inline static std::vector<${argumentType}> ${name};", 0),
             // public: static IReadOnlyCollection<std::exception> GetCollectedExceptions() { return _exceptionsBag; }
             // public: static std::vector<std::exception> GetCollectedExceptions() { return std::vector<std::exception>(_exceptionsBag); }
             (new Regex(@"(?<access>(private|protected|public): )?static IReadOnlyCollection<(?<argumentType>[^;\r\n]+)> (?<methodName>[_a-zA-Z0-9]+)\(\) { return (?<fieldName>[_a-zA-Z0-9]+); }"), "${access}static std::vector<${argumentType}> ${methodName}() { return std::vector<${argumentType}>(${fieldName}); }", 0),
@@ -494,7 +500,7 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // Insert scope borders.
             // class Range<T> {
             // class Range<T> {/*~type~Range<T>~*/
-            (new Regex(@"(?<classDeclarationBegin>\r?\n(?<indent>[\t ]*)template <typename (?<typeParameter>[^\n]+)> (struct|class) (?<type>[a-zA-Z0-9]+(<((?!\s*:\s*)[^{\n])+>)?)(\s*:\s*[^{\n]+)?[\t ]*(\r?\n)?[\t ]*{)"), "${classDeclarationBegin}/*~type~${type}<${typeParameter}>~*/", 0),
+            (new Regex(@"(?<classDeclarationBegin>\r?\n(?<indent>[\t ]*)template <typename (?<typeParameter>[^\n]+)> (struct|class) (?<type>[a-zA-Z0-9]+<\k<typeParameter>>)(\s*:\s*[^{\n]+)?[\t ]*(\r?\n)?[\t ]*{)"), "${classDeclarationBegin}/*~type~${type}~*/", 0),
             // Inside the scope of /*~type~Range<T>~*/ insert inner scope and replace:
             // public: static implicit operator std::tuple<T, T>(Range<T> range)
             // public: operator std::tuple<T, T>() const {/*~variable~Range<T>~*/
@@ -547,7 +553,7 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             (new Regex(@"(?<before>\r?\n[^""\r\n]*(""(\\""|[^""\r\n])*""[^""\r\n]*)*)(?<=\W)(System\.)?ArgumentNullException(?<after>\W)"), "${before}std::invalid_argument${after}", 10),
             // template <typename T> struct Range : IEquatable<Range<T>>
             // template <typename T> struct Range {
-            (new Regex(@"(?<before>template <typename (?<typeParameter>[^\n]+)> (struct|class) (?<type>[a-zA-Z0-9]+)) : IEquatable<\k<type><\k<typeParameter>>>(?<after>(\s|\n)*{)"), "${before}${after}", 0),
+            (new Regex(@"(?<before>template <typename (?<typeParameter>[^\n]+)> (struct|class) (?<type>[a-zA-Z0-9]+<[^\n]+>)) : (public )?IEquatable<\k<type>>(?<after>(\s|\n)*{)"), "${before}${after}", 0),
             // #region Always
             // 
             (new Regex(@"(^|\r?\n)[ \t]*\#(region|endregion)[^\r\n]*(\r?\n|$)"), "", 0),
