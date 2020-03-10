@@ -107,8 +107,8 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // public: inline static Range<int> SByte = Range<int>(std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
             (new Regex(@"(?<access>(private|protected|public): )?static readonly (?<type>[a-zA-Z0-9]+(<[a-zA-Z0-9]+>)?) (?<name>[a-zA-Z0-9_]+) = new \k<type>\((?<arguments>[^\n]+)\);"), "${access}inline static ${type} ${name} = ${type}(${arguments});", 0),
             // public: static readonly string ExceptionContentsSeparator = "---";
-            // public: inline static const char* ExceptionContentsSeparator = "---";
-            (new Regex(@"(?<access>(private|protected|public): )?(const|static readonly) string (?<name>[a-zA-Z0-9_]+) = ""(?<string>(\""|[^""\r\n])+)"";"), "${access}inline static const char* ${name} = \"${string}\";", 0),
+            // public: inline static std::string ExceptionContentsSeparator = "---";
+            (new Regex(@"(?<access>(private|protected|public): )?(const|static readonly) string (?<name>[a-zA-Z0-9_]+) = ""(?<string>(\""|[^""\r\n])+)"";"), "${access}inline static std::string ${name} = \"${string}\";", 0),
             // private: const int MaxPath = 92;
             // private: inline static const int MaxPath = 92;
             (new Regex(@"(?<access>(private|protected|public): )?(const|static readonly) (?<type>[a-zA-Z0-9]+) (?<name>[_a-zA-Z0-9]+) = (?<value>[^;\r\n]+);"), "${access}inline static const ${type} ${name} = ${value};", 0),
@@ -151,8 +151,8 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // Count => GetSizeOrZero(Root);
             // GetCount() { return GetSizeOrZero(Root); }
             (new Regex(@"(\W)([A-Z][a-zA-Z]+)\s+=>\s+([^;\r\n]+);"), "$1Get$2() { return $3; }", 0),
-            // ArgumentInRange(const char* message) { const char* messageBuilder() { return message; }
-            // ArgumentInRange(const char* message) { auto messageBuilder = [&]() -> const char* { return message; };
+            // ArgumentInRange(string message) { string messageBuilder() { return message; }
+            // ArgumentInRange(string message) { auto messageBuilder = [&]() -> string { return message; };
             (new Regex(@"(?<before>\W[_a-zA-Z0-9]+\([^\)\n]*\)[\s\n]*{[\s\n]*([^{}]|\n)*?(\r?\n)?[ \t]*)(?<returnType>[_a-zA-Z0-9*:]+[_a-zA-Z0-9*: ]*) (?<methodName>[_a-zA-Z0-9]+)\((?<arguments>[^\)\n]*)\)\s*{(?<body>(""[^""\n]+""|[^}]|\n)+?)}"), "${before}auto ${methodName} = [&]() -> ${returnType} {${body}};", 10),
             // Func<TElement> treeCount
             // std::function<TElement()> treeCount
@@ -185,8 +185,8 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // return {range.Minimum, range.Maximum}
             (new Regex(@"(?<before>return\s*)\((?<values>[^\)\n]+)\)(?!\()(?<after>\W)"), "${before}{${values}}${after}", 0),
             // string
-            // const char*
-            (new Regex(@"(\W)string(\W)"), "$1const char*$2", 0),
+            // std::string
+            (new Regex(@"(\W)(?<!::)string(\W)"), "$1std::string$2", 0),
             // System.ValueTuple
             // std::tuple
             (new Regex(@"(?<before>\W)(System\.)?ValueTuple(?!\s*=|\()(?<after>\W)"), "${before}std::tuple${after}", 0),
@@ -290,14 +290,14 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // Assert::IsTrue
             (new Regex(@"(Assert)\.(True|False)"), "$1::Is$2", 0),
             // $"Argument {argumentName} is null."
-            // std::string("Argument ").append(Platform::Converters::To<std::string>(argumentName)).append(" is null.").data()
-            (new Regex(@"\$""(?<left>(\\""|[^""\r\n])*){(?<expression>[_a-zA-Z0-9]+)}(?<right>(\\""|[^""\r\n])*)"""), "std::string($\"${left}\").append(Platform::Converters::To<std::string>(${expression})).append(\"${right}\").data()", 10),
+            // std::string("Argument ").append(Platform::Converters::To<std::string>(argumentName)).append(" is null.")
+            (new Regex(@"\$""(?<left>(\\""|[^""\r\n])*){(?<expression>[_a-zA-Z0-9]+)}(?<right>(\\""|[^""\r\n])*)"""), "std::string($\"${left}\").append(Platform::Converters::To<std::string>(${expression})).append(\"${right}\")", 10),
             // $"
             // "
             (new Regex(@"\$"""), "\"", 0),
-            // std::string(std::string("[").append(Platform::Converters::To<std::string>(Minimum)).append(", ").data()).append(Platform::Converters::To<std::string>(Maximum)).append("]").data()
-            // std::string("[").append(Platform::Converters::To<std::string>(Minimum)).append(", ").append(Platform::Converters::To<std::string>(Maximum)).append("]").data()
-            (new Regex(@"std::string\((?<begin>std::string\(""(\\""|[^""])*""\)(\.append\((Platform::Converters::To<std::string>\([^)\n]+\)|[^)\n]+)\))+)\.data\(\)\)\.append"), "${begin}.append", 10),
+            // std::string(std::string("[").append(Platform::Converters::To<std::string>(Minimum)).append(", ")).append(Platform::Converters::To<std::string>(Maximum)).append("]")
+            // std::string("[").append(Platform::Converters::To<std::string>(Minimum)).append(", ").append(Platform::Converters::To<std::string>(Maximum)).append("]")
+            (new Regex(@"std::string\((?<begin>std::string\(""(\\""|[^""])*""\)(\.append\((Platform::Converters::To<std::string>\([^)\n]+\)|[^)\n]+)\))+)\)\.append"), "${begin}.append", 10),
             // Console.WriteLine("...")
             // printf("...\n")
             (new Regex(@"Console\.WriteLine\(""([^""\r\n]+)""\)"), "printf(\"$1\\n\")", 0),
@@ -314,13 +314,13 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // bool operator ==(const Key &other) const { ... }
             (new Regex(@"(?<before>\r?\n[^\n]+bool )Equals\((?<type>[^\n{]+) (?<variable>[a-zA-Z0-9]+)\)(?<after>(\s|\n)*{)"), "${before}operator ==(const ${type} &${variable}) const${after}", 0),
             // Insert scope borders.
-            // class Range { ... public: override const char* ToString() { return ...; }
-            // class Range {/*~Range<T>~*/ ... public: override const char* ToString() { return ...; }
-            (new Regex(@"(?<classDeclarationBegin>\r?\n(?<indent>[\t ]*)template <typename (?<typeParameter>[^<>\n]+)> (struct|class) (?<type>[a-zA-Z0-9]+<\k<typeParameter>>)(\s*:\s*[^{\n]+)?[\t ]*(\r?\n)?[\t ]*{)(?<middle>((?!class|struct).|\n)+?)(?<toStringDeclaration>(?<access>(private|protected|public): )override const char\* ToString\(\))"), "${classDeclarationBegin}/*~${type}~*/${middle}${toStringDeclaration}", 0),
+            // class Range { ... public: override std::string ToString() { return ...; }
+            // class Range {/*~Range<T>~*/ ... public: override std::string ToString() { return ...; }
+            (new Regex(@"(?<classDeclarationBegin>\r?\n(?<indent>[\t ]*)template <typename (?<typeParameter>[^<>\n]+)> (struct|class) (?<type>[a-zA-Z0-9]+<\k<typeParameter>>)(\s*:\s*[^{\n]+)?[\t ]*(\r?\n)?[\t ]*{)(?<middle>((?!class|struct).|\n)+?)(?<toStringDeclaration>(?<access>(private|protected|public): )override std::string ToString\(\))"), "${classDeclarationBegin}/*~${type}~*/${middle}${toStringDeclaration}", 0),
             // Inside the scope of ~!Range!~ replace:
-            // public: override const char* ToString() { return ...; }
+            // public: override std::string ToString() { return ...; }
             // public: operator std::string() const { return ...; }\n\npublic: friend std::ostream & operator <<(std::ostream &out, const A &obj) { return out << (std::string)obj; }
-            (new Regex(@"(?<scope>/\*~(?<type>[_a-zA-Z0-9<>:]+)~\*/)(?<separator>.|\n)(?<before>((?<!/\*~\k<type>~\*/)(.|\n))*?)(?<toStringDeclaration>\r?\n(?<indent>[ \t]*)(?<access>(private|protected|public): )override const char\* ToString\(\) (?<toStringMethodBody>{[^}\n]+}))"), "${scope}${separator}${before}" + Environment.NewLine + "${indent}${access}operator std::string() const ${toStringMethodBody}" + Environment.NewLine + Environment.NewLine + "${indent}${access}friend std::ostream & operator <<(std::ostream &out, const ${type} &obj) { return out << (std::string)obj; }", 0),
+            (new Regex(@"(?<scope>/\*~(?<type>[_a-zA-Z0-9<>:]+)~\*/)(?<separator>.|\n)(?<before>((?<!/\*~\k<type>~\*/)(.|\n))*?)(?<toStringDeclaration>\r?\n(?<indent>[ \t]*)(?<access>(private|protected|public): )override std::string ToString\(\) (?<toStringMethodBody>{[^}\n]+}))"), "${scope}${separator}${before}" + Environment.NewLine + "${indent}${access}operator std::string() const ${toStringMethodBody}" + Environment.NewLine + Environment.NewLine + "${indent}${access}friend std::ostream & operator <<(std::ostream &out, const ${type} &obj) { return out << (std::string)obj; }", 0),
             // Remove scope borders.
             // /*~Range~*/
             // 
@@ -383,8 +383,8 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             (new Regex(@"(?<start>, |\()(System\.Text\.)?StringBuilder (?<variable>[a-zA-Z0-9]+)(?<end>,|\))"), "${start}/*~${variable}~*/std::string& ${variable}${end}", 0),
             // Inside the scope of ~!added!~ replace:
             // sb.ToString()
-            // sb.data()
-            (new Regex(@"(?<scope>/\*~(?<variable>[a-zA-Z0-9]+)~\*/)(?<separator>.|\n)(?<before>((?<!/\*~\k<variable>~\*/)(.|\n))*?)\k<variable>\.ToString\(\)"), "${scope}${separator}${before}${variable}.data()", 10),
+            // sb
+            (new Regex(@"(?<scope>/\*~(?<variable>[a-zA-Z0-9]+)~\*/)(?<separator>.|\n)(?<before>((?<!/\*~\k<variable>~\*/)(.|\n))*?)\k<variable>\.ToString\(\)"), "${scope}${separator}${before}${variable}", 10),
             // sb.AppendLine(argument)
             // sb.append(Platform::Converters::To<std::string>(argument)).append(1, '\n')
             (new Regex(@"(?<scope>/\*~(?<variable>[a-zA-Z0-9]+)~\*/)(?<separator>.|\n)(?<before>((?<!/\*~\k<variable>~\*/)(.|\n))*?)\k<variable>\.AppendLine\((?<argument>[^\),\r\n]+)\)"), "${scope}${separator}${before}${variable}.append(Platform::Converters::To<std::string>(${argument})).append(1, '\\n')", 10),
@@ -545,9 +545,12 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // new
             // 
             (new Regex(@"(?<before>\r?\n[^""\r\n]*(""(\\""|[^""\r\n])*""[^""\r\n]*)*)(?<=\W)new\s+"), "${before}", 10),
+            // x == null
+            // x == nullptr
+            (new Regex(@"(?<before>\r?\n[^""\r\n]*(""(\\""|[^""\r\n])*""[^""\r\n]*)*)(?<=\W)(?<variable>[_a-zA-Z][_a-zA-Z0-9]+)(?<operator>\s*(==|!=)\s*)null(?<after>\W)"), "${before}${variable}${operator}nullptr${after}", 10),
             // null
-            // nullptr
-            (new Regex(@"(?<before>\r?\n[^""\r\n]*(""(\\""|[^""\r\n])*""[^""\r\n]*)*)(?<=\W)null(?<after>\W)"), "${before}nullptr${after}", 10),
+            // {}
+            (new Regex(@"(?<before>\r?\n[^""\r\n]*(""(\\""|[^""\r\n])*""[^""\r\n]*)*)(?<=\W)null(?<after>\W)"), "${before}{}${after}", 10),
             // default
             // 0
             (new Regex(@"(?<before>\r?\n[^""\r\n]*(""(\\""|[^""\r\n])*""[^""\r\n]*)*)(?<=\W)default(?<after>\W)"), "${before}0${after}", 10),
