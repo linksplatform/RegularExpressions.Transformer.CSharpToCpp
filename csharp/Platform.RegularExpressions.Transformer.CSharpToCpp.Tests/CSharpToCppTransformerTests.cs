@@ -26,7 +26,7 @@ class Program
 }";
             const string expectedResult = @"class Program
 {
-    public: static void Main(const char* args[])
+    public: static void Main(std::string args[])
     {
         printf(""Hello, world!\n"");
     }
