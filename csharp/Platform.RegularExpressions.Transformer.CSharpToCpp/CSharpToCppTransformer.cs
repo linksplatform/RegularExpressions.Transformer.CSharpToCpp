@@ -282,19 +282,13 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             (new Regex(@"class ([a-zA-Z0-9]+Tests)"), "TEST_CLASS($1)", 0),
             // Assert.Equal
             // Assert::AreEqual
-            (new Regex(@"(Assert)\.Equal"), "$1::AreEqual", 0),
-            // Assert.NotEqual
-            // Assert::AreNotEqual
-            (new Regex(@"(Assert)\.NotEqual"), "$1::AreNotEqual", 0),
+            (new Regex(@"(Assert)\.((Not)?Equal)"), "$1::Are$2", 0),
             // Assert.Throws
             // Assert::ExpectException
             (new Regex(@"(Assert)\.Throws"), "$1::ExpectException", 0),
             // Assert.True
             // Assert::IsTrue
-            (new Regex(@"(Assert)\.True"), "$1::IsTrue", 0),
-            // Assert.False
-            // Assert::IsFalse
-            (new Regex(@"(Assert)\.False"), "$1::IsFalse", 0),
+            (new Regex(@"(Assert)\.(True|False)"), "$1::Is$2", 0),
             // $"Argument {argumentName} is null."
             // std::string("Argument ").append(Platform::Converters::To<std::string>(argumentName)).append(" is null.").data()
             (new Regex(@"\$""(?<left>(\\""|[^""\r\n])*){(?<expression>[_a-zA-Z0-9]+)}(?<right>(\\""|[^""\r\n])*)"""), "std::string($\"${left}\").append(Platform::Converters::To<std::string>(${expression})).append(\"${right}\").data()", 10),
