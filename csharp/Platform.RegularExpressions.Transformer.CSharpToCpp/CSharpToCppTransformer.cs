@@ -539,6 +539,9 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // ((1, 2))
             // ({1, 2})
             (new Regex(@"(?<before>\(|, )\((?<first>[^\n()]+), (?<second>[^\n()]+)\)(?<after>\)|, )"), "${before}{${first}, ${second}}${after}", 10),
+            // range.ToString()
+            // Platform::Converters::To<std::string>(range).data()
+            (new Regex(@"(?<before>\W)(?<variable>[_a-zA-Z][_a-zA-Z0-9]+)\.ToString\(\)"), "${before}Platform::Converters::To<std::string>(${variable}).data()", 10),
             // new
             // 
             (new Regex(@"(?<before>\r?\n[^""\r\n]*(""(\\""|[^""\r\n])*""[^""\r\n]*)*)(?<=\W)new\s+"), "${before}", 10),
