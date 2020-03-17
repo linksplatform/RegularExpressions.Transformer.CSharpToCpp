@@ -560,8 +560,8 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // ({1, 2})
             (new Regex(@"(?<before>\(|, )\((?<first>[^\n()]+), (?<second>[^\n()]+)\)(?<after>\)|, )"), "${before}{${first}, ${second}}${after}", 10),
             // {1, 2}.GetHashCode()
-            // Platform::Hashing::Hash({1, 2})
-            (new Regex(@"{(?<first>[^\n{}]+), (?<second>[^\n{}]+)}\.GetHashCode\(\)"), "Platform::Hashing::Hash({${first}, ${second}})", 10),
+            // Platform::Hashing::Hash(1, 2)
+            (new Regex(@"{(?<first>[^\n{}]+), (?<second>[^\n{}]+)}\.GetHashCode\(\)"), "Platform::Hashing::Hash(${first}, ${second})", 10),
             // range.ToString()
             // Platform::Converters::To<std::string>(range).data()
             (new Regex(@"(?<before>\W)(?<variable>[_a-zA-Z][_a-zA-Z0-9]+)\.ToString\(\)"), "${before}Platform::Converters::To<std::string>(${variable}).data()", 10),
