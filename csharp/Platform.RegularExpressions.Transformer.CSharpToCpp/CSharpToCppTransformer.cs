@@ -607,12 +607,12 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // [Fact]
             // 
             (new Regex(@"(?<firstNewLine>\r?\n|\A)(?<indent>[\t ]+)\[[a-zA-Z0-9]+(\((?<expression>((?<parenthesis>\()|(?<-parenthesis>\))|[^()\r\n]*)+)(?(parenthesis)(?!))\))?\][ \t]*(\r?\n\k<indent>)?"), "${firstNewLine}${indent}", 5),
-            // \n ... namespace
-            // namespace
-            (new Regex(@"(\S[\r\n]{1,2})?[\r\n]+namespace"), "$1namespace", 0),
-            // \n ... class
-            // class
-            (new Regex(@"(\S[\r\n]{1,2})?[\r\n]+class"), "$1class", 0),
+            // \A \n ... namespace
+            // \Anamespace
+            (new Regex(@"(\A)(\r?\n)+namespace"), "$1namespace", 0),
+            // \A \n ... class
+            // \Aclass
+            (new Regex(@"(\A)(\r?\n)+class"), "$1class", 0),
             // \n\n\n
             // \n\n
             (new Regex(@"\r?\n[ \t]*\r?\n[ \t]*\r?\n"), Environment.NewLine + Environment.NewLine, 50),
