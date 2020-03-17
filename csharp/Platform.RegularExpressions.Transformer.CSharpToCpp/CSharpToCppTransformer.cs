@@ -517,6 +517,26 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // /*~ex~*/
             // 
             (new Regex(@"/\*~[^~\n]+~[^~\n]+~\*/"), "", 0),
+            // Insert scope borders.
+            // namespace Platform::Ranges { ... }
+            // namespace Platform::Ranges {/*~start~namespace~Platform::Ranges~*/ ... /*~end~namespace~Platform::Ranges~*/} 
+            (new Regex(@"(?<namespaceDeclarationBegin>\r?\n(?<indent>[\t ]*)namespace (?<namespaceName>(?<namePart>[a-zA-Z][a-zA-Z0-9]+)(?<nextNamePart>::[a-zA-Z][a-zA-Z0-9]+)+)(\s|\n)*{)(?<middle>(.|\n)*)(?<end>(?<=\r?\n)\k<indent>}(?!;))"), "${namespaceDeclarationBegin}/*~start~namespace~${namespaceName}~*/${middle}/*~end~namespace~${namespaceName}~*/${end}", 0),
+            // Insert scope borders.
+            // class Range<T> { ... };
+            // class Range<T> {/*~start~type~Range<T>~T~*/ ... /*~start~type~Range<T>~T~*/};
+            (new Regex(@"(?<classDeclarationBegin>\r?\n(?<indent>[\t ]*)template <typename (?<typeParameter>[^\n]+)> (struct|class) (?<type>[a-zA-Z0-9]+<\k<typeParameter>>)(\s*:\s*[^{\n]+)?[\t ]*(\r?\n)?[\t ]*{)(?<middle>(.|\n)*)(?<endIndent>(?<=\r?\n)\k<indent>)(?<end>};)"), "${classDeclarationBegin}/*~start~type~${type}~${typeParameter}~*/${middle}${endIndent}/*~end~type~${type}~${typeParameter}~*/${end}", 0),
+            // Inside scopes replace:
+            // /*~start~namespace~Platform::Ranges~*/ ... /*~start~type~Range<T>~T~*/ ... public: override std::int32_t GetHashCode() { return {Minimum, Maximum}.GetHashCode(); } ... /*~start~type~Range<T>~T~*/ ... /*~end~namespace~Platform::Ranges~*/
+            // /*~start~namespace~Platform::Ranges~*/ ... /*~start~type~Range<T>~T~*/ ... /*~start~type~Range<T>~T~*/ ... /*~end~namespace~Platform::Ranges~*/ namespace std { template <typename T> struct hash<Platform::Ranges::Range<T>> { std::size_t operator()(const Platform::Ranges::Range<T> &obj) const { return {Minimum, Maximum}.GetHashCode(); } }; }
+            (new Regex(@"(?<namespaceScopeStart>/\*~start~namespace~(?<namespace>[^~\n\*]+)~\*/)(?<betweenStartScopes>(.|\n)+)(?<typeScopeStart>/\*~start~type~(?<type>[^~\n\*]+)~(?<typeParameter>[^~\n\*]+)~\*/)(?<before>(.|\n)+?)(?<hashMethodDeclaration>\r?\n[ \t]*(?<access>(private|protected|public): )override std::int32_t GetHashCode\(\)(\s|\n)*{\s*(?<methodBody>[^\s][^\n]+[^\s])\s*}\s*)(?<after>(.|\n)+?)(?<typeScopeEnd>/\*~end~type~\k<type>~\k<typeParameter>~\*/)(?<betweenEndScopes>(.|\n)+)(?<namespaceScopeEnd>/\*~end~namespace~\k<namespace>~\*/)}\r?\n"), "${namespaceScopeStart}${betweenStartScopes}${typeScopeStart}${before}${after}${typeScopeEnd}${betweenEndScopes}${namespaceScopeEnd}}" + Environment.NewLine + Environment.NewLine + "namespace std" + Environment.NewLine + "{" + Environment.NewLine + "    template <typename ${typeParameter}>" + Environment.NewLine + "    struct hash<${namespace}::${type}>" + Environment.NewLine + "    {" + Environment.NewLine + "        std::size_t operator()(const ${namespace}::${type} &obj) const" + Environment.NewLine + "        {" + Environment.NewLine + "            /*~start~method~*/${methodBody}/*~end~method~*/" + Environment.NewLine + "        }" + Environment.NewLine + "    };" + Environment.NewLine + "}" + Environment.NewLine, 10),
+            // Inside scope of /*~start~method~*/ replace:
+            // /*~start~method~*/ ... Minimum ... /*~end~method~*/
+            // /*~start~method~*/ ... obj.Minimum ... /*~end~method~*/
+            (new Regex(@"(?<methodScopeStart>/\*~start~method~\*/)(?<before>.+({|, ))(?<name>[a-zA-Z][a-zA-Z0-9]+)(?<after>[^\n\.\(a-zA-Z0-9]((?!/\*~end~method~\*/)[^\n])+)(?<methodScopeEnd>/\*~end~method~\*/)"), "${methodScopeStart}${before}obj.${name}${after}${methodScopeEnd}", 10),
+            // Remove scope borders.
+            // /*~start~type~Range<T>~*/
+            // 
+            (new Regex(@"/\*~[^~\*\n]+(~[^~\*\n]+)*~\*/"), "", 0),
         }.Cast<ISubstitutionRule>().ToList();
 
         public static readonly IList<ISubstitutionRule> LastStage = new List<SubstitutionRule>
@@ -539,6 +559,9 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // ((1, 2))
             // ({1, 2})
             (new Regex(@"(?<before>\(|, )\((?<first>[^\n()]+), (?<second>[^\n()]+)\)(?<after>\)|, )"), "${before}{${first}, ${second}}${after}", 10),
+            // {1, 2}.GetHashCode()
+            // Platform::Hashing::Hash({1, 2})
+            (new Regex(@"{(?<first>[^\n{}]+), (?<second>[^\n{}]+)}\.GetHashCode\(\)"), "Platform::Hashing::Hash({${first}, ${second}})", 10),
             // range.ToString()
             // Platform::Converters::To<std::string>(range).data()
             (new Regex(@"(?<before>\W)(?<variable>[_a-zA-Z][_a-zA-Z0-9]+)\.ToString\(\)"), "${before}Platform::Converters::To<std::string>(${variable}).data()", 10),
@@ -597,7 +620,7 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // {\n
             (new Regex(@"{[ \t]*\r?\n[ \t]*\r?\n"), "{" + Environment.NewLine, 10),
             // \n\n}
-            // {\n
+            // \n}
             (new Regex(@"\r?\n[ \t]*\r?\n(?<end>[ \t]*})"), Environment.NewLine + "${end}", 10),
         }.Cast<ISubstitutionRule>().ToList();
 
