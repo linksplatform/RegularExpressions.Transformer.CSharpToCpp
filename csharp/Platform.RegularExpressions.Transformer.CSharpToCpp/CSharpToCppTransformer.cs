@@ -58,7 +58,7 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // 
             (new Regex(@"\r?\n[^\n]+bool operator !=\((?<type>[^\n]+) (?<left>[a-zA-Z0-9]+), \k<type> (?<right>[a-zA-Z0-9]+)\) => !\((\k<left>|\k<right>) == (\k<left>|\k<right>)\);"), "", 10),
             // public override bool Equals(object obj) => obj is Range<T> range ? Equals(range) : false;
-            //
+            // 
             (new Regex(@"\r?\n[^\n]+override bool Equals\((System\.)?[Oo]bject (?<this>[a-zA-Z0-9]+)\) => \k<this> is [^\n]+ (?<other>[a-zA-Z0-9]+) \? Equals\(\k<other>\) : false;"), "", 10),
             // out TProduct
             // TProduct
@@ -108,7 +108,7 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             (new Regex(@"(?<access>(private|protected|public): )?static readonly (?<type>[a-zA-Z0-9]+(<[a-zA-Z0-9]+>)?) (?<name>[a-zA-Z0-9_]+) = new \k<type>\((?<arguments>[^\n]+)\);"), "${access}inline static ${type} ${name} = ${type}(${arguments});", 0),
             // public: static readonly string ExceptionContentsSeparator = "---";
             // public: inline static std::string ExceptionContentsSeparator = "---";
-            (new Regex(@"(?<access>(private|protected|public): )?(const|static readonly) string (?<name>[a-zA-Z0-9_]+) = ""(?<string>(\""|[^""\r\n])+)"";"), "${access}inline static std::string ${name} = \"${string}\";", 0),
+            (new Regex(@"(?<access>(private|protected|public): )?(const|static readonly) string (?<name>[a-zA-Z0-9_]+) = ""(?<string>(\\""|[^""\r\n])+)"";"), "${access}inline static std::string ${name} = \"${string}\";", 0),
             // private: const int MaxPath = 92;
             // private: inline static const int MaxPath = 92;
             (new Regex(@"(?<access>(private|protected|public): )?(const|static readonly) (?<type>[a-zA-Z0-9]+) (?<name>[_a-zA-Z0-9]+) = (?<value>[^;\r\n]+);"), "${access}inline static const ${type} ${name} = ${value};", 0),
@@ -440,7 +440,6 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // Inside method bodies replace:
             // GetFirst(
             // this->GetFirst(
-            //(new Regex(@"(?<separator>(\(|, |([\W]) |return ))(?<!(->|\* ))(?<method>(?!sizeof)[a-zA-Z0-9]+)\((?!\) \{)"), "${separator}this->${method}(", 1),
             (new Regex(@"(?<scope>/\*method-start\*/)(?<before>((?<!/\*method-end\*/)(.|\n))*?)(?<separator>[\W](?<!(::|\.|->|throw\s+)))(?<method>(?!sizeof)[a-zA-Z0-9]+)\((?!\) \{)(?<after>(.|\n)*?)(?<scopeEnd>/\*method-end\*/)"), "${scope}${before}${separator}this->${method}(${after}${scopeEnd}", 100),
             // Remove scope borders.
             // /*method-start*/
@@ -599,10 +598,10 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // 
             (new Regex(@"(^|\r?\n)[ \t]*\#(region|endregion)[^\r\n]*(\r?\n|$)"), "", 0),
             // //#define ENABLE_TREE_AUTO_DEBUG_AND_VALIDATION
-            //
+            // 
             (new Regex(@"\/\/[ \t]*\#define[ \t]+[_a-zA-Z0-9]+[ \t]*"), "", 0),
             // #if USEARRAYPOOL\r\n#endif
-            //
+            // 
             (new Regex(@"#if [a-zA-Z0-9]+\s+#endif"), "", 0),
             // [Fact]
             // 
