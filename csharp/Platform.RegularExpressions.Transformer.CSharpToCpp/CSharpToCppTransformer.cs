@@ -120,7 +120,7 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             (new Regex(@"(?<access>(private|protected|public): )?abstract (?<method>[^;\r\n]+);"), "${access}virtual ${method} = 0;", 0),
             // TElement GetFirst();
             // virtual TElement GetFirst() = 0;
-            (new Regex(@"([\r\n]+[ ]+)((?!return)[a-zA-Z0-9]+ [a-zA-Z0-9]+\([^\)\r\n]*\))(;[ ]*[\r\n]+)"), "$1virtual $2 = 0$3", 1),
+            (new Regex(@"(?<before>[\r\n]+[ ]+)(?<methodDeclaration>(?!return)[a-zA-Z0-9]+ [a-zA-Z0-9]+\([^\)\r\n]*\))(?<after>;[ ]*[\r\n]+)"), "${before}virtual ${methodDeclaration} = 0${after}", 1),
             // protected: readonly TreeElement[] _elements;
             // protected: TreeElement _elements[N];
             (new Regex(@"(?<access>(private|protected|public): )?readonly (?<type>[a-zA-Z<>0-9]+)([\[\]]+) (?<name>[_a-zA-Z0-9]+);"), "${access}${type} ${name}[N];", 0),
@@ -186,7 +186,7 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             (new Regex(@"(?<before>return\s*)\((?<values>[^\)\n]+)\)(?!\()(?<after>\W)"), "${before}{${values}}${after}", 0),
             // string
             // std::string
-            (new Regex(@"(\W)(?<!::)string(\W)"), "$1std::string$2", 0),
+            (new Regex(@"(?<before>\W)(?<!::)string(?<after>\W)"), "${before}std::string${after}", 0),
             // System.ValueTuple
             // std::tuple
             (new Regex(@"(?<before>\W)(System\.)?ValueTuple(?!\s*=|\()(?<after>\W)"), "${before}std::tuple${after}", 0),
@@ -234,7 +234,7 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             (new Regex(@"(struct|class) ([a-zA-Z0-9]+)(\s+){([\sa-zA-Z0-9;:_]+?)}([^;])"), "$1 $2$3{$4};$5", 0),
             // class Program { }
             // class Program { };
-            (new Regex(@"(struct|class) ([a-zA-Z0-9]+[^\r\n]*)([\r\n]+(?<indentLevel>[\t ]*)?)\{([\S\s]+?[\r\n]+\k<indentLevel>)\}([^;]|$)"), "$1 $2$3{$4};$5", 0),
+            (new Regex(@"(?<type>struct|class) (?<name>[a-zA-Z0-9]+[^\r\n]*)(?<beforeBody>[\r\n]+(?<indentLevel>[\t ]*)?)\{(?<body>[\S\s]+?[\r\n]+\k<indentLevel>)\}(?<afterBody>[^;]|$)"), "${type} ${name}${beforeBody}{${body}};${afterBody}", 0),
             // class SizedBinaryTreeMethodsBase : GenericCollectionMethodsBase
             // class SizedBinaryTreeMethodsBase : public GenericCollectionMethodsBase
             (new Regex(@"(struct|class) ([a-zA-Z0-9]+)(<[a-zA-Z0-9 ,]+>)? : ([a-zA-Z0-9]+)"), "$1 $2$3 : public $4", 0),
@@ -282,7 +282,7 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             (new Regex(@"class ([a-zA-Z0-9]+Tests)"), "TEST_CLASS($1)", 0),
             // Assert.Equal
             // Assert::AreEqual
-            (new Regex(@"(Assert)\.((Not)?Equal)"), "$1::Are$2", 0),
+            (new Regex(@"(?<type>Assert)\.(?<method>(Not)?Equal)"), "${type}::Are${method}", 0),
             // Assert.Throws
             // Assert::ExpectException
             (new Regex(@"(Assert)\.Throws"), "$1::ExpectException", 0),
@@ -303,7 +303,7 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             (new Regex(@"Console\.WriteLine\(""([^""\r\n]+)""\)"), "printf(\"$1\\n\")", 0),
             // TElement Root;
             // TElement Root = 0;
-            (new Regex(@"(\r?\n[\t ]+)(private|protected|public)?(: )?([a-zA-Z0-9:_]+(?<!return)) ([_a-zA-Z0-9]+);"), "$1$2$3$4 $5 = 0;", 0),
+            (new Regex(@"(?<before>\r?\n[\t ]+)(?<access>(private|protected|public)(: )?)?(?<type>[a-zA-Z0-9:_]+(?<!return)) (?<name>[_a-zA-Z0-9]+);"), "${before}${access}${type} ${name} = 0;", 0),
             // TreeElement _elements[N];
             // TreeElement _elements[N] = { {0} };
             (new Regex(@"(\r?\n[\t ]+)(private|protected|public)?(: )?([a-zA-Z0-9]+) ([_a-zA-Z0-9]+)\[([_a-zA-Z0-9]+)\];"), "$1$2$3$4 $5[$6] = { {0} };", 0),
