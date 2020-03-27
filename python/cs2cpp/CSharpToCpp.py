@@ -134,7 +134,7 @@ class CSharpToCpp(Translator):
         (r"(?P<access>(private|protected|public): )?abstract (?P<method>[^;\r\n]+);", r"\g<access>virtual \g<method> = 0;", None, 0),
         # TElement GetFirst();
         # virtual TElement GetFirst() = 0;
-        (r"([\r\n]+[ ]+)((?!return)[a-zA-Z0-9]+ [a-zA-Z0-9]+\([^\)\r\n]*\))(;[ ]*[\r\n]+)", r"\1virtual \2 = 0\3", None, 1),
+        (r"(?P<before>[\r\n]+[ ]+)(?P<methodDeclaration>(?!return)[a-zA-Z0-9]+ [a-zA-Z0-9]+\([^\)\r\n]*\))(?P<after>;[ ]*[\r\n]+)", r"\g<before>virtual \g<methodDeclaration> = 0\g<after>", None, 1),
         # protected: readonly TreeElement[] _elements;
         # protected: TreeElement _elements[N];
         (r"(?P<access>(private|protected|public): )?readonly (?P<type>[a-zA-Z<>0-9]+)([\[\]]+) (?P<name>[_a-zA-Z0-9]+);", r"\g<access>\g<type> \g<name>[N];", None, 0),
@@ -200,7 +200,7 @@ class CSharpToCpp(Translator):
         (r"(?P<before>return\s*)\((?P<values>[^\)\n]+)\)(?!\()(?P<after>\W)", r"\g<before>{\g<values>}\g<after>", None, 0),
         # string
         # std::string
-        (r"(\W)(?<!::)string(\W)", r"\1std::string\2", None, 0),
+        (r"(?P<before>\W)(?<!::)string(?P<after>\W)", r"\g<before>std::string\g<after>", None, 0),
         # System.ValueTuple
         # std::tuple
         (r"(?P<before>\W)(System\.)?ValueTuple(?!\s*=|\()(?P<after>\W)", r"\g<before>std::tuple\g<after>", None, 0),
@@ -248,7 +248,7 @@ class CSharpToCpp(Translator):
         (r"(struct|class) ([a-zA-Z0-9]+)(\s+){([\sa-zA-Z0-9;:_]+?)}([^;])", r"\1 \2\3{\4};\5", None, 0),
         # class Program { }
         # class Program { };
-        (r"(struct|class) ([a-zA-Z0-9]+[^\r\n]*)([\r\n]+(?P<indentLevel>[\t ]*)?)\{([\S\s]+?[\r\n]+(?P=indentLevel))\}([^;]|$)", r"\1 \2\3{\4};\5", None, 0),
+        (r"(?P<type>struct|class) (?P<name>[a-zA-Z0-9]+[^\r\n]*)(?P<beforeBody>[\r\n]+(?P<indentLevel>[\t ]*)?)\{(?P<body>[\S\s]+?[\r\n]+(?P=indentLevel))\}(?P<afterBody>[^;]|$)", r"\g<type> \g<name>\g<beforeBody>{\g<body>};\g<afterBody>", None, 0),
         # class SizedBinaryTreeMethodsBase : GenericCollectionMethodsBase
         # class SizedBinaryTreeMethodsBase : public GenericCollectionMethodsBase
         (r"(struct|class) ([a-zA-Z0-9]+)(<[a-zA-Z0-9 ,]+>)? : ([a-zA-Z0-9]+)", r"\1 \2\3 : public \4", None, 0),
@@ -296,7 +296,7 @@ class CSharpToCpp(Translator):
         (r"class ([a-zA-Z0-9]+Tests)", r"TEST_CLASS(\1)", None, 0),
         # Assert.Equal
         # Assert::AreEqual
-        (r"(Assert)\.((Not)?Equal)", r"\1::Are\2", None, 0),
+        (r"(?P<type>Assert)\.(?P<method>(Not)?Equal)", r"\g<type>::Are\g<method>", None, 0),
         # Assert.Throws
         # Assert::ExpectException
         (r"(Assert)\.Throws", r"\1::ExpectException", None, 0),
@@ -317,7 +317,7 @@ class CSharpToCpp(Translator):
         (r"Console\.WriteLine\(\"([^\"\r\n]+)\"\)", r"printf(\"\1\\n\")", None, 0),
         # TElement Root;
         # TElement Root = 0;
-        (r"(\r?\n[\t ]+)(private|protected|public)?(: )?([a-zA-Z0-9:_]+(?<!return)) ([_a-zA-Z0-9]+);", r"\1\2\3\4 \5 = 0;", None, 0),
+        (r"(?P<before>\r?\n[\t ]+)(?P<access>(private|protected|public)(: )?)?(?P<type>[a-zA-Z0-9:_]+(?<!return)) (?P<name>[_a-zA-Z0-9]+);", r"\g<before>\g<access>\g<type> \g<name> = 0;", None, 0),
         # TreeElement _elements[N];
         # TreeElement _elements[N] = { {0} };
         (r"(\r?\n[\t ]+)(private|protected|public)?(: )?([a-zA-Z0-9]+) ([_a-zA-Z0-9]+)\[([_a-zA-Z0-9]+)\];", r"\1\2\3\4 \5[\6] = { {0} };", None, 0),
