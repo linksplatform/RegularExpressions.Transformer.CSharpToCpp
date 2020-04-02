@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="cs2cpp",
-    version="0.1.0",
+    version="0.1.1",
     author="Ethosa",
     author_email="social.ethosa@gmail.com",
     description="Csharp to Cpp code translator",
