@@ -160,6 +160,9 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // Action<TElement> free
             // std::function<void(TElement)> free
             (new Regex(@"Action<([a-zA-Z0-9]+)> ([a-zA-Z0-9]+)"), "std::function<void($1)> $2", 0),
+            // Action action
+            // std::function<void()> action
+            (new Regex(@"Action ([a-zA-Z0-9]+)"), "std::function<void()> $1", 0),
             // Predicate<TArgument> predicate
             // std::function<bool(TArgument)> predicate
             (new Regex(@"Predicate<([a-zA-Z0-9]+)> ([a-zA-Z0-9]+)"), "std::function<bool($1)> $2", 0),
@@ -217,9 +220,6 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // char*[] args
             // char* args[]
             (new Regex(@"([_a-zA-Z0-9:\*]?)\[\] ([a-zA-Z0-9]+)"), "$1 $2[]", 0),
-            // @object
-            // object
-            (new Regex(@"@([_a-zA-Z0-9]+)"), "$1", 0),
             // float.MinValue
             // std::numeric_limits<float>::lowest()
             (new Regex(@"(?<before>\W)(?<type>std::[a-z0-9_]+|float|double)\.MinValue(?<after>\W)"), "${before}std::numeric_limits<${type}>::lowest()${after}", 0),
@@ -334,6 +334,9 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // public: static event EventHandler<std::exception> ExceptionIgnored = OnExceptionIgnored; ... };
             // ... public: static inline Platform::Delegates::MulticastDelegate<void(void*, const std::exception&)> ExceptionIgnored = OnExceptionIgnored; };
             (new Regex(@"(?<begin>\r?\n(\r?\n)?(?<halfIndent>[ \t]+)\k<halfIndent>)(?<access>(private|protected|public): )?static event EventHandler<(?<argumentType>[^;\r\n]+)> (?<name>[_a-zA-Z0-9]+) = (?<defaultDelegate>[_a-zA-Z0-9]+);(?<middle>(.|\n)+?)(?<end>\r?\n\k<halfIndent>};)"), "${middle}" + Environment.NewLine + Environment.NewLine + "${halfIndent}${halfIndent}${access}static inline Platform::Delegates::MulticastDelegate<void(void*, const ${argumentType}&)> ${name} = ${defaultDelegate};${end}", 0),
+            // public: event Disposal OnDispose;
+            // public: Platform::Delegates::MulticastDelegate<Disposal> OnDispose;
+            (new Regex(@"(?<begin>(?<access>(private|protected|public): )?(static )?)event (?<type>[a-zA-Z][:_a-zA-Z0-9]+) (?<name>[a-zA-Z][_a-zA-Z0-9]+);"), "${begin}Platform::Delegates::MulticastDelegate<${type}> ${name};", 0),
             // Insert scope borders.
             // class IgnoredExceptions { ... private: inline static std::vector<std::exception> _exceptionsBag;
             // class IgnoredExceptions {/*~_exceptionsBag~*/ ... private: inline static std::vector<std::exception> _exceptionsBag;
@@ -578,10 +581,13 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             (new Regex(@"(?<before>\r?\n[^""\r\n]*(""(\\""|[^""\r\n])*""[^""\r\n]*)*)(?<=\W)default(?<after>\W)"), "${before}0${after}", 10),
             // object x
             // void *x
-            (new Regex(@"(?<before>\r?\n[^""\r\n]*(""(\\""|[^""\r\n])*""[^""\r\n]*)*)(?<=\W)([O|o]bject|System\.Object) (?<after>\w)"), "${before}void *${after}", 10),
+            (new Regex(@"(?<before>\r?\n[^""\r\n]*(""(\\""|[^""\r\n])*""[^""\r\n]*)*)(?<=\W)(?<!@)(object|System\.Object) (?<after>\w)"), "${before}void *${after}", 10),
             // <object>
             // <void*>
-            (new Regex(@"(?<before>\r?\n[^""\r\n]*(""(\\""|[^""\r\n])*""[^""\r\n]*)*)(?<=\W)(?<!\w )([O|o]bject|System\.Object)(?<after>\W)"), "${before}void*${after}", 10),
+            (new Regex(@"(?<before>\r?\n[^""\r\n]*(""(\\""|[^""\r\n])*""[^""\r\n]*)*)(?<=\W)(?<!@)(object|System\.Object)(?<after>\W)"), "${before}void*${after}", 10),
+            // @object
+            // object
+            (new Regex(@"@([_a-zA-Z0-9]+)"), "$1", 0),
             // ArgumentNullException
             // std::invalid_argument
             (new Regex(@"(?<before>\r?\n[^""\r\n]*(""(\\""|[^""\r\n])*""[^""\r\n]*)*)(?<=\W)(System\.)?ArgumentNullException(?<after>\W)"), "${before}std::invalid_argument${after}", 10),
@@ -594,6 +600,12 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // template <typename T> struct Range : IEquatable<Range<T>>
             // template <typename T> struct Range {
             (new Regex(@"(?<before>template <typename (?<typeParameter>[^\n]+)> (struct|class) (?<type>[a-zA-Z0-9]+<[^\n]+>)) : (public )?IEquatable<\k<type>>(?<after>(\s|\n)*{)"), "${before}${after}", 0),
+            // public: delegate void Disposal(bool manual, bool wasDisposed);
+            // public: delegate void Disposal(bool, bool);
+            (new Regex(@"(?<before>(?<access>(private|protected|public): )delegate (?<returnType>[a-zA-Z][a-zA-Z0-9:]+) (?<delegate>[a-zA-Z][a-zA-Z0-9]+)\(((?<leftArgumentType>[a-zA-Z][a-zA-Z0-9:]+), )*)(?<argumentType>[a-zA-Z][a-zA-Z0-9:]+) (?<argumentName>[a-zA-Z][a-zA-Z0-9]+)(?<after>(, (?<rightArgumentType>[a-zA-Z][a-zA-Z0-9:]+) (?<rightArgumentName>[a-zA-Z][a-zA-Z0-9]+))*\);)"), "${before}${argumentType}${after}", 20),
+            // public: delegate void Disposal(bool, bool);
+            // using Disposal = void(bool, bool);
+            (new Regex(@"(?<access>(private|protected|public): )delegate (?<returnType>[a-zA-Z][a-zA-Z0-9:]+) (?<delegate>[a-zA-Z][a-zA-Z0-9]+)\((?<argumentTypes>[^\(\)\n]*)\);"), "using ${delegate} = ${returnType}(${argumentTypes});", 20),
             // #region Always
             // 
             (new Regex(@"(^|\r?\n)[ \t]*\#(region|endregion)[^\r\n]*(\r?\n|$)"), "", 0),
