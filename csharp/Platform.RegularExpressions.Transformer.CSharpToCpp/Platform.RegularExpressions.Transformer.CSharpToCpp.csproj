@@ -41,7 +41,7 @@ Fixed translation of object type.</PackageReleaseNotes>
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Platform.RegularExpressions.Transformer" Version="0.3.2" />
+    <PackageReference Include="Platform.RegularExpressions.Transformer" Version="0.3.3" />
   </ItemGroup>
 
 </Project>
