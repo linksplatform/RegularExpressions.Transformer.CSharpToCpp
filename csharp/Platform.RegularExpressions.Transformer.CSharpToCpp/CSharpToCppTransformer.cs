@@ -100,6 +100,9 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // (this 
             // (
             (new Regex(@"\(this "), "(", 0),
+            // private: static readonly Disposal _emptyDelegate = (manual, wasDisposed) => { };
+            // private: inline static std::function<Disposal> _emptyDelegate = [](auto manual, auto wasDisposed) { };
+            (new Regex(@"(?<access>(private|protected|public): )?static readonly (?<type>[a-zA-Z][a-zA-Z0-9]*) (?<name>[a-zA-Z_][a-zA-Z0-9_]*) = \((?<firstArgument>[a-zA-Z_][a-zA-Z0-9_]*), (?<secondArgument>[a-zA-Z_][a-zA-Z0-9_]*)\) => {\s*};"), "${access}inline static std::function<${type}> ${name} = [](auto ${firstArgument}, auto ${secondArgument}) { };", 0),
             // public: static readonly EnsureAlwaysExtensionRoot Always = new EnsureAlwaysExtensionRoot();
             // public: inline static EnsureAlwaysExtensionRoot Always;
             (new Regex(@"(?<access>(private|protected|public): )?static readonly (?<type>[a-zA-Z0-9]+(<[a-zA-Z0-9]+>)?) (?<name>[a-zA-Z0-9_]+) = new \k<type>\(\);"), "${access}inline static ${type} ${name};", 0),
@@ -139,6 +142,9 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // int SizeBalancedTree(int capacity) => a;
             // int SizeBalancedTree(int capacity) { return a; }
             (new Regex(@"(^\s+)(private|protected|public)?(: )?(template \<[^>\r\n]+\> )?(static )?(override )?([a-zA-Z0-9]+ )([a-zA-Z0-9]+)\(([^\(\r\n]*)\)\s+=>\s+([^;\r\n]+);"), "$1$2$3$4$5$6$7$8($9) { return $10; }", 0),
+            // OnDispose = (manual, wasDisposed) =>
+            // OnDispose = [&](auto manual, auto wasDisposed)
+            (new Regex(@"(?<variable>[a-zA-Z_][a-zA-Z0-9_]*)(?<operator>\s*=\s*)\((?<firstArgument>[a-zA-Z_][a-zA-Z0-9_]*), (?<secondArgument>[a-zA-Z_][a-zA-Z0-9_]*)\)\s*=>"), "${variable}${operator}[&](auto ${firstArgument}, auto ${secondArgument})", 0),
             // () => Integer<TElement>.Zero,
             // () { return Integer<TElement>.Zero; },
             (new Regex(@"\(\)\s+=>\s+(?<expression>[^(),;\r\n]+(\(((?<parenthesis>\()|(?<-parenthesis>\))|[^();\r\n]*?)*?\))?[^(),;\r\n]*)(?<after>,|\);)"), "() { return ${expression}; }${after}", 0),
