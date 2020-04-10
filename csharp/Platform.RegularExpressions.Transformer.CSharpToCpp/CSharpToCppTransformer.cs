@@ -144,10 +144,13 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             (new Regex(@"(^\s+)(private|protected|public)?(: )?(template \<[^>\r\n]+\> )?(static )?(override )?([a-zA-Z0-9]+ )([a-zA-Z0-9]+)\(([^\(\r\n]*)\)\s+=>\s+([^;\r\n]+);"), "$1$2$3$4$5$6$7$8($9) { return $10; }", 0),
             // OnDispose = (manual, wasDisposed) =>
             // OnDispose = [&](auto manual, auto wasDisposed)
-            (new Regex(@"(?<variable>[a-zA-Z_][a-zA-Z0-9_]*)(?<operator>\s*=\s*)\((?<firstArgument>[a-zA-Z_][a-zA-Z0-9_]*), (?<secondArgument>[a-zA-Z_][a-zA-Z0-9_]*)\)\s*=>"), "${variable}${operator}[&](auto ${firstArgument}, auto ${secondArgument})", 0),
+            (new Regex(@"(?<variable>[a-zA-Z_][a-zA-Z0-9_]*)(?<operator>\s*\+?=\s*)\((?<firstArgument>[a-zA-Z_][a-zA-Z0-9_]*), (?<secondArgument>[a-zA-Z_][a-zA-Z0-9_]*)\)\s*=>"), "${variable}${operator}[&](auto ${firstArgument}, auto ${secondArgument})", 0),
             // () => Integer<TElement>.Zero,
             // () { return Integer<TElement>.Zero; },
             (new Regex(@"\(\)\s+=>\s+(?<expression>[^(),;\r\n]+(\(((?<parenthesis>\()|(?<-parenthesis>\))|[^();\r\n]*?)*?\))?[^(),;\r\n]*)(?<after>,|\);)"), "() { return ${expression}; }${after}", 0),
+            // ~DisposableBase() => Destruct();
+            // ~DisposableBase() { Destruct(); }
+            (new Regex(@"~(?<class>[a-zA-Z_][a-zA-Z0-9_]*)\(\)\s+=>\s+([^;\r\n]+?);"), "~${class}() { $1; }", 0),
             // => Integer<TElement>.Zero;
             // { return Integer<TElement>.Zero; }
             (new Regex(@"\)\s+=>\s+([^;\r\n]+?);"), ") { return $1; }", 0),
@@ -155,8 +158,17 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // [&]()-> auto { return avlTree.Count; }
             (new Regex(@"(?<before>, |\()\(\) { return (?<expression>[^;\r\n]+); }"), "${before}[&]()-> auto { return ${expression}; }", 0),
             // Count => GetSizeOrZero(Root);
-            // GetCount() { return GetSizeOrZero(Root); }
-            (new Regex(@"(\W)([A-Z][a-zA-Z]+)\s+=>\s+([^;\r\n]+);"), "$1Get$2() { return $3; }", 0),
+            // Count() { return GetSizeOrZero(Root); }
+            (new Regex(@"(\W)([A-Z][a-zA-Z]+)\s+=>\s+([^;\r\n]+);"), "$1$2() { return $3; }", 0),
+            // public: T Object { get; }
+            // public: const T Object;
+            (new Regex(@"(?<before>[^\r]\r?\n[ \t]*)(?<access>(private|protected|public): )?(?<type>[a-zA-Z_][a-zA-Z0-9_:<>]*) (?<property>[a-zA-Z_][a-zA-Z0-9_]*)(?<blockOpen>[\n\s]*{[\n\s]*)(\[[^\n]+\][\n\s]*)?get;(?<blockClose>[\n\s]*})(?<after>[\n\s]*)"), "${before}${access}const ${type} ${property};${after}", 2),
+            // public: bool IsDisposed { get => _disposed > 0; }
+            // public: bool IsDisposed() { return _disposed > 0; }
+            (new Regex(@"(?<before>[^\r]\r?\n[ \t]*)(?<access>(private|protected|public): )?(?<virtual>virtual )?bool (?<property>[a-zA-Z_][a-zA-Z0-9_]*)(?<blockOpen>[\n\s]*{[\n\s]*)(\[[^\n]+\][\n\s]*)?get\s*=>\s*(?<expression>[^\n]+);(?<blockClose>[\n\s]*}[\n\s]*)"), "${before}${access}${virtual}bool ${property}()${blockOpen}return ${expression};${blockClose}", 2),
+            // protected: virtual std::string ObjectName { get => GetType().Name; }
+            // protected: virtual std::string ObjectName() { return GetType().Name; }
+            (new Regex(@"(?<before>[^\r]\r?\n[ \t]*)(?<access>(private|protected|public): )?(?<virtual>virtual )?(?<type>[a-zA-Z_][a-zA-Z0-9_:<>]*) (?<property>[a-zA-Z_][a-zA-Z0-9_]*)(?<blockOpen>[\n\s]*{[\n\s]*)(\[[^\n]+\][\n\s]*)?get\s*=>\s*(?<expression>[^\n]+);(?<blockClose>[\n\s]*}[\n\s]*)"), "${before}${access}${virtual}${type} ${property}()${blockOpen}return ${expression};${blockClose}", 2),
             // ArgumentInRange(string message) { string messageBuilder() { return message; }
             // ArgumentInRange(string message) { auto messageBuilder = [&]() -> string { return message; };
             (new Regex(@"(?<before>\W[_a-zA-Z0-9]+\([^\)\n]*\)[\s\n]*{[\s\n]*([^{}]|\n)*?(\r?\n)?[ \t]*)(?<returnType>[_a-zA-Z0-9*:]+[_a-zA-Z0-9*: ]*) (?<methodName>[_a-zA-Z0-9]+)\((?<arguments>[^\)\n]*)\)\s*{(?<body>(""[^""\n]+""|[^}]|\n)+?)}"), "${before}auto ${methodName} = [&]() -> ${returnType} {${body}};", 10),
@@ -166,9 +178,18 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // Action<TElement> free
             // std::function<void(TElement)> free
             (new Regex(@"Action<([a-zA-Z0-9]+)> ([a-zA-Z0-9]+)"), "std::function<void($1)> $2", 0),
+            // Action<TPrimary, TAuxiliary> action
+            // std::function<void(TPrimary, TAuxiliary)> action
+            (new Regex(@"Action<([a-zA-Z0-9]+), ([a-zA-Z0-9]+)> ([a-zA-Z0-9]+)"), "std::function<void($1, $2)> $3", 0),
+            // , Action<TPrimary, TAuxiliary>>
+            // , std::function<void(TPrimary, TAuxiliary)>>
+            (new Regex(@"(, )Action<([a-zA-Z0-9]+), ([a-zA-Z0-9]+)>(>)"), "$1std::function<void($2, $3)>$4", 0),
             // Action action
             // std::function<void()> action
             (new Regex(@"Action ([a-zA-Z0-9]+)"), "std::function<void()> $1", 0),
+            // , Action>
+            // ,std::function<void()>>
+            (new Regex(@"(, )Action(>)"), "$1std::function<void()>$2", 0),
             // Predicate<TArgument> predicate
             // std::function<bool(TArgument)> predicate
             (new Regex(@"Predicate<([a-zA-Z0-9]+)> ([a-zA-Z0-9]+)"), "std::function<bool($1)> $2", 0),
@@ -466,6 +487,9 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // /*~ex~*/
             // 
             (new Regex(@"/\*~[_a-zA-Z0-9]+~\*/"), "", 0),
+            // throw ObjectDisposedException(objectName, message);
+            // throw std::runtime_error(std::string("Attempt to access disposed object [").append(objectName).append("]: ").append(message).append("."));
+            (new Regex(@"throw ObjectDisposedException\((?<objectName>[a-zA-Z_][a-zA-Z0-9_]*), (?<message>[a-zA-Z0-9_]*[Mm]essage[a-zA-Z0-9_]*(\(\))?|[a-zA-Z_][a-zA-Z0-9_]*)\);"), "throw std::runtime_error(std::string(\"Attempt to access disposed object [\").append(${objectName}).append(\"]: \").append(${message}).append(\".\"));", 0),
             // throw ArgumentNullException(argumentName, message);
             // throw std::invalid_argument(std::string("Argument ").append(argumentName).append(" is null: ").append(message).append("."));
             (new Regex(@"throw ArgumentNullException\((?<argument>[a-zA-Z]*[Aa]rgument[a-zA-Z]*), (?<message>[a-zA-Z]*[Mm]essage[a-zA-Z]*(\(\))?)\);"), "throw std::invalid_argument(std::string(\"Argument \").append(${argument}).append(\" is null: \").append(${message}).append(\".\"));", 0),
@@ -508,15 +532,15 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // Insert scope borders.
             // class Range<T> {
             // class Range<T> {/*~type~Range<T>~*/
-            (new Regex(@"(?<classDeclarationBegin>\r?\n(?<indent>[\t ]*)template <typename (?<typeParameter>[^\n]+)> (struct|class) (?<type>[a-zA-Z0-9]+<\k<typeParameter>>)(\s*:\s*[^{\n]+)?[\t ]*(\r?\n)?[\t ]*{)"), "${classDeclarationBegin}/*~type~${type}~*/", 0),
+            (new Regex(@"(?<classDeclarationBegin>\r?\n(?<indent>[\t ]*)(template\s*<[^<>\n]*> )?(struct|class) (?<fullType>(?<typeName>[a-zA-Z0-9]+)(<[^:\n]*>)?)(\s*:\s*[^{\n]+)?[\t ]*(\r?\n)?[\t ]*{)"), "${classDeclarationBegin}/*~type~${typeName}~${fullType}~*/", 0),
             // Inside the scope of /*~type~Range<T>~*/ insert inner scope and replace:
             // public: static implicit operator std::tuple<T, T>(Range<T> range)
             // public: operator std::tuple<T, T>() const {/*~variable~Range<T>~*/
-            (new Regex(@"(?<scope>/\*~type~(?<type>[^~\n\*]+)~\*/)(?<separator>.|\n)(?<before>((?<!/\*~type~\k<type>~\*/)(.|\n))*?)(?<access>(private|protected|public): )static implicit operator (?<targetType>[^\(\n]+)\((?<argumentDeclaration>\k<type> (?<variable>[a-zA-Z0-9]+))\)(?<after>\s*\n?\s*{)"), "${scope}${separator}${before}${access}operator ${targetType}() const${after}/*~variable~${variable}~*/", 10),
+            (new Regex(@"(?<scope>/\*~type~(?<typeName>[^~\n\*]+)~(?<fullType>[^~\n\*]+)~\*/)(?<separator>.|\n)(?<before>((?<!/\*~type~\k<typeName>~\k<fullType>~\*/)(.|\n))*?)(?<access>(private|protected|public): )static implicit operator (?<targetType>[^\(\n]+)\((?<argumentDeclaration>\k<fullType> (?<variable>[a-zA-Z0-9]+))\)(?<after>\s*\n?\s*{)"), "${scope}${separator}${before}${access}operator ${targetType}() const${after}/*~variable~${variable}~*/", 10),
             // Inside the scope of /*~type~Range<T>~*/ replace:
             // public: static implicit operator Range<T>(std::tuple<T, T> tuple) { return new Range<T>(std::get<1-1>(tuple), std::get<2-1>(tuple)); }
             // public: Range(std::tuple<T, T> tuple) : Range(std::get<1-1>(tuple), std::get<2-1>(tuple)) { }
-            (new Regex(@"(?<scope>/\*~type~(?<type>(?<typeName>[_a-zA-Z0-9]+)[^~\n\*]*)~\*/)(?<separator>.|\n)(?<before>((?<!/\*~type~\k<type>~\*/)(.|\n))*?)(?<access>(private|protected|public): )static implicit operator \k<type>\((?<arguments>[^{}\n]+)\)(\s|\n)*{(\s|\n)*return (new )?\k<type>\((?<passedArguments>[^\n]+)\);(\s|\n)*}"), "${scope}${separator}${before}${access}${typeName}(${arguments}) : ${typeName}(${passedArguments}) { }", 10),
+            (new Regex(@"(?<scope>/\*~type~(?<typeName>[^~\n\*]+)~(?<fullType>[^~\n\*]+)~\*/)(?<separator>.|\n)(?<before>((?<!/\*~type~\k<typeName>~\k<fullType>~\*/)(.|\n))*?)(?<access>(private|protected|public): )static implicit operator (\k<fullType>|\k<typeName>)\((?<arguments>[^{}\n]+)\)(\s|\n)*{(\s|\n)*return (new )?(\k<fullType>|\k<typeName>)\((?<passedArguments>[^\n]+)\);(\s|\n)*}"), "${scope}${separator}${before}${access}${typeName}(${arguments}) : ${typeName}(${passedArguments}) { }", 10),
             // Inside the scope of /*~variable~range~*/ replace:
             // range.Minimum
             // this->Minimum
@@ -594,6 +618,9 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // @object
             // object
             (new Regex(@"@([_a-zA-Z0-9]+)"), "$1", 0),
+            // this->GetType().Name
+            // typeid(this).name()
+            (new Regex(@"(this)->GetType\(\)\.Name"), "typeid($1).name()", 0),
             // ArgumentNullException
             // std::invalid_argument
             (new Regex(@"(?<before>\r?\n[^""\r\n]*(""(\\""|[^""\r\n])*""[^""\r\n]*)*)(?<=\W)(System\.)?ArgumentNullException(?<after>\W)"), "${before}std::invalid_argument${after}", 10),
