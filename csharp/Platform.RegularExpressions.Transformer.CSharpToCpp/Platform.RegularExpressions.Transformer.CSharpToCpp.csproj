@@ -4,7 +4,7 @@
     <Description>LinksPlatform's Platform.RegularExpressions.Transformer.CSharpToCpp Class Library</Description>
     <Copyright>Konstantin Diachenko</Copyright>
     <AssemblyTitle>Platform.RegularExpressions.Transformer.CSharpToCpp</AssemblyTitle>
-    <VersionPrefix>0.2.34</VersionPrefix>
+    <VersionPrefix>0.2.35</VersionPrefix>
     <Authors>Konstantin Diachenko</Authors>
     <TargetFrameworks>net472;netstandard2.0;netstandard2.1</TargetFrameworks>
     <AssemblyName>Platform.RegularExpressions.Transformer.CSharpToCpp</AssemblyName>
@@ -24,12 +24,16 @@
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <LangVersion>latest</LangVersion>
-    <PackageReleaseNotes>Translation support added for:
-* Action,
-* events with no inline initialization,
-* delegate type declarations.
-
-Fixed translation of object type.</PackageReleaseNotes>
+    <PackageReleaseNotes>Platform.RegularExpressions.Transformer dependency updated from 0.3.2 to 0.3.3.
+Better support for the lambdas translation.
+Support for inline destructor translation added.
+Better support for properties translation.
+Properties naming convention does not require the "Get" prefix anymore.
+Better support for the translation of Action with no type parameters as well as Action with two type parameters.
+Support for the translation of ObjectDisposedException added.
+Better support for the translation of implicit operators.
+Support for the translation of type name added.
+</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup Condition="$(TargetFramework.StartsWith('net4')) AND '$(MSBuildRuntimeType)' == 'Core' AND '$(OS)' != 'Windows_NT'">
