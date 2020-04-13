@@ -177,19 +177,7 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             (new Regex(@"Func<([a-zA-Z0-9]+)> ([a-zA-Z0-9]+)"), "std::function<$1()> $2", 0),
             // Action<TElement> free
             // std::function<void(TElement)> free
-            (new Regex(@"Action<([a-zA-Z0-9]+)> ([a-zA-Z0-9]+)"), "std::function<void($1)> $2", 0),
-            // Action<TPrimary, TAuxiliary> action
-            // std::function<void(TPrimary, TAuxiliary)> action
-            (new Regex(@"Action<([a-zA-Z0-9]+), ([a-zA-Z0-9]+)> ([a-zA-Z0-9]+)"), "std::function<void($1, $2)> $3", 0),
-            // , Action<TPrimary, TAuxiliary>>
-            // , std::function<void(TPrimary, TAuxiliary)>>
-            (new Regex(@"(, )Action<([a-zA-Z0-9]+), ([a-zA-Z0-9]+)>(>)"), "$1std::function<void($2, $3)>$4", 0),
-            // Action action
-            // std::function<void()> action
-            (new Regex(@"Action ([a-zA-Z0-9]+)"), "std::function<void()> $1", 0),
-            // , Action>
-            // ,std::function<void()>>
-            (new Regex(@"(, )Action(>)"), "$1std::function<void()>$2", 0),
+            (new Regex(@"Action(<(?<typeParameters>[a-zA-Z0-9]+(, ([a-zA-Z0-9]+))*)>)?(?<after>>| (?<variable>[a-zA-Z0-9]+))"), "std::function<void(${typeParameters})>${after}", 0),
             // Predicate<TArgument> predicate
             // std::function<bool(TArgument)> predicate
             (new Regex(@"Predicate<([a-zA-Z0-9]+)> ([a-zA-Z0-9]+)"), "std::function<bool($1)> $2", 0),
