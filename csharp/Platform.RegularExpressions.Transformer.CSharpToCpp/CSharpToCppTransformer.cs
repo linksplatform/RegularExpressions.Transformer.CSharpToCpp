@@ -543,7 +543,7 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             (new Regex(@"(?<namespaceDeclarationBegin>\r?\n(?<indent>[\t ]*)namespace (?<namespaceName>(?<namePart>[a-zA-Z][a-zA-Z0-9]+)(?<nextNamePart>::[a-zA-Z][a-zA-Z0-9]+)+)(\s|\n)*{)(?<middle>(.|\n)*)(?<end>(?<=\r?\n)\k<indent>}(?!;))"), "${namespaceDeclarationBegin}/*~start~namespace~${namespaceName}~*/${middle}/*~end~namespace~${namespaceName}~*/${end}", 0),
             // Insert scope borders.
             // class Range<T> { ... };
-            // class Range<T> {/*~start~type~Range<T>~T~*/ ... /*~start~type~Range<T>~T~*/};
+            // class Range<T> {/*~start~type~Range<T>~T~*/ ... /*~end~type~Range<T>~T~*/};
             (new Regex(@"(?<classDeclarationBegin>\r?\n(?<indent>[\t ]*)template <typename (?<typeParameter>[^\n]+)> (struct|class) (?<type>[a-zA-Z0-9]+<\k<typeParameter>>)(\s*:\s*[^{\n]+)?[\t ]*(\r?\n)?[\t ]*{)(?<middle>(.|\n)*)(?<endIndent>(?<=\r?\n)\k<indent>)(?<end>};)"), "${classDeclarationBegin}/*~start~type~${type}~${typeParameter}~*/${middle}${endIndent}/*~end~type~${type}~${typeParameter}~*/${end}", 0),
             // Inside scopes replace:
             // /*~start~namespace~Platform::Ranges~*/ ... /*~start~type~Range<T>~T~*/ ... public: override std::int32_t GetHashCode() { return {Minimum, Maximum}.GetHashCode(); } ... /*~start~type~Range<T>~T~*/ ... /*~end~namespace~Platform::Ranges~*/
@@ -555,6 +555,29 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             (new Regex(@"(?<methodScopeStart>/\*~start~method~\*/)(?<before>.+({|, ))(?<name>[a-zA-Z][a-zA-Z0-9]+)(?<after>[^\n\.\(a-zA-Z0-9]((?!/\*~end~method~\*/)[^\n])+)(?<methodScopeEnd>/\*~end~method~\*/)"), "${methodScopeStart}${before}obj.${name}${after}${methodScopeEnd}", 10),
             // Remove scope borders.
             // /*~start~type~Range<T>~*/
+            // 
+            (new Regex(@"/\*~[^~\*\n]+(~[^~\*\n]+)*~\*/"), "", 0),
+            // class Disposable<T> : public Disposable
+            // class Disposable<T> : public Disposable<>
+            (new Regex(@"(?<before>(struct|class) (?<type>[a-zA-Z][a-zA-Z0-9]*)<[^<>\n]+> : (?<access>(private|protected|public) )?\k<type>)(?<after>\b(?!<))"), "${before}<>${after}", 0),
+            // Insert scope borders.
+            // class Disposable<T> : public Disposable<> { ... };
+            // class Disposable<T> : public Disposable<> {/*~start~type~Disposable~Disposable<T>~Disposable~Disposable<>~*/ ... /*~start~type~Disposable~Disposable<T>~Disposable~Disposable<>~*/};
+            (new Regex(@"(?<classDeclarationBegin>\r?\n(?<indent>[\t ]*)template[\t ]*<(?<typeParameters>[^\n]*)>[\t ]*(struct|class)[\t ]+(?<fullType>(?<type>[a-zA-Z][a-zA-Z0-9]*)(<[^<>\n]*>)?)[\t ]*:[\t ]*(?<access>(private|protected|public)[\t ]+)?(?<fullBaseType>(?<baseType>[a-zA-Z][a-zA-Z0-9]*)(<[^<>\n]*>)?)[\t ]*(\r?\n)?[\t ]*{)(?<middle>(.|\n)*)(?<beforeEnd>(?<=\r?\n)\k<indent>)(?<end>};)"), "${classDeclarationBegin}/*~start~type~${type}~${fullType}~${baseType}~${fullBaseType}~*/${middle}${beforeEnd}/*~end~type~${type}~${fullType}~${baseType}~${fullBaseType}~*/${end}", 0),
+            // Inside scopes replace:
+            // /*~start~type~Disposable~Disposable<T>~Disposable~Disposable<>~*/ ... ) : base( ... /*~end~type~Disposable~Disposable<T>~Disposable~Disposable<>~*/
+            // /*~start~type~Disposable~Disposable<T>~Disposable~Disposable<>~*/ ... ) : Disposable<>( /*~end~type~Disposable~Disposable<T>~Disposable~Disposable<>~*/
+            (new Regex(@"(?<before>(?<typeScopeStart>/\*~start~type~(?<types>(?<type>[^~\n\*]+)~(?<fullType>[^~\n\*]+)~\k<type>~(?<fullBaseType>[^~\n\*]+))~\*/)(.|\n)+?\)\s*:\s)*base(?<after>\((.|\n)+?(?<typeScopeEnd>/\*~end~type~\k<types>~\*/))"), "${before}${fullBaseType}${after}", 20),
+            // Inside scopes replace:
+            // /*~start~type~Disposable~Disposable<T>~X~X<>~*/ ... ) : base( ... /*~end~type~Disposable~Disposable<T>~X~X<>~*/
+            // /*~start~type~Disposable~Disposable<T>~X~X<>~*/ ... ) : X( /*~end~type~Disposable~Disposable<T>~X~X<>~*/
+            (new Regex(@"(?<before>(?<typeScopeStart>/\*~start~type~(?<types>(?<type>[^~\n\*]+)~(?<fullType>[^~\n\*]+)~(?<baseType>[^~\n\*]+)~(?<fullBaseType>[^~\n\*]+))~\*/)(.|\n)+?\)\s*:\s)*base(?<after>\((.|\n)+?(?<typeScopeEnd>/\*~end~type~\k<types>~\*/))"), "${before}${baseType}${after}", 20),
+            // Inside scopes replace:
+            // /*~start~type~Disposable~Disposable<T>~X~X<>~*/ ... public: Disposable(T object) { Object = object; } ... public: Disposable(T object) : Disposable(object) { } ... /*~end~type~Disposable~Disposable<T>~X~X<>~*/
+            // /*~start~type~Disposable~Disposable<T>~X~X<>~*/ ... public: Disposable(T object) { Object = object; } /*~end~type~Disposable~Disposable<T>~X~X<>~*/
+            (new Regex(@"(?<before>(?<typeScopeStart>/\*~start~type~(?<types>(?<type>[^~\n\*]+)~(?<fullType>[^~\n\*]+)~(?<baseType>[^~\n\*]+)~(?<fullBaseType>[^~\n\*]+))~\*/)(.|\n)+?(?<constructor>(?<access>(private|protected|public):[\t ]*)?\k<type>\((?<arguments>[^()\n]+)\)\s*{[^{}\n]+})(.|\n)+?)*(?<duplicateConstructor>(?<access>(private|protected|public):[\t ]*)?\k<type>\(\k<arguments>\)\s*:[^{}\n]+\s*{[^{}\n]+})(?<after>(.|\n)+?(?<typeScopeEnd>/\*~end~type~\k<types>~\*/))"), "${before}${after}", 20),
+            // Remove scope borders.
+            // /*~start~type~Disposable~Disposable<T>~Disposable~Disposable<>~*/
             // 
             (new Regex(@"/\*~[^~\*\n]+(~[^~\*\n]+)*~\*/"), "", 0),
         }.Cast<ISubstitutionRule>().ToList();
