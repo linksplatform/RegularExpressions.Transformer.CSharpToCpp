@@ -244,18 +244,24 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // using Platform.Numbers;
             // 
             (new Regex(@"([\r\n]{2}|^)\s*?using [\.a-zA-Z0-9]+;\s*?$"), "", 0),
+            // class SizedBinaryTreeMethodsBase : GenericCollectionMethodsBase
+            // class SizedBinaryTreeMethodsBase : public GenericCollectionMethodsBase
+            (new Regex(@"(struct|class) ([a-zA-Z0-9]+)(<[a-zA-Z0-9 ,]+>)? : ([a-zA-Z0-9]+)"), "$1 $2$3 : public $4", 0),
+            // System.IDisposable
+            // System::IDisposable
+            (new Regex(@"(?<before>System(::[a-zA-Z_]\w*)*)\.(?<after>[a-zA-Z_]\w*)"), "${before}::${after}", 20),
+            // class IProperty : ISetter<TValue, TObject>, IProvider<TValue, TObject>
+            // class IProperty : public ISetter<TValue, TObject>, public IProvider<TValue, TObject>
+            (new Regex(@"(?<before>(interface|struct|class) [a-zA-Z_]\w* : ((public [a-zA-Z_][\w:]*(<[a-zA-Z0-9 ,]+>)?, )+)?)(?<inheritedType>(?!public)[a-zA-Z_][\w:]*(<[a-zA-Z0-9 ,]+>)?)(?<after>(, [a-zA-Z_][\w:]*(?!>)|[ \r\n]+))"), "${before}public ${inheritedType}${after}", 10),
+            // interface IDisposable {
+            // class IDisposable { public:
+            (new Regex(@"(?<before>\r?\n)(?<indent>[ \t]*)interface (?<interface>[a-zA-Z_]\w*)(?<typeDefinitionEnding>[^{]+){"), "${before}${indent}class ${interface}${typeDefinitionEnding}{" + Environment.NewLine + "    public:", 0),
             // struct TreeElement { }
             // struct TreeElement { };
             (new Regex(@"(struct|class) ([a-zA-Z0-9]+)(\s+){([\sa-zA-Z0-9;:_]+?)}([^;])"), "$1 $2$3{$4};$5", 0),
             // class Program { }
             // class Program { };
             (new Regex(@"(?<type>struct|class) (?<name>[a-zA-Z0-9]+[^\r\n]*)(?<beforeBody>[\r\n]+(?<indentLevel>[\t ]*)?)\{(?<body>[\S\s]+?[\r\n]+\k<indentLevel>)\}(?<afterBody>[^;]|$)"), "${type} ${name}${beforeBody}{${body}};${afterBody}", 0),
-            // class SizedBinaryTreeMethodsBase : GenericCollectionMethodsBase
-            // class SizedBinaryTreeMethodsBase : public GenericCollectionMethodsBase
-            (new Regex(@"(struct|class) ([a-zA-Z0-9]+)(<[a-zA-Z0-9 ,]+>)? : ([a-zA-Z0-9]+)"), "$1 $2$3 : public $4", 0),
-            // class IProperty : ISetter<TValue, TObject>, IProvider<TValue, TObject>
-            // class IProperty : public ISetter<TValue, TObject>, public IProvider<TValue, TObject>
-            (new Regex(@"(?<before>(struct|class) [a-zA-Z0-9]+ : ((public [a-zA-Z0-9]+(<[a-zA-Z0-9 ,]+>)?, )+)?)(?<inheritedType>(?!public)[a-zA-Z0-9]+(<[a-zA-Z0-9 ,]+>)?)(?<after>(, [a-zA-Z0-9]+(?!>)|[ \r\n]+))"), "${before}public ${inheritedType}${after}", 10),
             // Insert scope borders.
             // ref TElement root
             // ~!root!~ref TElement root
@@ -436,9 +442,9 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // 
             (new Regex(@"~![a-zA-Z0-9]+!~"), "", 5),
             // Insert scope borders.
-            // auto random = new System.Random(0);
+            // auto random = new System::Random(0);
             // std::srand(0);
-            (new Regex(@"[a-zA-Z0-9\.]+ ([a-zA-Z0-9]+) = new (System\.)?Random\(([a-zA-Z0-9]+)\);"), "~!$1!~std::srand($3);", 0),
+            (new Regex(@"[a-zA-Z0-9\.]+ ([a-zA-Z0-9]+) = new (System::)?Random\(([a-zA-Z0-9]+)\);"), "~!$1!~std::srand($3);", 0),
             // Inside the scope of ~!random!~ replace:
             // random.Next(1, N)
             // (std::rand() % N) + 1
