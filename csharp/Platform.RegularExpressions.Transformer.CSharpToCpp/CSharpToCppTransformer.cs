@@ -650,6 +650,18 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // public: delegate void Disposal(bool, bool);
             // using Disposal = void(bool, bool);
             (new Regex(@"(?<access>(private|protected|public): )delegate (?<returnType>[a-zA-Z][a-zA-Z0-9:]+) (?<delegate>[a-zA-Z][a-zA-Z0-9]+)\((?<argumentTypes>[^\(\)\n]*)\);"), "using ${delegate} = ${returnType}(${argumentTypes});", 20),
+            // <4-1>
+            // <3>
+            (new Regex(@"(?<before><)4-1(?<after>>)"), "${before}3${after}", 0),
+            // <3-1>
+            // <2>
+            (new Regex(@"(?<before><)3-1(?<after>>)"), "${before}2${after}", 0),
+            // <2-1>
+            // <1>
+            (new Regex(@"(?<before><)2-1(?<after>>)"), "${before}1${after}", 0),
+            // <1-1>
+            // <0>
+            (new Regex(@"(?<before><)1-1(?<after>>)"), "${before}0${after}", 0),
             // #region Always
             // 
             (new Regex(@"(^|\r?\n)[ \t]*\#(region|endregion)[^\r\n]*(\r?\n|$)"), "", 0),
