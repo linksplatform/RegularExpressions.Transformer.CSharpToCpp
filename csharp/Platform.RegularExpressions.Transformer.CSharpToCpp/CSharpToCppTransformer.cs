@@ -160,6 +160,18 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // Count => GetSizeOrZero(Root);
             // Count() { return GetSizeOrZero(Root); }
             (new Regex(@"(\W)([A-Z][a-zA-Z]+)\s+=>\s+([^;\r\n]+);"), "$1$2() { return $3; }", 0),
+            // Insert scope borders.
+            // interface IDisposable { ... }
+            // interface IDisposable {/*~start~interface~IDisposable~*/ ... /*~end~interface~IDisposable~*/}
+            (new Regex(@"(?<classDeclarationBegin>\r?\n(?<indent>[\t ]*)interface[\t ]*(?<type>[a-zA-Z][a-zA-Z0-9]*(<[^<>\n]*>)?)[^{}]*{)(?<middle>(.|\n)*)(?<beforeEnd>(?<=\r?\n)\k<indent>)(?<end>})"), "${classDeclarationBegin}/*~start~interface~${type}~*/${middle}${beforeEnd}/*~end~interface~${type}~*/${end}", 0),
+            // Inside scopes replace:
+            // /*~start~interface~IDisposable~*/ ... bool IsDisposed { get; } ... /*~end~interface~IDisposable~*/
+            // /*~start~interface~IDisposable~*/ ... virtual bool IsDisposed() = 0; /*~end~interface~IDisposable~*/
+            (new Regex(@"(?<before>(?<typeScopeStart>/\*~start~interface~(?<type>[^~\n\*]+)~\*/)(.|\n)+?)(?<propertyDeclaration>(?<access>(private|protected|public): )?(?<propertyType>[a-zA-Z_][a-zA-Z0-9_:<>]*) (?<property>[a-zA-Z_][a-zA-Z0-9_]*)(?<blockOpen>[\n\s]*{[\n\s]*)(\[[^\n]+\][\n\s]*)?get;(?<blockClose>[\n\s]*}))(?<after>(.|\n)+?(?<typeScopeEnd>/\*~end~interface~\k<type>~\*/))"), "${before}virtual ${propertyType} ${property}() = 0;${after}", 20),
+            // Remove scope borders.
+            // /*~start~interface~IDisposable~*/
+            // 
+            (new Regex(@"/\*~[^~\*\n]+(~[^~\*\n]+)*~\*/"), "", 0),
             // public: T Object { get; }
             // public: const T Object;
             (new Regex(@"(?<before>[^\r]\r?\n[ \t]*)(?<access>(private|protected|public): )?(?<type>[a-zA-Z_][a-zA-Z0-9_:<>]*) (?<property>[a-zA-Z_][a-zA-Z0-9_]*)(?<blockOpen>[\n\s]*{[\n\s]*)(\[[^\n]+\][\n\s]*)?get;(?<blockClose>[\n\s]*})(?<after>[\n\s]*)"), "${before}${access}const ${type} ${property};${after}", 2),
@@ -552,8 +564,8 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // class Range<T> {/*~start~type~Range<T>~T~*/ ... /*~end~type~Range<T>~T~*/};
             (new Regex(@"(?<classDeclarationBegin>\r?\n(?<indent>[\t ]*)template <typename (?<typeParameter>[^\n]+)> (struct|class) (?<type>[a-zA-Z0-9]+<\k<typeParameter>>)(\s*:\s*[^{\n]+)?[\t ]*(\r?\n)?[\t ]*{)(?<middle>(.|\n)*)(?<endIndent>(?<=\r?\n)\k<indent>)(?<end>};)"), "${classDeclarationBegin}/*~start~type~${type}~${typeParameter}~*/${middle}${endIndent}/*~end~type~${type}~${typeParameter}~*/${end}", 0),
             // Inside scopes replace:
-            // /*~start~namespace~Platform::Ranges~*/ ... /*~start~type~Range<T>~T~*/ ... public: override std::int32_t GetHashCode() { return {Minimum, Maximum}.GetHashCode(); } ... /*~start~type~Range<T>~T~*/ ... /*~end~namespace~Platform::Ranges~*/
-            // /*~start~namespace~Platform::Ranges~*/ ... /*~start~type~Range<T>~T~*/ ... /*~start~type~Range<T>~T~*/ ... /*~end~namespace~Platform::Ranges~*/ namespace std { template <typename T> struct hash<Platform::Ranges::Range<T>> { std::size_t operator()(const Platform::Ranges::Range<T> &obj) const { return {Minimum, Maximum}.GetHashCode(); } }; }
+            // /*~start~namespace~Platform::Ranges~*/ ... /*~start~type~Range<T>~T~*/ ... public: override std::int32_t GetHashCode() { return {Minimum, Maximum}.GetHashCode(); } ... /*~end~type~Range<T>~T~*/ ... /*~end~namespace~Platform::Ranges~*/
+            // /*~start~namespace~Platform::Ranges~*/ ... /*~start~type~Range<T>~T~*/ ... /*~end~type~Range<T>~T~*/ ... /*~end~namespace~Platform::Ranges~*/ namespace std { template <typename T> struct hash<Platform::Ranges::Range<T>> { std::size_t operator()(const Platform::Ranges::Range<T> &obj) const { return {Minimum, Maximum}.GetHashCode(); } }; }
             (new Regex(@"(?<namespaceScopeStart>/\*~start~namespace~(?<namespace>[^~\n\*]+)~\*/)(?<betweenStartScopes>(.|\n)+)(?<typeScopeStart>/\*~start~type~(?<type>[^~\n\*]+)~(?<typeParameter>[^~\n\*]+)~\*/)(?<before>(.|\n)+?)(?<hashMethodDeclaration>\r?\n[ \t]*(?<access>(private|protected|public): )override std::int32_t GetHashCode\(\)(\s|\n)*{\s*(?<methodBody>[^\s][^\n]+[^\s])\s*}\s*)(?<after>(.|\n)+?)(?<typeScopeEnd>/\*~end~type~\k<type>~\k<typeParameter>~\*/)(?<betweenEndScopes>(.|\n)+)(?<namespaceScopeEnd>/\*~end~namespace~\k<namespace>~\*/)}\r?\n"), "${namespaceScopeStart}${betweenStartScopes}${typeScopeStart}${before}${after}${typeScopeEnd}${betweenEndScopes}${namespaceScopeEnd}}" + Environment.NewLine + Environment.NewLine + "namespace std" + Environment.NewLine + "{" + Environment.NewLine + "    template <typename ${typeParameter}>" + Environment.NewLine + "    struct hash<${namespace}::${type}>" + Environment.NewLine + "    {" + Environment.NewLine + "        std::size_t operator()(const ${namespace}::${type} &obj) const" + Environment.NewLine + "        {" + Environment.NewLine + "            /*~start~method~*/${methodBody}/*~end~method~*/" + Environment.NewLine + "        }" + Environment.NewLine + "    };" + Environment.NewLine + "}" + Environment.NewLine, 10),
             // Inside scope of /*~start~method~*/ replace:
             // /*~start~method~*/ ... Minimum ... /*~end~method~*/
@@ -568,7 +580,7 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             (new Regex(@"(?<before>(struct|class) (?<type>[a-zA-Z][a-zA-Z0-9]*)<[^<>\n]+> : (?<access>(private|protected|public) )?\k<type>)(?<after>\b(?!<))"), "${before}<>${after}", 0),
             // Insert scope borders.
             // class Disposable<T> : public Disposable<> { ... };
-            // class Disposable<T> : public Disposable<> {/*~start~type~Disposable~Disposable<T>~Disposable~Disposable<>~*/ ... /*~start~type~Disposable~Disposable<T>~Disposable~Disposable<>~*/};
+            // class Disposable<T> : public Disposable<> {/*~start~type~Disposable~Disposable<T>~Disposable~Disposable<>~*/ ... /*~end~type~Disposable~Disposable<T>~Disposable~Disposable<>~*/};
             (new Regex(@"(?<classDeclarationBegin>\r?\n(?<indent>[\t ]*)template[\t ]*<(?<typeParameters>[^\n]*)>[\t ]*(struct|class)[\t ]+(?<fullType>(?<type>[a-zA-Z][a-zA-Z0-9]*)(<[^<>\n]*>)?)[\t ]*:[\t ]*(?<access>(private|protected|public)[\t ]+)?(?<fullBaseType>(?<baseType>[a-zA-Z][a-zA-Z0-9]*)(<[^<>\n]*>)?)[\t ]*(\r?\n)?[\t ]*{)(?<middle>(.|\n)*)(?<beforeEnd>(?<=\r?\n)\k<indent>)(?<end>};)"), "${classDeclarationBegin}/*~start~type~${type}~${fullType}~${baseType}~${fullBaseType}~*/${middle}${beforeEnd}/*~end~type~${type}~${fullType}~${baseType}~${fullBaseType}~*/${end}", 0),
             // Inside scopes replace:
             // /*~start~type~Disposable~Disposable<T>~Disposable~Disposable<>~*/ ... ) : base( ... /*~end~type~Disposable~Disposable<T>~Disposable~Disposable<>~*/
