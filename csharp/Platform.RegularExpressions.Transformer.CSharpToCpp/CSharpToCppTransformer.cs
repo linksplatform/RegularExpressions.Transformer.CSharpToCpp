@@ -630,7 +630,7 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             (new Regex(@"(?<argumentAbstractType>I[A-Z][a-zA-Z0-9]+(<[^>\r\n]+>)?) (?<argument>[_a-zA-Z0-9]+)(?<after>,|\))"), "${argumentAbstractType} &${argument}${after}", 0),
             // ICounter<int, int> c1;
             // ICounter<int, int>* c1;
-            (new Regex(@"(?<abstractType>I[A-Z][a-zA-Z0-9]+(<[^>\r\n]+>)?) (?<variable>[_a-zA-Z0-9]+)(?<after> = null)?;"), "${abstractType} *${variable}${after}", 0),
+            (new Regex(@"(?<abstractType>I[A-Z][a-zA-Z0-9]+(<[^>\r\n]+>)?) (?<variable>[_a-zA-Z0-9]+)(?<after> = null)?;"), "${abstractType} *${variable}${after};", 0),
             // (expression)
             // expression
             (new Regex(@"(\(| )\(([a-zA-Z0-9_\*:]+)\)(,| |;|\))"), "$1$2$3", 0),
