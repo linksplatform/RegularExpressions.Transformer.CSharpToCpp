@@ -4,7 +4,7 @@
     <Description>LinksPlatform's Platform.RegularExpressions.Transformer.CSharpToCpp Class Library</Description>
     <Copyright>Konstantin Diachenko</Copyright>
     <AssemblyTitle>Platform.RegularExpressions.Transformer.CSharpToCpp</AssemblyTitle>
-    <VersionPrefix>0.2.36</VersionPrefix>
+    <VersionPrefix>0.2.37</VersionPrefix>
     <Authors>Konstantin Diachenko</Authors>
     <TargetFrameworks>net472;netstandard2.0;netstandard2.1</TargetFrameworks>
     <AssemblyName>Platform.RegularExpressions.Transformer.CSharpToCpp</AssemblyName>
@@ -24,11 +24,8 @@
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <LangVersion>latest</LangVersion>
-    <PackageReleaseNotes>Action delegate translation rules merged and simplified.
-Better support for translation of constructors.
-Rules for tuple access simplification added.
-Better support for translation of Interfaces.
-Better support for translation of properties inside interfaces.</PackageReleaseNotes>
+    <PackageReleaseNotes>Better support for translation of interface arguments.
+Support for translation of ProcessExit event added.</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup Condition="$(TargetFramework.StartsWith('net4')) AND '$(MSBuildRuntimeType)' == 'Core' AND '$(OS)' != 'Windows_NT'">
