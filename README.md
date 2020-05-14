@@ -10,7 +10,7 @@
 
 LinksPlatform's Platform.RegularExpressions.Transformer.CSharpToCpp Class Library.
 
-Namespace: [Platform.RegularExpressions.Transformer.CSharpToCpp](https://linksplatform.github.io/RegularExpressions.Transformer.CSharpToCpp/api/Platform.RegularExpressions.Transformer.CSharpToCpp.html)
+Namespace: [Platform.RegularExpressions.Transformer.CSharpToCpp](https://linksplatform.github.io/RegularExpressions.Transformer.CSharpToCpp/csharp/api/Platform.RegularExpressions.Transformer.CSharpToCpp.html)
 
 Forked from: [LinksPlatform/Collections.Methods/CSharpToCppTranslator](https://github.com/linksplatform/Collections.Methods/tree/93bdb700f81cae341164da6a78e1b770814d0eba/CSharpToCppTranslator)
 
@@ -19,7 +19,7 @@ NuGet package: [Platform.RegularExpressions.Transformer.CSharpToCpp](https://www
 Python version: [cs2cpp](https://github.com/linksplatform/RegularExpressions.Transformer.CSharpToCpp/tree/master/python)
 
 ## [Documentation](https://linksplatform.github.io/RegularExpressions.Transformer.CSharpToCpp)
-[PDF file](https://linksplatform.github.io/RegularExpressions.Transformer.CSharpToCpp/Platform.RegularExpressions.Transformer.CSharpToCpp.pdf) with code for e-readers.
+[PDF file](https://linksplatform.github.io/RegularExpressions.Transformer.CSharpToCpp/csharp/Platform.RegularExpressions.Transformer.CSharpToCpp.pdf) with code for e-readers.
 
 ## Depend on
 *   [Platform.RegularExpressions.Transformer](https://github.com/linksplatform/RegularExpressions.Transformer)	
