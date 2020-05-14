@@ -18,7 +18,43 @@
       "output": {
         ".html": {
           "relative_path": "README.html",
-          "hash": "DiprU7MulESoonhVScJl/w=="
+          "hash": "d8yf20+PW4+BQc1iH0xFXQ=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "obj/api/Platform.RegularExpressions.Transformer.CSharpToCpp.CSharpToCppTransformer.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Platform.RegularExpressions.Transformer.CSharpToCpp.CSharpToCppTransformer.html",
+          "hash": "D2+WcEIlsUC2GyIqzJrR/Q=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "obj/api/Platform.RegularExpressions.Transformer.CSharpToCpp.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Platform.RegularExpressions.Transformer.CSharpToCpp.html",
+          "hash": "6dYgN1QbjDr04a6ZhdMhmg=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Toc",
+      "source_relative_path": "obj/api/toc.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/toc.html",
+          "hash": "D7eRnJ4/YWVivO6I+Gm/QA=="
         }
       },
       "is_incremental": false,
@@ -33,7 +69,7 @@
       "output": {
         ".html": {
           "relative_path": "toc.html",
-          "hash": "L+fYtXwb52jwcJPk2pd/nQ=="
+          "hash": "Zg+JVhLwDUeiHJACGma4+g=="
         }
       },
       "is_incremental": false,
@@ -55,6 +91,12 @@
           "can_incremental": false,
           "incrementalPhase": "build",
           "total_file_count": 1,
+          "skipped_file_count": 0
+        },
+        "ManagedReferenceDocumentProcessor": {
+          "can_incremental": false,
+          "incrementalPhase": "build",
+          "total_file_count": 2,
           "skipped_file_count": 0
         },
         "TocDocumentProcessor": {
