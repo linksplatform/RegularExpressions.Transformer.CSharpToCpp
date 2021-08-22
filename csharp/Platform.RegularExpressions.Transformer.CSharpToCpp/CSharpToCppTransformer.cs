@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -7,8 +7,21 @@ using System.Text.RegularExpressions;
 
 namespace Platform.RegularExpressions.Transformer.CSharpToCpp
 {
+    /// <summary>
+    /// <para>
+    /// Represents the sharp to cpp transformer.
+    /// </para>
+    /// <para></para>
+    /// </summary>
+    /// <seealso cref="TextTransformer"/>
     public class CSharpToCppTransformer : TextTransformer
     {
+        /// <summary>
+        /// <para>
+        /// The to list.
+        /// </para>
+        /// <para></para>
+        /// </summary>
         public static readonly IList<ISubstitutionRule> FirstStage = new List<SubstitutionRule>
         {
             // // ...
@@ -623,6 +636,12 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             (new Regex(@"AppDomain\.CurrentDomain\.ProcessExit -= ([a-zA-Z_][a-zA-Z0-9_]*);"), "/* No translation. It is not possible to unsubscribe from std::atexit. */", 0),
         }.Cast<ISubstitutionRule>().ToList();
 
+        /// <summary>
+        /// <para>
+        /// The to list.
+        /// </para>
+        /// <para></para>
+        /// </summary>
         public static readonly IList<ISubstitutionRule> LastStage = new List<SubstitutionRule>
         {
             // IDisposable disposable)
@@ -735,8 +754,24 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             (new Regex(@"\r?\n[ \t]*\r?\n(?<end>[ \t]*})"), Environment.NewLine + "${end}", 10),
         }.Cast<ISubstitutionRule>().ToList();
 
+        /// <summary>
+        /// <para>
+        /// Initializes a new <see cref="CSharpToCppTransformer"/> instance.
+        /// </para>
+        /// <para></para>
+        /// </summary>
+        /// <param name="extraRules">
+        /// <para>A extra rules.</para>
+        /// <para></para>
+        /// </param>
         public CSharpToCppTransformer(IList<ISubstitutionRule> extraRules) : base(FirstStage.Concat(extraRules).Concat(LastStage).ToList()) { }
 
+        /// <summary>
+        /// <para>
+        /// Initializes a new <see cref="CSharpToCppTransformer"/> instance.
+        /// </para>
+        /// <para></para>
+        /// </summary>
         public CSharpToCppTransformer() : base(FirstStage.Concat(LastStage).ToList()) { }
     }
 }

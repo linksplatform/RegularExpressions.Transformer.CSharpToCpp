@@ -2,8 +2,20 @@ using Xunit;
 
 namespace Platform.RegularExpressions.Transformer.CSharpToCpp.Tests
 {
+    /// <summary>
+    /// <para>
+    /// Represents the sharp to cpp transformer tests.
+    /// </para>
+    /// <para></para>
+    /// </summary>
     public class CSharpToCppTransformerTests
     {
+        /// <summary>
+        /// <para>
+        /// Tests that empty line test.
+        /// </para>
+        /// <para></para>
+        /// </summary>
         [Fact]
         public void EmptyLineTest()
         {
@@ -13,6 +25,12 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp.Tests
             Assert.Equal("", actualResult);
         }
 
+        /// <summary>
+        /// <para>
+        /// Tests that hello world test.
+        /// </para>
+        /// <para></para>
+        /// </summary>
         [Fact]
         public void HelloWorldTest()
         {

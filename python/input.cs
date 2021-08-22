@@ -1,8 +1,30 @@
 using System;
 
 // This is hello world program.
+/// <summary>
+
+/// <para>
+
+/// Represents the program.
+
+/// </para>
+
+/// <para></para>
+
+/// </summary>
+
 class Program
 {
+    /// <summary>
+    /// <para>
+    /// Main the args.
+    /// </para>
+    /// <para></para>
+    /// </summary>
+    /// <param name="args">
+    /// <para>The args.</para>
+    /// <para></para>
+    /// </param>
     public static void Main(string[] args)
     {
         var myFirstString = "ban";
