@@ -1,7 +1,19 @@
 using System;
 
 // This is hello world program.
-private Program
+/// <summary>
+
+/// <para>
+
+/// Represents the program.
+
+/// </para>
+
+/// <para></para>
+
+/// </summary>
+
+class Program
 {
     /// <summary>
     /// <para>
