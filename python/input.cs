@@ -1,6 +1,17 @@
 using System;
 
 // This is hello world program.
+/// <summary>
+
+/// <para>
+
+/// Represents the program.
+
+/// </para>
+
+/// <para></para>
+
+/// </summary>
 
 class Program
 {
