@@ -1,13 +1,19 @@
-<h1 align="center">CSharpToCpp</h1>
+<div align="center">
 
-Installation: ```pip install --upgrade cs2cpp```
-Import:
-```python
-from cs2cpp import CSharpToCppTranslator
-```
+# CSharpToCpp
+### Simple C# to C++ translator written in Python
 
- translate code :eyes: :
+</div>
+
+
+## Get Started
+### Install
+```pip install --upgrade cs2cpp```
+
+### Usage
 ```python
+from cs2cpp import CSharpToCpp
+
 cscpp = CSharpToCpp()
 sourceCode = """using System;
 // This is hello world program.
@@ -20,5 +26,5 @@ class Program
         Console.WriteLine("Hello, world!");
     }
 }"""
-print(cscpp.Transform(sourceCode)) # translate code from C# to C++!
+print(cscpp.translate(sourceCode)) # translate code from C# to C++!
 ```

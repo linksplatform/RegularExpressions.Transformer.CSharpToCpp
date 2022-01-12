@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="cs2cpp",
-    version="0.1.1",
+    version="0.2.0",
     author="Ethosa",
     author_email="social.ethosa@gmail.com",
     description="Csharp to Cpp code translator",
@@ -14,7 +14,7 @@ setuptools.setup(
     url="https://github.com/linksplatform/RegularExpressions.Transformer.CSharpToCpp/tree/master/python",
     packages=setuptools.find_packages(),
     license="LGPLv3",
-    keywords="csharp cpp cs2cpp platform ethosa konard",
+    keywords="csharp cpp cs2cpp links platform ethosa konard",
     classifiers=[
         "Development Status :: 4 - Beta",
         "Programming Language :: Python :: 3",
@@ -22,6 +22,8 @@ setuptools.setup(
         "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
         "License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)",
         "Operating System :: OS Independent",
     ],
@@ -30,5 +32,5 @@ setuptools.setup(
         "Documentation": "https://github.com/linksplatform/RegularExpressions.Transformer.CSharpToCpp/tree/master/python",
     },
     python_requires=">=3",
-    install_requires=["retranslator"]
+    install_requires=["retranslator >= 0.2.0"]
 )
