@@ -28,6 +28,7 @@
 Updated dependencies:
 Platform.RegularExpressions.Transformer from 0.3.3 to 0.3.4
 Microsoft.NETFramework.ReferenceAssemblies from 1.0.0 to 1.0.2.</PackageReleaseNotes>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup Condition="$(TargetFramework.StartsWith('net4')) AND '$(MSBuildRuntimeType)' == 'Core' AND '$(OS)' != 'Windows_NT'">
