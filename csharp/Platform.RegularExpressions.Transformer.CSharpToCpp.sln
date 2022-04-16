@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29326.143
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Platform.RegularExpressions.Transformer.CSharpToCpp", "csharp\Platform.RegularExpressions.Transformer.CSharpToCpp\Platform.RegularExpressions.Transformer.CSharpToCpp.csproj", "{4CC673F5-B97D-441D-8D74-6F40A93F1454}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Platform.RegularExpressions.Transformer.CSharpToCpp", "Platform.RegularExpressions.Transformer.CSharpToCpp\Platform.RegularExpressions.Transformer.CSharpToCpp.csproj", "{4CC673F5-B97D-441D-8D74-6F40A93F1454}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Platform.RegularExpressions.Transformer.CSharpToCpp.Tests", "csharp\Platform.RegularExpressions.Transformer.CSharpToCpp.Tests\Platform.RegularExpressions.Transformer.CSharpToCpp.Tests.csproj", "{03D93E29-4D6F-44DD-AFCC-F220154C1CF0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Platform.RegularExpressions.Transformer.CSharpToCpp.Tests", "Platform.RegularExpressions.Transformer.CSharpToCpp.Tests\Platform.RegularExpressions.Transformer.CSharpToCpp.Tests.csproj", "{03D93E29-4D6F-44DD-AFCC-F220154C1CF0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
