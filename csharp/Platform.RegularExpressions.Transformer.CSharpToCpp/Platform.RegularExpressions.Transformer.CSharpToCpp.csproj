@@ -12,8 +12,7 @@
     <PackageTags>LinksPlatform;RegularExpressions.Transformer.CSharpToCpp;CSharpToCppTransformer</PackageTags>
     <PackageIconUrl>https://raw.githubusercontent.com/linksplatform/Documentation/18469f4d033ee9a5b7b84caab9c585acab2ac519/doc/Avatar-rainbow-icon-64x64.png</PackageIconUrl>
     <PackageProjectUrl>https://linksplatform.github.io/RegularExpressions.Transformer.CSharpToCpp</PackageProjectUrl>
-    <PackageLicenseExpression>LGPL-3.0-only</PackageLicenseExpression>
-    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <PackageLicenseExpression>Unlicensed</PackageLicenseExpression>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>git://github.com/linksplatform/RegularExpressions.Transformer.CSharpToCpp</RepositoryUrl>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
