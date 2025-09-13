@@ -21,6 +21,48 @@ class CSharpToCpp(Translator):
         self.rules.extend(CSharpToCpp.LAST_RULES)
         Translator.__init__(self, self.rules)
 
+    # Mapping of std library features to their required headers
+    STD_LIBRARY_INCLUDES = {
+        "std::string": "<string>",
+        "std::vector": "<vector>",
+        "std::function": "<functional>",
+        "std::tuple": "<tuple>",
+        "std::numeric_limits": "<limits>",
+        "std::exception": "<exception>",
+        "std::mutex": "<mutex>",
+        "std::lock_guard": "<mutex>",
+        "std::ostream": "<ostream>",
+        "std::int8_t": "<cstdint>",
+        "std::int16_t": "<cstdint>",
+        "std::int32_t": "<cstdint>",
+        "std::int64_t": "<cstdint>",
+        "std::uint8_t": "<cstdint>",
+        "std::uint16_t": "<cstdint>",
+        "std::uint32_t": "<cstdint>",
+        "std::uint64_t": "<cstdint>"
+    }
+
+    def _generate_includes(self, transformed_code: str) -> str:
+        """Analyzes the transformed output and generates necessary include statements."""
+        required_includes = set()
+        
+        for std_feature in self.STD_LIBRARY_INCLUDES:
+            if std_feature in transformed_code:
+                required_includes.add(self.STD_LIBRARY_INCLUDES[std_feature])
+
+        if not required_includes:
+            return ""
+
+        sorted_includes = sorted(required_includes)
+        include_statements = [f"#include {include}" for include in sorted_includes]
+        return "\n".join(include_statements) + "\n\n"
+
+    def translate(self, text: str) -> str:
+        """Transforms C# code to C++ and generates necessary includes."""
+        transformed = super().translate(text)
+        includes = self._generate_includes(transformed)
+        return includes + transformed
+
     #  Rules for translate code
     FIRST_RULES = [
         # // ...

@@ -4,7 +4,7 @@
     <Description>LinksPlatform's Platform.RegularExpressions.Transformer.CSharpToCpp Class Library</Description>
     <Copyright>Konstantin Diachenko</Copyright>
     <AssemblyTitle>Platform.RegularExpressions.Transformer.CSharpToCpp</AssemblyTitle>
-    <VersionPrefix>0.3.0</VersionPrefix>
+    <VersionPrefix>0.4.0</VersionPrefix>
     <Authors>Konstantin Diachenko</Authors>
     <TargetFramework>net8</TargetFramework>
     <AssemblyName>Platform.RegularExpressions.Transformer.CSharpToCpp</AssemblyName>
@@ -23,7 +23,7 @@
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <LangVersion>latest</LangVersion>
-    <PackageReleaseNotes>Update target framework from net7 to net8.</PackageReleaseNotes>
+    <PackageReleaseNotes>Add automatic generation of necessary C++ standard library includes when using std library features. New TransformWithIncludes method provides transformation with required include statements.</PackageReleaseNotes>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 

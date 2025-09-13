@@ -756,6 +756,14 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
 
         /// <summary>
         /// <para>
+        /// Gets or sets a value indicating whether to automatically generate include statements for std library features.
+        /// </para>
+        /// <para></para>
+        /// </summary>
+        public bool AutoGenerateIncludes { get; set; } = true;
+
+        /// <summary>
+        /// <para>
         /// Initializes a new <see cref="CSharpToCppTransformer"/> instance.
         /// </para>
         /// <para></para>
@@ -773,5 +781,89 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
         /// <para></para>
         /// </summary>
         public CSharpToCppTransformer() : base(FirstStage.Concat(LastStage).ToList()) { }
+
+        /// <summary>
+        /// <para>
+        /// Maps std library features to their required header files.
+        /// </para>
+        /// <para></para>
+        /// </summary>
+        private static readonly Dictionary<string, string> StdLibraryIncludes = new Dictionary<string, string>
+        {
+            { "std::string", "<string>" },
+            { "std::vector", "<vector>" },
+            { "std::function", "<functional>" },
+            { "std::tuple", "<tuple>" },
+            { "std::numeric_limits", "<limits>" },
+            { "std::exception", "<exception>" },
+            { "std::mutex", "<mutex>" },
+            { "std::lock_guard", "<mutex>" },
+            { "std::ostream", "<ostream>" },
+            { "std::int8_t", "<cstdint>" },
+            { "std::int16_t", "<cstdint>" },
+            { "std::int32_t", "<cstdint>" },
+            { "std::int64_t", "<cstdint>" },
+            { "std::uint8_t", "<cstdint>" },
+            { "std::uint16_t", "<cstdint>" },
+            { "std::uint32_t", "<cstdint>" },
+            { "std::uint64_t", "<cstdint>" }
+        };
+
+        /// <summary>
+        /// <para>
+        /// Analyzes the transformed output and generates necessary include statements.
+        /// </para>
+        /// <para></para>
+        /// </summary>
+        /// <param name="transformedCode">
+        /// <para>The transformed C++ code.</para>
+        /// <para></para>
+        /// </param>
+        /// <returns>
+        /// <para>A string containing the necessary include statements.</para>
+        /// <para></para>
+        /// </returns>
+        private static string GenerateIncludes(string transformedCode)
+        {
+            var requiredIncludes = new HashSet<string>();
+            
+            foreach (var stdFeature in StdLibraryIncludes.Keys)
+            {
+                if (transformedCode.Contains(stdFeature))
+                {
+                    requiredIncludes.Add(StdLibraryIncludes[stdFeature]);
+                }
+            }
+
+            if (requiredIncludes.Count == 0)
+            {
+                return string.Empty;
+            }
+
+            var sortedIncludes = requiredIncludes.OrderBy(x => x).ToList();
+            var includeStatements = sortedIncludes.Select(include => $"#include {include}").ToArray();
+            return string.Join(Environment.NewLine, includeStatements) + Environment.NewLine + Environment.NewLine;
+        }
+
+        /// <summary>
+        /// <para>
+        /// Transforms the specified text from C# to C++ and generates necessary includes.
+        /// </para>
+        /// <para></para>
+        /// </summary>
+        /// <param name="text">
+        /// <para>The text to transform.</para>
+        /// <para></para>
+        /// </param>
+        /// <returns>
+        /// <para>The transformed C++ text with necessary includes.</para>
+        /// <para></para>
+        /// </returns>
+        public string TransformWithIncludes(string text)
+        {
+            var transformed = Transform(text);
+            var includes = GenerateIncludes(transformed);
+            return includes + transformed;
+        }
     }
 }
