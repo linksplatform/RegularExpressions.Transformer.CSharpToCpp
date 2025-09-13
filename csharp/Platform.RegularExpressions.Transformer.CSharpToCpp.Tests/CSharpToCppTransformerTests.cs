@@ -35,5 +35,34 @@ class Program
             var actualResult = transformer.Transform(helloWorldCode);
             Assert.Equal(expectedResult, actualResult);
         }
+
+        [Fact]
+        public void SafeHashSpecializationTest()
+        {
+            const string inputCode = @"
+namespace Platform.Ranges
+{
+    template <typename T> struct Range
+    {
+        T Minimum;
+        T Maximum;
+        
+        public: override std::int32_t GetHashCode()
+        {
+            return {Minimum, Maximum}.GetHashCode();
+        }
+    };
+}";
+            var transformer = new CSharpToCppTransformer();
+            var actualResult = transformer.Transform(inputCode);
+            
+            // Should generate safe specialization syntax
+            Assert.Contains("template <typename T>", actualResult);
+            Assert.Contains("struct std::hash<Platform::Ranges::Range<T>>", actualResult);
+            
+            // Should NOT contain unsafe namespace std opening
+            Assert.DoesNotContain("namespace std\n{", actualResult);
+            Assert.DoesNotContain("namespace std {", actualResult);
+        }
     }
 }
