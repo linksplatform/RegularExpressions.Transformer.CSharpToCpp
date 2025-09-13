@@ -65,10 +65,10 @@ class CSharpToCpp(Translator):
         SubRule(r"Comparer<[^>\n]+>\.Default\.Compare\(\s*(?P<first>[^,)\n]+),\s*(?P<second>[^\)\n]+)\s*\)\s*(?P<comparison>[<>=]=?)\s*0(?P<after>\D)", r"\g<first> \g<comparison> \g<second>\g<after>", max_repeat=0),
         # public static bool operator ==(Range<T> left, Range<T> right) => left.Equals(right);
         # 
-        SubRule(r"\r?\n[^\n]+bool operator ==\((?P<type>[^\n]+) (?P<left>[a-zA-Z0-9]+), \k<type> (?P<right>[a-zA-Z0-9]+)\) => (\k<left>|\k<right>)\.Equals\((\k<left>|\k<right>)\);", r"", max_repeat=10),
+        SubRule(r"\r?\n[^\n]+bool operator==\((?P<type>[^\n]+) (?P<left>[a-zA-Z0-9]+), \k<type> (?P<right>[a-zA-Z0-9]+)\) => (\k<left>|\k<right>)\.Equals\((\k<left>|\k<right>)\);", r"", max_repeat=10),
         # public static bool operator !=(Range<T> left, Range<T> right) => !(left == right);
         # 
-        SubRule(r"\r?\n[^\n]+bool operator !=\((?P<type>[^\n]+) (?P<left>[a-zA-Z0-9]+), \k<type> (?P<right>[a-zA-Z0-9]+)\) => !\((\k<left>|\k<right>) == (\k<left>|\k<right>)\);", r"", max_repeat=10),
+        SubRule(r"\r?\n[^\n]+bool operator!=\((?P<type>[^\n]+) (?P<left>[a-zA-Z0-9]+), \k<type> (?P<right>[a-zA-Z0-9]+)\) => !\((\k<left>|\k<right>) == (\k<left>|\k<right>)\);", r"", max_repeat=10),
         # public override bool Equals(object obj) => obj is Range<T> range ? Equals(range) : false;
         # 
         SubRule(r"\r?\n[^\n]+override bool Equals\((System\.)?[Oo]bject (?P<this>[a-zA-Z0-9]+)\) => \k<this> is [^\n]+ (?P<other>[a-zA-Z0-9]+) \? Equals\(\k<other>\) : false;", r"", max_repeat=10),
@@ -357,7 +357,7 @@ class CSharpToCpp(Translator):
         SubRule(r"(\r?\n[\t ]+)[a-zA-Z0-9]+ ([a-zA-Z0-9]+) = new ([a-zA-Z0-9]+)\[([_a-zA-Z0-9]+)\];", r"\1\3 \2[\4] = { {0} };", max_repeat=0),
         # bool Equals(Range<T> other) { ... }
         # bool operator ==(const Key &other) const { ... }
-        SubRule(r"(?P<before>\r?\n[^\n]+bool )Equals\((?P<type>[^\n{]+) (?P<variable>[a-zA-Z0-9]+)\)(?P<after>(\s|\n)*{)", r"\g<before>operator ==(const \g<type> &\g<variable>) const\g<after>", max_repeat=0),
+        SubRule(r"(?P<before>\r?\n[^\n]+bool )Equals\((?P<type>[^\n{]+) (?P<variable>[a-zA-Z0-9]+)\)(?P<after>(\s|\n)*{)", r"\g<before>operator==(const \g<type> &\g<variable>) const\g<after>", max_repeat=0),
         # Insert scope borders.
         # class Range { ... public: override std::string ToString() { return ...; }
         # class Range {/*~Range<T>~*/ ... public: override std::string ToString() { return ...; }
