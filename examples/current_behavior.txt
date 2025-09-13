@@ -1,0 +1,43 @@
+=== PRAGMA ONCE TEST ===
+Input:
+#pragma once
+using System;
+
+class Test
+{
+    public void Method() { }
+}
+
+Output:
+class Test
+{
+    public: void Method() { }
+};
+
+=== INTERFACE TEST ===
+Input:
+interface ITest<T>
+{
+    void Method(T value);
+}
+
+Output:
+interface ITest<T>
+{
+    virtual void Method(T value) = 0;
+}
+
+=== STRUCT TEST ===
+Input:
+struct TestStruct<T>
+{
+    public T Value { get; set; }
+    public void Method() { }
+}
+
+Output:
+struct TestStruct<T>
+{
+    public: inline T Value;
+    public: void Method() { }
+};
