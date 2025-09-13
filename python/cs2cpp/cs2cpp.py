@@ -84,6 +84,9 @@ class CSharpToCpp(Translator):
         # public abstract class
         # class
         SubRule(r"((public|protected|private|internal|abstract|static) )*(?P<category>interface|class|struct)", r"\g<category>", max_repeat=0),
+        # public: static implicit operator TargetType(SourceType source) { ... }
+        # public: explicit operator TargetType() const { ... }
+        SubRule(r"(?P<access>(private|protected|public): )static implicit operator (?P<targetType>[^\(\n]+)\((?P<sourceType>[^\s\(\n]+) (?P<variable>[a-zA-Z0-9]+)\)", r"\g<access>explicit operator \g<targetType>() const", max_repeat=0),
         # class GenericCollectionMethodsBase<TElement> {
         # template <typename TElement> class GenericCollectionMethodsBase {
         SubRule(r"(?P<before>\r?\n)(?P<indent>[ \t]*)(?P<type>class|struct) (?P<typeName>[a-zA-Z0-9]+)<(?P<typeParameters>[a-zA-Z0-9 ,]+)>(?P<typeDefinitionEnding>[^{]+){", r"\g<before>\g<indent>template <typename ...> \g<type> \g<typeName>;\n" + "\g<indent>template <typename \g<typeParameters>> \g<type> \g<typeName><\g<typeParameters>>\g<typeDefinitionEnding>{", max_repeat=0),
@@ -149,8 +152,8 @@ class CSharpToCpp(Translator):
         # static void NotImplementedException(ThrowExtensionRoot root) { return throw new NotImplementedException(); }
         SubRule(r"(^\s+)(private|protected|public)?(: )?(template \<[^>\r\n]+\> )?(static )?(override )?([a-zA-Z0-9]+ )([a-zA-Z0-9]+)\(([^\(\r\n]*)\)\s+=>\s+throw([^;\r\n]+);", r"\1\2\3\4\5\6\7\8(\9) { throw\10; }", max_repeat=0),
         # SizeBalancedTree(int capacity) => a = b;
-        # SizeBalancedTree(int capacity) { a = b; }
-        SubRule(r"(^\s+)(private|protected|public)?(: )?(template \<[^>\r\n]+\> )?(static )?(override )?(void )?([a-zA-Z0-9]+)\(([^\(\r\n]*)\)\s+=>\s+([^;\r\n]+);", r"\1\2\3\4\5\6\7\8(\9) { \10; }", max_repeat=0),
+        # explicit SizeBalancedTree(int capacity) noexcept { a = b; }
+        SubRule(r"(^\s+)(private|protected|public)?(: )?(template \<[^>\r\n]+\> )?(static )?(override )?(void )?([a-zA-Z0-9]+)\(([^\(\r\n]*)\)\s+=>\s+([^;\r\n]+);", r"\1\2\3\4\5\6explicit \7\8(\9) noexcept { \10; }", max_repeat=0),
         # int SizeBalancedTree(int capacity) => a;
         # int SizeBalancedTree(int capacity) { return a; }
         SubRule(r"(^\s+)(private|protected|public)?(: )?(template \<[^>\r\n]+\> )?(static )?(override )?([a-zA-Z0-9]+ )([a-zA-Z0-9]+)\(([^\(\r\n]*)\)\s+=>\s+([^;\r\n]+);", r"\1\2\3\4\5\6\7\8(\9) { return \10; }", max_repeat=0),
@@ -553,12 +556,12 @@ class CSharpToCpp(Translator):
         SubRule(r"(?P<classDeclarationBegin>\r?\n(?P<indent>[\t ]*)(template\s*<[^<>\n]*> )?(struct|class) (?P<fullType>(?P<typeName>[a-zA-Z0-9]+)(<[^:\n]*>)?)(\s*:\s*[^{\n]+)?[\t ]*(\r?\n)?[\t ]*{)", r"\g<classDeclarationBegin>/*~type~\g<typeName>~\g<fullType>~*/", max_repeat=0),
         # Inside the scope of /*~type~Range<T>~*/ insert inner scope and replace:
         # public: static implicit operator std::tuple<T, T>(Range<T> range)
-        # public: operator std::tuple<T, T>() const {/*~variable~Range<T>~*/
-        SubRule(r"(?P<scope>/\*~type~(?P<typeName>[^~\n\*]+)~(?P<fullType>[^~\n\*]+)~\*/)(?P<separator>.|\n)(?P<before>((?<!/\*~type~\k<typeName>~\k<fullType>~\*/)(.|\n))*?)(?P<access>(private|protected|public): )static implicit operator (?P<targetType>[^\(\n]+)\((?P<argumentDeclaration>\k<fullType> (?P<variable>[a-zA-Z0-9]+))\)(?P<after>\s*\n?\s*{)", r"\g<scope>\g<separator>\g<before>\g<access>operator \g<targetType>() const\g<after>/*~variable~\g<variable>~*/", max_repeat=10),
+        # public: explicit operator std::tuple<T, T>() const {/*~variable~Range<T>~*/
+        SubRule(r"(?P<scope>/\*~type~(?P<typeName>[^~\n\*]+)~(?P<fullType>[^~\n\*]+)~\*/)(?P<separator>.|\n)(?P<before>((?<!/\*~type~\k<typeName>~\k<fullType>~\*/)(.|\n))*?)(?P<access>(private|protected|public): )static implicit operator (?P<targetType>[^\(\n]+)\((?P<argumentDeclaration>\k<fullType> (?P<variable>[a-zA-Z0-9]+))\)(?P<after>\s*\n?\s*{)", r"\g<scope>\g<separator>\g<before>\g<access>explicit operator \g<targetType>() const\g<after>/*~variable~\g<variable>~*/", max_repeat=10),
         # Inside the scope of /*~type~Range<T>~*/ replace:
         # public: static implicit operator Range<T>(std::tuple<T, T> tuple) { return new Range<T>(std::get<1-1>(tuple), std::get<2-1>(tuple)); }
-        # public: Range(std::tuple<T, T> tuple) : Range(std::get<1-1>(tuple), std::get<2-1>(tuple)) { }
-        SubRule(r"(?P<scope>/\*~type~(?P<typeName>[^~\n\*]+)~(?P<fullType>[^~\n\*]+)~\*/)(?P<separator>.|\n)(?P<before>((?<!/\*~type~\k<typeName>~\k<fullType>~\*/)(.|\n))*?)(?P<access>(private|protected|public): )static implicit operator (\k<fullType>|\k<typeName>)\((?P<arguments>[^{}\n]+)\)(\s|\n)*{(\s|\n)*return (new )?(\k<fullType>|\k<typeName>)\((?P<passedArguments>[^\n]+)\);(\s|\n)*}", r"\g<scope>\g<separator>\g<before>\g<access>\g<typeName>(\g<arguments>) : \g<typeName>(\g<passedArguments>) { }", max_repeat=10),
+        # public: explicit Range(std::tuple<T, T> tuple) : Range(std::get<1-1>(tuple), std::get<2-1>(tuple)) { }
+        SubRule(r"(?P<scope>/\*~type~(?P<typeName>[^~\n\*]+)~(?P<fullType>[^~\n\*]+)~\*/)(?P<separator>.|\n)(?P<before>((?<!/\*~type~\k<typeName>~\k<fullType>~\*/)(.|\n))*?)(?P<access>(private|protected|public): )static implicit operator (\k<fullType>|\k<typeName>)\((?P<arguments>[^{}\n]+)\)(\s|\n)*{(\s|\n)*return (new )?(\k<fullType>|\k<typeName>)\((?P<passedArguments>[^\n]+)\);(\s|\n)*}", r"\g<scope>\g<separator>\g<before>\g<access>explicit \g<typeName>(\g<arguments>) : \g<typeName>(\g<passedArguments>) { }", max_repeat=10),
         # Inside the scope of /*~variable~range~*/ replace:
         # range.Minimum
         # this->Minimum
