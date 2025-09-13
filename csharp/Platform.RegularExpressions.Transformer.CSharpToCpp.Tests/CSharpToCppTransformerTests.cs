@@ -35,5 +35,50 @@ class Program
             var actualResult = transformer.Transform(helloWorldCode);
             Assert.Equal(expectedResult, actualResult);
         }
+
+        [Fact]
+        public void TemplateLineBreakTest()
+        {
+            const string inputCode = @"
+struct ISetter<TValue>
+{
+    virtual void Set(TValue value) = 0;
+
+    virtual ~ISetter<TValue>() = default;
+};";
+            const string expectedResult = @"
+template <typename ...> struct ISetter;
+template <typename TValue>
+struct ISetter<TValue>
+{
+    virtual void Set(TValue value) = 0;
+
+    virtual ~ISetter<TValue>() = default;
+};";
+            var transformer = new CSharpToCppTransformer();
+            var actualResult = transformer.Transform(inputCode);
+            Assert.Equal(expectedResult, actualResult);
+        }
+
+        [Fact]
+        public void InterfaceTemplateLineBreakTest()
+        {
+            const string inputCode = @"
+interface IFactory<TProduct>
+{
+    TProduct Create();
+};";
+            const string expectedResult = @"
+template <typename ...> class IFactory;
+template <typename TProduct>
+class IFactory<TProduct>
+{
+    public:
+    TProduct Create();
+};";
+            var transformer = new CSharpToCppTransformer();
+            var actualResult = transformer.Transform(inputCode);
+            Assert.Equal(expectedResult, actualResult);
+        }
     }
 }

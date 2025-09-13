@@ -86,13 +86,13 @@ class CSharpToCpp(Translator):
         SubRule(r"((public|protected|private|internal|abstract|static) )*(?P<category>interface|class|struct)", r"\g<category>", max_repeat=0),
         # class GenericCollectionMethodsBase<TElement> {
         # template <typename TElement> class GenericCollectionMethodsBase {
-        SubRule(r"(?P<before>\r?\n)(?P<indent>[ \t]*)(?P<type>class|struct) (?P<typeName>[a-zA-Z0-9]+)<(?P<typeParameters>[a-zA-Z0-9 ,]+)>(?P<typeDefinitionEnding>[^{]+){", r"\g<before>\g<indent>template <typename ...> \g<type> \g<typeName>;\n" + "\g<indent>template <typename \g<typeParameters>> \g<type> \g<typeName><\g<typeParameters>>\g<typeDefinitionEnding>{", max_repeat=0),
+        SubRule(r"(?P<before>\r?\n)(?P<indent>[ \t]*)(?P<type>class|struct) (?P<typeName>[a-zA-Z0-9]+)<(?P<typeParameters>[a-zA-Z0-9 ,]+)>(?P<typeDefinitionEnding>[^{]+){", r"\g<before>\g<indent>template <typename ...> \g<type> \g<typeName>;\n" + "\g<indent>template <typename \g<typeParameters>>\n" + "\g<indent>\g<type> \g<typeName><\g<typeParameters>>\g<typeDefinitionEnding>{", max_repeat=0),
         # static void TestMultipleCreationsAndDeletions<TElement>(SizedBinaryTreeMethodsBase<TElement> tree, TElement* root)
         # template<typename T> static void TestMultipleCreationsAndDeletions<TElement>(SizedBinaryTreeMethodsBase<TElement> tree, TElement* root)
         SubRule(r"static ([a-zA-Z0-9]+) ([a-zA-Z0-9]+)<([a-zA-Z0-9]+)>\(([^\)\r\n]+)\)", r"template <typename \3> static \1 \2(\4)", max_repeat=0),
         # interface IFactory<out TProduct> {
         # template <typename...> class IFactory;\ntemplate <typename TProduct> class IFactory<TProduct>
-        SubRule(r"(?P<before>\r?\n)(?P<indent>[ \t]*)interface (?P<interface>[a-zA-Z0-9]+)<(?P<typeParameters>[a-zA-Z0-9 ,]+)>(?P<typeDefinitionEnding>[^{]+){", r"\g<before>\g<indent>template <typename ...> class \g<interface>;\n" + "\g<indent>template <typename \g<typeParameters>> class \g<interface><\g<typeParameters>>\g<typeDefinitionEnding>{\n" + "    public:", max_repeat=0),
+        SubRule(r"(?P<before>\r?\n)(?P<indent>[ \t]*)interface (?P<interface>[a-zA-Z0-9]+)<(?P<typeParameters>[a-zA-Z0-9 ,]+)>(?P<typeDefinitionEnding>[^{]+){", r"\g<before>\g<indent>template <typename ...> class \g<interface>;\n" + "\g<indent>template <typename \g<typeParameters>>\n" + "\g<indent>class \g<interface><\g<typeParameters>>\g<typeDefinitionEnding>{\n" + "    public:", max_repeat=0),
         # template <typename TObject, TProperty, TValue>
         # template <typename TObject, typename TProperty, typename TValue>
         SubRule(r"(?P<before>template <((, )?typename [a-zA-Z0-9]+)+, )(?P<typeParameter>[a-zA-Z0-9]+)(?P<after>(,|>))", r"\g<before>typename \g<typeParameter>\g<after>", max_repeat=10),
