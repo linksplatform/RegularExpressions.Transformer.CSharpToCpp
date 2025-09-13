@@ -29,7 +29,7 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             (new Regex(@"(\r?\n)?[ \t]+//+.+"), "", 0),
             // #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
             // 
-            (new Regex(@"^\s*?\#pragma[\sa-zA-Z0-9]+$"), "", 0),
+            (new Regex(@"^\s*?\#pragma(?! once)[\sa-zA-Z0-9]+$"), "", 0),
             // {\n\n\n
             // {
             (new Regex(@"{\s+[\r\n]+"), "{" + Environment.NewLine, 0),
@@ -86,14 +86,14 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // class
             (new Regex(@"((public|protected|private|internal|abstract|static) )*(?<category>interface|class|struct)"), "${category}", 0),
             // class GenericCollectionMethodsBase<TElement> {
-            // template <typename TElement> class GenericCollectionMethodsBase {
-            (new Regex(@"(?<before>\r?\n)(?<indent>[ \t]*)(?<type>class|struct) (?<typeName>[a-zA-Z0-9]+)<(?<typeParameters>[a-zA-Z0-9 ,]+)>(?<typeDefinitionEnding>[^{]+){"), "${before}${indent}template <typename ...> ${type} ${typeName};" + Environment.NewLine + "${indent}template <typename ${typeParameters}> ${type} ${typeName}<${typeParameters}>${typeDefinitionEnding}{", 0),
+            // template <typename TElement>\nclass GenericCollectionMethodsBase {
+            (new Regex(@"(?<before>\r?\n)(?<indent>[ \t]*)(?<type>class|struct) (?<typeName>[a-zA-Z0-9]+)<(?<typeParameters>[a-zA-Z0-9 ,]+)>(?<typeDefinitionEnding>[^{]+){"), "${before}${indent}template <typename ...> ${type} ${typeName};" + Environment.NewLine + "${indent}template <typename ${typeParameters}>" + Environment.NewLine + "${indent}${type} ${typeName}<${typeParameters}>${typeDefinitionEnding}{", 0),
             // static void TestMultipleCreationsAndDeletions<TElement>(SizedBinaryTreeMethodsBase<TElement> tree, TElement* root)
             // template<typename T> static void TestMultipleCreationsAndDeletions<TElement>(SizedBinaryTreeMethodsBase<TElement> tree, TElement* root)
             (new Regex(@"static ([a-zA-Z0-9]+) ([a-zA-Z0-9]+)<([a-zA-Z0-9]+)>\(([^\)\r\n]+)\)"), "template <typename $3> static $1 $2($4)", 0),
             // interface IFactory<out TProduct> {
-            // template <typename...> class IFactory;\ntemplate <typename TProduct> class IFactory<TProduct>
-            (new Regex(@"(?<before>\r?\n)(?<indent>[ \t]*)interface (?<interface>[a-zA-Z0-9]+)<(?<typeParameters>[a-zA-Z0-9 ,]+)>(?<typeDefinitionEnding>[^{]+){"), "${before}${indent}template <typename ...> class ${interface};" + Environment.NewLine + "${indent}template <typename ${typeParameters}> class ${interface}<${typeParameters}>${typeDefinitionEnding}{" + Environment.NewLine + "    public:", 0),
+            // template <typename...> struct IFactory;\ntemplate <typename TProduct>\nstruct IFactory<TProduct>
+            (new Regex(@"(?<before>\r?\n)(?<indent>[ \t]*)interface (?<interface>[a-zA-Z0-9]+)<(?<typeParameters>[a-zA-Z0-9 ,]+)>(?<typeDefinitionEnding>[^{]+){"), "${before}${indent}template <typename ...> struct ${interface};" + Environment.NewLine + "${indent}template <typename ${typeParameters}>" + Environment.NewLine + "${indent}struct ${interface}<${typeParameters}>${typeDefinitionEnding}{" + Environment.NewLine + "    public:", 0),
             // template <typename TObject, TProperty, TValue>
             // template <typename TObject, typename TProperty, typename TValue>
             (new Regex(@"(?<before>template <((, )?typename [a-zA-Z0-9]+)+, )(?<typeParameter>[a-zA-Z0-9]+)(?<after>(,|>))"), "${before}typename ${typeParameter}${after}", 10),
@@ -279,8 +279,12 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // class IProperty : public ISetter<TValue, TObject>, public IProvider<TValue, TObject>
             (new Regex(@"(?<before>(interface|struct|class) [a-zA-Z_]\w* : ((public [a-zA-Z_][\w:]*(<[a-zA-Z0-9 ,]+>)?, )+)?)(?<inheritedType>(?!public)[a-zA-Z_][\w:]*(<[a-zA-Z0-9 ,]+>)?)(?<after>(, [a-zA-Z_][\w:]*(?!>)|[ \r\n]+))"), "${before}public ${inheritedType}${after}", 10),
             // interface IDisposable {
-            // class IDisposable { public:
-            (new Regex(@"(?<before>\r?\n)(?<indent>[ \t]*)interface (?<interface>[a-zA-Z_]\w*)(?<typeDefinitionEnding>[^{]+){"), "${before}${indent}class ${interface}${typeDefinitionEnding}{" + Environment.NewLine + "    public:", 0),
+            // struct IDisposable { public:
+            (new Regex(@"(?<before>\r?\n)(?<indent>[ \t]*)interface (?<interface>[a-zA-Z_]\w*)(?<typeDefinitionEnding>[^{]+){"), "${before}${indent}struct ${interface}${typeDefinitionEnding}{" + Environment.NewLine + "    public:", 0),
+            // Add virtual destructors for structs (originally interfaces) that contain virtual methods
+            // struct ITest<T> { public: virtual void Method(T value) = 0; }
+            // struct ITest<T> { public: virtual void Method(T value) = 0; virtual ~ITest() = default; }
+            (new Regex(@"(?<beforeEnd>struct (?<structName>[a-zA-Z_][a-zA-Z0-9_]*)[^{]*\{[^}]*public:[^}]*virtual[^}]*?(?=\r?\n[ \t]*}))(?<endIndent>\r?\n[ \t]*)(?<end>})"), "${beforeEnd}${endIndent}    virtual ~${structName}() = default;${endIndent}${end}", 0),
             // struct TreeElement { }
             // struct TreeElement { };
             (new Regex(@"(struct|class) ([a-zA-Z0-9]+)(\s+){([\sa-zA-Z0-9;:_]+?)}([^;])"), "$1 $2$3{$4};$5", 0),
@@ -752,6 +756,11 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // \n\n}
             // \n}
             (new Regex(@"\r?\n[ \t]*\r?\n(?<end>[ \t]*})"), Environment.NewLine + "${end}", 10),
+            // Fix virtual destructors to use = default instead of = 0 (FINAL STAGE)
+            // Only applies to destructors that were already added (i.e. interfaces converted to structs)
+            // virtual ~ITest() = 0;
+            // virtual ~ITest() = default;
+            (new Regex(@"(\s*)virtual ~([a-zA-Z_][a-zA-Z0-9_]*)\(\) = 0;"), "$1virtual ~$2() = default;", 0),
         }.Cast<ISubstitutionRule>().ToList();
 
         /// <summary>
