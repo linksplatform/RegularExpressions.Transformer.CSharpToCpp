@@ -647,6 +647,12 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // IDisposable disposable)
             // IDisposable &disposable)
             (new Regex(@"(?<argumentAbstractType>I[A-Z][a-zA-Z0-9]+(<[^>\r\n]+>)?) (?<argument>[_a-zA-Z0-9]+)(?<after>,|\))"), "${argumentAbstractType} &${argument}${after}", 0),
+            // std::vector<std::int32_t> list) or std::string name) or MyClass obj) -> const std::vector<std::int32_t>& list) or const std::string& name) or const MyClass& obj)
+            // Convert big types to const references for better performance
+            (new Regex(@"(?<bigType>std::(vector|string|map|set|list|unordered_map|unordered_set|multimap|multiset|deque|array|queue|stack|priority_queue)<[^>\r\n]*>|std::(string|wstring)|[A-Z][a-zA-Z0-9]*(<[^>\r\n]+>)?) (?<argument>[_a-zA-Z0-9]+)(?<after>,|\))"), "const ${bigType}& ${argument}${after}", 5),
+            // auto&& param) -> auto&& param) (keep universal references as is)
+            // This rule preserves universal references for perfect forwarding
+            (new Regex(@"(?<universalRef>auto&&) (?<argument>[_a-zA-Z0-9]+)(?<after>,|\))"), "${universalRef} ${argument}${after}", 0),
             // ICounter<int, int> c1;
             // ICounter<int, int>* c1;
             (new Regex(@"(?<abstractType>I[A-Z][a-zA-Z0-9]+(<[^>\r\n]+>)?) (?<variable>[_a-zA-Z0-9]+)(?<after> = null)?;"), "${abstractType} *${variable}${after};", 0),
@@ -741,6 +747,10 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // \Anamespace
             (new Regex(@"(\A)(\r?\n)+namespace"), "$1namespace", 0),
             // \A \n ... class
+            // Transform universal reference parameters to use std::forward
+            // For parameters declared as auto&& that are passed to functions, use std::forward
+            // push_back(param) where param is auto&& -> push_back(std::forward<decltype(param)>(param))
+            (new Regex(@"(?<method>push_back|emplace_back|insert|emplace)\((?<param>[_a-zA-Z0-9]+)\)(?=\s*(;|,|\)))"), "${method}(std::forward<decltype(${param})>(${param}))", 0),
             // \Aclass
             (new Regex(@"(\A)(\r?\n)+class"), "$1class", 0),
             // \n\n\n
