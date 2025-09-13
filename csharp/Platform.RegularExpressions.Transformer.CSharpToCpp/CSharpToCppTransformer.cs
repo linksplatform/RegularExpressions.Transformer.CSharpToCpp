@@ -87,13 +87,13 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             (new Regex(@"((public|protected|private|internal|abstract|static) )*(?<category>interface|class|struct)"), "${category}", 0),
             // class GenericCollectionMethodsBase<TElement> {
             // template <typename TElement> class GenericCollectionMethodsBase {
-            (new Regex(@"(?<before>\r?\n)(?<indent>[ \t]*)(?<type>class|struct) (?<typeName>[a-zA-Z0-9]+)<(?<typeParameters>[a-zA-Z0-9 ,]+)>(?<typeDefinitionEnding>[^{]+){"), "${before}${indent}template <typename ...> ${type} ${typeName};" + Environment.NewLine + "${indent}template <typename ${typeParameters}> ${type} ${typeName}<${typeParameters}>${typeDefinitionEnding}{", 0),
+            (new Regex(@"(?<before>\r?\n)(?<indent>[ \t]*)(?<type>class|struct) (?<typeName>[a-zA-Z0-9]+)<(?<typeParameters>[a-zA-Z0-9 ,]+)>(?<typeDefinitionEnding>[^{]+){"), "${before}${indent}template <typename ...> ${type} ${typeName};" + Environment.NewLine + "${indent}template <typename ${typeParameters}>" + Environment.NewLine + "${indent}${type} ${typeName}<${typeParameters}>${typeDefinitionEnding}{", 0),
             // static void TestMultipleCreationsAndDeletions<TElement>(SizedBinaryTreeMethodsBase<TElement> tree, TElement* root)
             // template<typename T> static void TestMultipleCreationsAndDeletions<TElement>(SizedBinaryTreeMethodsBase<TElement> tree, TElement* root)
             (new Regex(@"static ([a-zA-Z0-9]+) ([a-zA-Z0-9]+)<([a-zA-Z0-9]+)>\(([^\)\r\n]+)\)"), "template <typename $3> static $1 $2($4)", 0),
             // interface IFactory<out TProduct> {
             // template <typename...> class IFactory;\ntemplate <typename TProduct> class IFactory<TProduct>
-            (new Regex(@"(?<before>\r?\n)(?<indent>[ \t]*)interface (?<interface>[a-zA-Z0-9]+)<(?<typeParameters>[a-zA-Z0-9 ,]+)>(?<typeDefinitionEnding>[^{]+){"), "${before}${indent}template <typename ...> class ${interface};" + Environment.NewLine + "${indent}template <typename ${typeParameters}> class ${interface}<${typeParameters}>${typeDefinitionEnding}{" + Environment.NewLine + "    public:", 0),
+            (new Regex(@"(?<before>\r?\n)(?<indent>[ \t]*)interface (?<interface>[a-zA-Z0-9]+)<(?<typeParameters>[a-zA-Z0-9 ,]+)>(?<typeDefinitionEnding>[^{]+){"), "${before}${indent}template <typename ...> class ${interface};" + Environment.NewLine + "${indent}template <typename ${typeParameters}>" + Environment.NewLine + "${indent}class ${interface}<${typeParameters}>${typeDefinitionEnding}{" + Environment.NewLine + "    public:", 0),
             // template <typename TObject, TProperty, TValue>
             // template <typename TObject, typename TProperty, typename TValue>
             (new Regex(@"(?<before>template <((, )?typename [a-zA-Z0-9]+)+, )(?<typeParameter>[a-zA-Z0-9]+)(?<after>(,|>))"), "${before}typename ${typeParameter}${after}", 10),
