@@ -633,6 +633,25 @@ class CSharpToCpp(Translator):
         # AppDomain.CurrentDomain.ProcessExit -= OnProcessExit;
         # /* No translation. It is not possible to unsubscribe from std::atexit. */
         SubRule(r"AppDomain\.CurrentDomain\.ProcessExit -= ([a-zA-Z_][a-zA-Z0-9_]*);", r"/* No translation. It is not possible to unsubscribe from std::atexit. */", max_repeat=0),
+        # C++ Modern Style Improvements
+        # std::string &val
+        # std::string& val
+        SubRule(r"(?P<type>std::[a-zA-Z0-9_]+|[a-zA-Z][a-zA-Z0-9_]*) &(?P<var>[a-zA-Z_][a-zA-Z0-9_]*)", r"\g<type>& \g<var>", max_repeat=0),
+        # Type *val
+        # Type* val
+        SubRule(r"(?P<type>std::[a-zA-Z0-9_]+|[a-zA-Z][a-zA-Z0-9_]*) \*(?P<var>[a-zA-Z_][a-zA-Z0-9_]*)", r"\g<type>* \g<var>", max_repeat=0),
+        # constructor(std::string string) : field(string)
+        # constructor(std::string string) : field(std::move(string))
+        SubRule(r"(?P<constructor>[a-zA-Z_][a-zA-Z0-9_]*)\((?P<params>[^)]*std::string [a-zA-Z_][a-zA-Z0-9_]*[^)]*)\)(?P<init>\s*:\s*[^{]*?)(?P<fieldAssignment>(?P<field>[a-zA-Z_][a-zA-Z0-9_]*)\((?P<param>[a-zA-Z_][a-zA-Z0-9_]*)\))", r"\g<constructor>(\g<params>)\g<init>\g<field>(std::move(\g<param>))", max_repeat=0),
+        # function(std::string param)
+        # function(const std::string& param)
+        SubRule(r"(?P<func>[a-zA-Z_][a-zA-Z0-9_]*)\((?P<before>[^)]*?)(?P<sep>(^|\(|, ))std::string (?P<param>[a-zA-Z_][a-zA-Z0-9_]*)(?P<after>[^)]*)\)", r"\g<func>(\g<before>\g<sep>const std::string& \g<param>\g<after>)", max_repeat=0),
+        # function(std::vector<Type> param)  
+        # function(const std::vector<Type>& param)
+        SubRule(r"(?P<func>[a-zA-Z_][a-zA-Z0-9_]*)\((?P<before>[^)]*?)(?P<sep>(^|\(|, ))std::(?P<container>vector|string|unordered_set|unordered_map|set|map)<(?P<type>[^>]+)> (?P<param>[a-zA-Z_][a-zA-Z0-9_]*)(?P<after>[^)]*)\)", r"\g<func>(\g<before>\g<sep>const std::\g<container><\g<type>>& \g<param>\g<after>)", max_repeat=0),
+        # vector.push_back(value)
+        # vector.push_back(std::move(value)) for non-const value parameters
+        SubRule(r"(?P<container>[a-zA-Z_][a-zA-Z0-9_]*)\.push_back\((?P<value>[a-zA-Z_][a-zA-Z0-9_]*)\)(?!\s*//.*const)", r"\g<container>.push_back(std::move(\g<value>))", max_repeat=0),
     ]
 
 
@@ -745,4 +764,12 @@ class CSharpToCpp(Translator):
         # \n\n}
         # \n}
         SubRule(r"\r?\n[ \t]*\r?\n(?P<end>[ \t]*})", "\n\g<end>", max_repeat=10),
+        # C++ Universal Reference and std::forward for templates
+        # template<typename T> void func(T arg)
+        # template<typename T> void func(T&& arg)
+        SubRule(r"(?P<before>template\s*<\s*typename\s+(?P<typeParam>[a-zA-Z_][a-zA-Z0-9_]*)\s*>\s*[^(]*\([^)]*?)(?P<type>\k<typeParam>) (?P<param>[a-zA-Z_][a-zA-Z0-9_]*)(?P<after>[^)]*\))", r"\g<before>\g<type>&& \g<param>\g<after>", max_repeat=0),
+        # Inside template functions, use std::forward for perfect forwarding
+        # container.push_back(templateParam)
+        # container.push_back(std::forward<decltype(templateParam)>(templateParam))
+        SubRule(r"(?P<container>[a-zA-Z_][a-zA-Z0-9_]*)\.push_back\((?P<param>[a-zA-Z_][a-zA-Z0-9_]*)\)(?=.*template.*\k<param>)", r"\g<container>.push_back(std::forward<decltype(\g<param>)>(\g<param>))", max_repeat=0),
     ]

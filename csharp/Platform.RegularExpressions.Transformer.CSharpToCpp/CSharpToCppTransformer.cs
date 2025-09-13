@@ -634,6 +634,25 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // AppDomain.CurrentDomain.ProcessExit -= OnProcessExit;
             // /* No translation. It is not possible to unsubscribe from std::atexit. */
             (new Regex(@"AppDomain\.CurrentDomain\.ProcessExit -= ([a-zA-Z_][a-zA-Z0-9_]*);"), "/* No translation. It is not possible to unsubscribe from std::atexit. */", 0),
+            // C++ Modern Style Improvements
+            // std::string &val
+            // std::string& val
+            (new Regex(@"(?<type>std::[a-zA-Z0-9_]+|[a-zA-Z][a-zA-Z0-9_]*) &(?<var>[a-zA-Z_][a-zA-Z0-9_]*)"), "${type}& ${var}", 0),
+            // Type *val
+            // Type* val
+            (new Regex(@"(?<type>std::[a-zA-Z0-9_]+|[a-zA-Z][a-zA-Z0-9_]*) \*(?<var>[a-zA-Z_][a-zA-Z0-9_]*)"), "${type}* ${var}", 0),
+            // constructor(std::string string) : field(string)
+            // constructor(std::string string) : field(std::move(string))
+            (new Regex(@"(?<constructor>[a-zA-Z_][a-zA-Z0-9_]*)\((?<params>[^)]*std::string [a-zA-Z_][a-zA-Z0-9_]*[^)]*)\)(?<init>\s*:\s*[^{]*?)(?<fieldAssignment>(?<field>[a-zA-Z_][a-zA-Z0-9_]*)\((?<param>[a-zA-Z_][a-zA-Z0-9_]*)\))"), "${constructor}(${params})${init}${field}(std::move(${param}))", 0),
+            // function(std::string param)
+            // function(const std::string& param)
+            (new Regex(@"(?<func>[a-zA-Z_][a-zA-Z0-9_]*)\((?<before>[^)]*?)(?<sep>(^|\(|, ))std::string (?<param>[a-zA-Z_][a-zA-Z0-9_]*)(?<after>[^)]*)\)"), "${func}(${before}${sep}const std::string& ${param}${after})", 0),
+            // function(std::vector<Type> param)  
+            // function(const std::vector<Type>& param)
+            (new Regex(@"(?<func>[a-zA-Z_][a-zA-Z0-9_]*)\((?<before>[^)]*?)(?<sep>(^|\(|, ))std::(vector|string|unordered_set|unordered_map|set|map)<[^>]+> (?<param>[a-zA-Z_][a-zA-Z0-9_]*)(?<after>[^)]*)\)"), "${func}(${before}${sep}const std::${2}<${3}>& ${param}${after})", 0),
+            // vector.push_back(value)
+            // vector.push_back(std::move(value)) for non-const value parameters
+            (new Regex(@"(?<container>[a-zA-Z_][a-zA-Z0-9_]*)\.push_back\((?<value>[a-zA-Z_][a-zA-Z0-9_]*)\)(?!\s*//.*const)"), "${container}.push_back(std::move(${value}))", 0),
         }.Cast<ISubstitutionRule>().ToList();
 
         /// <summary>
@@ -752,6 +771,14 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // \n\n}
             // \n}
             (new Regex(@"\r?\n[ \t]*\r?\n(?<end>[ \t]*})"), Environment.NewLine + "${end}", 10),
+            // C++ Universal Reference and std::forward for templates
+            // template<typename T> void func(T arg)
+            // template<typename T> void func(T&& arg)
+            (new Regex(@"(?<before>template\s*<\s*typename\s+(?<typeParam>[a-zA-Z_][a-zA-Z0-9_]*)\s*>\s*[^(]*\([^)]*?)(?<type>\k<typeParam>) (?<param>[a-zA-Z_][a-zA-Z0-9_]*)(?<after>[^)]*\))"), "${before}${type}&& ${param}${after}", 0),
+            // Inside template functions, use std::forward for perfect forwarding
+            // container.push_back(templateParam)
+            // container.push_back(std::forward<decltype(templateParam)>(templateParam))
+            (new Regex(@"(?<container>[a-zA-Z_][a-zA-Z0-9_]*)\.push_back\((?<param>[a-zA-Z_][a-zA-Z0-9_]*)\)(?=.*template.*\k<param>)"), "${container}.push_back(std::forward<decltype(${param})>(${param}))", 0),
         }.Cast<ISubstitutionRule>().ToList();
 
         /// <summary>
