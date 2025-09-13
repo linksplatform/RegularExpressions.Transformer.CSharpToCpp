@@ -85,6 +85,9 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // public abstract class
             // class
             (new Regex(@"((public|protected|private|internal|abstract|static) )*(?<category>interface|class|struct)"), "${category}", 0),
+            // public: static implicit operator TargetType(SourceType source) { ... }
+            // public: explicit operator TargetType() const { ... }
+            (new Regex(@"(?<access>(private|protected|public): )static implicit operator (?<targetType>[^\(\n]+)\((?<sourceType>[^\s\(\n]+) (?<variable>[a-zA-Z0-9]+)\)"), "${access}explicit operator ${targetType}() const", 0),
             // class GenericCollectionMethodsBase<TElement> {
             // template <typename TElement> class GenericCollectionMethodsBase {
             (new Regex(@"(?<before>\r?\n)(?<indent>[ \t]*)(?<type>class|struct) (?<typeName>[a-zA-Z0-9]+)<(?<typeParameters>[a-zA-Z0-9 ,]+)>(?<typeDefinitionEnding>[^{]+){"), "${before}${indent}template <typename ...> ${type} ${typeName};" + Environment.NewLine + "${indent}template <typename ${typeParameters}> ${type} ${typeName}<${typeParameters}>${typeDefinitionEnding}{", 0),
@@ -150,8 +153,8 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // static void NotImplementedException(ThrowExtensionRoot root) { return throw new NotImplementedException(); }
             (new Regex(@"(^\s+)(private|protected|public)?(: )?(template \<[^>\r\n]+\> )?(static )?(override )?([a-zA-Z0-9]+ )([a-zA-Z0-9]+)\(([^\(\r\n]*)\)\s+=>\s+throw([^;\r\n]+);"), "$1$2$3$4$5$6$7$8($9) { throw$10; }", 0),
             // SizeBalancedTree(int capacity) => a = b;
-            // SizeBalancedTree(int capacity) { a = b; }
-            (new Regex(@"(^\s+)(private|protected|public)?(: )?(template \<[^>\r\n]+\> )?(static )?(override )?(void )?([a-zA-Z0-9]+)\(([^\(\r\n]*)\)\s+=>\s+([^;\r\n]+);"), "$1$2$3$4$5$6$7$8($9) { $10; }", 0),
+            // explicit SizeBalancedTree(int capacity) noexcept { a = b; }
+            (new Regex(@"(^\s+)(private|protected|public)?(: )?(template \<[^>\r\n]+\> )?(static )?(override )?(void )?([a-zA-Z0-9]+)\(([^\(\r\n]*)\)\s+=>\s+([^;\r\n]+);"), "$1$2$3$4$5$6explicit $7$8($9) noexcept { $10; }", 0),
             // int SizeBalancedTree(int capacity) => a;
             // int SizeBalancedTree(int capacity) { return a; }
             (new Regex(@"(^\s+)(private|protected|public)?(: )?(template \<[^>\r\n]+\> )?(static )?(override )?([a-zA-Z0-9]+ )([a-zA-Z0-9]+)\(([^\(\r\n]*)\)\s+=>\s+([^;\r\n]+);"), "$1$2$3$4$5$6$7$8($9) { return $10; }", 0),
@@ -554,12 +557,12 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             (new Regex(@"(?<classDeclarationBegin>\r?\n(?<indent>[\t ]*)(template\s*<[^<>\n]*> )?(struct|class) (?<fullType>(?<typeName>[a-zA-Z0-9]+)(<[^:\n]*>)?)(\s*:\s*[^{\n]+)?[\t ]*(\r?\n)?[\t ]*{)"), "${classDeclarationBegin}/*~type~${typeName}~${fullType}~*/", 0),
             // Inside the scope of /*~type~Range<T>~*/ insert inner scope and replace:
             // public: static implicit operator std::tuple<T, T>(Range<T> range)
-            // public: operator std::tuple<T, T>() const {/*~variable~Range<T>~*/
-            (new Regex(@"(?<scope>/\*~type~(?<typeName>[^~\n\*]+)~(?<fullType>[^~\n\*]+)~\*/)(?<separator>.|\n)(?<before>((?<!/\*~type~\k<typeName>~\k<fullType>~\*/)(.|\n))*?)(?<access>(private|protected|public): )static implicit operator (?<targetType>[^\(\n]+)\((?<argumentDeclaration>\k<fullType> (?<variable>[a-zA-Z0-9]+))\)(?<after>\s*\n?\s*{)"), "${scope}${separator}${before}${access}operator ${targetType}() const${after}/*~variable~${variable}~*/", 10),
+            // public: explicit operator std::tuple<T, T>() const {/*~variable~Range<T>~*/
+            (new Regex(@"(?<scope>/\*~type~(?<typeName>[^~\n\*]+)~(?<fullType>[^~\n\*]+)~\*/)(?<separator>.|\n)(?<before>((?<!/\*~type~\k<typeName>~\k<fullType>~\*/)(.|\n))*?)(?<access>(private|protected|public): )static implicit operator (?<targetType>[^\(\n]+)\((?<argumentDeclaration>\k<fullType> (?<variable>[a-zA-Z0-9]+))\)(?<after>\s*\n?\s*{)"), "${scope}${separator}${before}${access}explicit operator ${targetType}() const${after}/*~variable~${variable}~*/", 10),
             // Inside the scope of /*~type~Range<T>~*/ replace:
             // public: static implicit operator Range<T>(std::tuple<T, T> tuple) { return new Range<T>(std::get<1-1>(tuple), std::get<2-1>(tuple)); }
-            // public: Range(std::tuple<T, T> tuple) : Range(std::get<1-1>(tuple), std::get<2-1>(tuple)) { }
-            (new Regex(@"(?<scope>/\*~type~(?<typeName>[^~\n\*]+)~(?<fullType>[^~\n\*]+)~\*/)(?<separator>.|\n)(?<before>((?<!/\*~type~\k<typeName>~\k<fullType>~\*/)(.|\n))*?)(?<access>(private|protected|public): )static implicit operator (\k<fullType>|\k<typeName>)\((?<arguments>[^{}\n]+)\)(\s|\n)*{(\s|\n)*return (new )?(\k<fullType>|\k<typeName>)\((?<passedArguments>[^\n]+)\);(\s|\n)*}"), "${scope}${separator}${before}${access}${typeName}(${arguments}) : ${typeName}(${passedArguments}) { }", 10),
+            // public: explicit Range(std::tuple<T, T> tuple) : Range(std::get<1-1>(tuple), std::get<2-1>(tuple)) { }
+            (new Regex(@"(?<scope>/\*~type~(?<typeName>[^~\n\*]+)~(?<fullType>[^~\n\*]+)~\*/)(?<separator>.|\n)(?<before>((?<!/\*~type~\k<typeName>~\k<fullType>~\*/)(.|\n))*?)(?<access>(private|protected|public): )static implicit operator (\k<fullType>|\k<typeName>)\((?<arguments>[^{}\n]+)\)(\s|\n)*{(\s|\n)*return (new )?(\k<fullType>|\k<typeName>)\((?<passedArguments>[^\n]+)\);(\s|\n)*}"), "${scope}${separator}${before}${access}explicit ${typeName}(${arguments}) : ${typeName}(${passedArguments}) { }", 10),
             // Inside the scope of /*~variable~range~*/ replace:
             // range.Minimum
             // this->Minimum
