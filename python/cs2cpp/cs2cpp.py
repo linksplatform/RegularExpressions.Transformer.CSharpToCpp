@@ -364,8 +364,8 @@ class CSharpToCpp(Translator):
         SubRule(r"(?P<classDeclarationBegin>\r?\n(?P<indent>[\t ]*)template <typename (?P<typeParameter>[^<>\n]+)> (struct|class) (?P<type>[a-zA-Z0-9]+<\k<typeParameter>>)(\s*:\s*[^{\n]+)?[\t ]*(\r?\n)?[\t ]*{)(?P<middle>((?!class|struct).|\n)+?)(?P<toStringDeclaration>(?P<access>(private|protected|public): )override std::string ToString\(\))", r"\g<classDeclarationBegin>/*~\g<type>~*/\g<middle>\g<toStringDeclaration>", max_repeat=0),
         # Inside the scope of ~!Range!~ replace:
         # public: override std::string ToString() { return ...; }
-        # public: operator std::string() const { return ...; }\n\npublic: friend std::ostream & operator <<(std::ostream &out, const A &obj) { return out << (std::string)obj; }
-        SubRule(r"(?P<scope>/\*~(?P<type>[_a-zA-Z0-9<>:]+)~\*/)(?P<separator>.|\n)(?P<before>((?<!/\*~\k<type>~\*/)(.|\n))*?)(?P<toStringDeclaration>\r?\n(?P<indent>[ \t]*)(?P<access>(private|protected|public): )override std::string ToString\(\) (?P<toStringMethodBody>{[^}\n]+}))", r"\g<scope>\g<separator>\g<before>\n\g<indent>\g<access>operator std::string() const \g<toStringMethodBody>\n\n\g<indent>\g<access>friend std::ostream & operator <<(std::ostream &out, const \g<type> &obj) { return out << (std::string)obj; }", max_repeat=0),
+        # public: operator std::string() const { return ...; }\n\npublic: friend std::ostream & operator <<(std::ostream &stream, const A &self) { return stream << (std::string)self; }
+        SubRule(r"(?P<scope>/\*~(?P<type>[_a-zA-Z0-9<>:]+)~\*/)(?P<separator>.|\n)(?P<before>((?<!/\*~\k<type>~\*/)(.|\n))*?)(?P<toStringDeclaration>\r?\n(?P<indent>[ \t]*)(?P<access>(private|protected|public): )override std::string ToString\(\) (?P<toStringMethodBody>{[^}\n]+}))", r"\g<scope>\g<separator>\g<before>\n\g<indent>\g<access>operator std::string() const \g<toStringMethodBody>\n\n\g<indent>\g<access>friend std::ostream & operator <<(std::ostream &stream, const \g<type> &self) { return stream << (std::string)self; }", max_repeat=0),
         # Remove scope borders.
         # /*~Range~*/
         # 
