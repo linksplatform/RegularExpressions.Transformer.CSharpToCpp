@@ -230,6 +230,9 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // string
             // std::string
             (new Regex(@"(?<before>\W)(?<!::)string(?<after>\W)"), "${before}std::string${after}", 0),
+            // Constructor(std::string param) { field = param; }
+            // Constructor(std::string param) : field(std::move(param)) { }
+            (new Regex(@"(?<access>(private|protected|public): )?(?<constructor>[a-zA-Z0-9_]+\((?<params>[^)]*std::string [a-zA-Z0-9_]+[^)]*)\))\s*{\s*(?<field>[a-zA-Z0-9_]+) = (?<param>[a-zA-Z0-9_]+);\s*}"), "${access}${constructor} : ${field}(std::move(${param})) { }", 0),
             // System.ValueTuple
             // std::tuple
             (new Regex(@"(?<before>\W)(System\.)?ValueTuple(?!\s*=|\()(?<after>\W)"), "${before}std::tuple${after}", 0),
