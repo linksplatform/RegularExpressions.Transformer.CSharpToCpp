@@ -41,10 +41,10 @@ class CSharpToCpp(Translator):
         # Insert markers
         # EqualityComparer<T> _equalityComparer = EqualityComparer<T>.Default;
         # EqualityComparer<T> _equalityComparer = EqualityComparer<T>.Default;/*~_comparer~*/
-        SubRule(r"(?P<declaration>EqualityComparer<(?P<type>[^>\n]+)> (?P<comparer>[a-zA-Z0-9_]+) = EqualityComparer<\k<type>>\.Default;)", r"\g<declaration>/*~\g<comparer>~*/", max_repeat=0),
+        SubRule(r"(?P<declaration>EqualityComparer<(?P<type>[^>\n]+)> (?P<comparer>[a-zA-Z0-9_]+) = EqualityComparer<(?P=type)>\.Default;)", r"\g<declaration>/*~\g<comparer>~*/", max_repeat=0),
         # /*~_equalityComparer~*/..._equalityComparer.Equals(Minimum, value)
         # /*~_equalityComparer~*/...Minimum == value
-        SubRule(r"(?P<before>/\*~(?P<comparer>[a-zA-Z0-9_]+)~\*/(.|\n)+\W)\k<comparer>\.Equals\((?P<left>[^,\n]+), (?P<right>[^)\n]+)\)", r"\g<before>\g<left> == \g<right>", max_repeat=50),
+        SubRule(r"(?P<before>/\*~(?P<comparer>[a-zA-Z0-9_]+)~\*/(.|\n)+\W)(?P=comparer)\.Equals\((?P<left>[^,\n]+), (?P<right>[^)\n]+)\)", r"\g<before>\g<left> == \g<right>", max_repeat=50),
         # Remove markers
         # /*~_equalityComparer~*/
         # 
@@ -52,10 +52,10 @@ class CSharpToCpp(Translator):
         # Insert markers
         # Comparer<T> _comparer = Comparer<T>.Default;
         # Comparer<T> _comparer = Comparer<T>.Default;/*~_comparer~*/
-        SubRule(r"(?P<declaration>Comparer<(?P<type>[^>\n]+)> (?P<comparer>[a-zA-Z0-9_]+) = Comparer<\k<type>>\.Default;)", r"\g<declaration>/*~\g<comparer>~*/", max_repeat=0),
+        SubRule(r"(?P<declaration>Comparer<(?P<type>[^>\n]+)> (?P<comparer>[a-zA-Z0-9_]+) = Comparer<(?P=type)>\.Default;)", r"\g<declaration>/*~\g<comparer>~*/", max_repeat=0),
         # /*~_comparer~*/..._comparer.Compare(Minimum, value) <= 0
         # /*~_comparer~*/...Minimum <= value
-        SubRule(r"(?P<before>/\*~(?P<comparer>[a-zA-Z0-9_]+)~\*/(.|\n)+\W)\k<comparer>\.Compare\((?P<left>[^,\n]+), (?P<right>[^)\n]+)\)\s*(?P<comparison>[<>=]=?)\s*0(?P<after>\D)", r"\g<before>\g<left> \g<comparison> \g<right>\g<after>", max_repeat=50),
+        SubRule(r"(?P<before>/\*~(?P<comparer>[a-zA-Z0-9_]+)~\*/(.|\n)+\W)(?P=comparer)\.Compare\((?P<left>[^,\n]+), (?P<right>[^)\n]+)\)\s*(?P<comparison>[<>=]=?)\s*0(?P<after>\D)", r"\g<before>\g<left> \g<comparison> \g<right>\g<after>", max_repeat=50),
         # Remove markers
         # private static readonly Comparer<T> _comparer = Comparer<T>.Default;/*~_comparer~*/
         # 
@@ -65,13 +65,13 @@ class CSharpToCpp(Translator):
         SubRule(r"Comparer<[^>\n]+>\.Default\.Compare\(\s*(?P<first>[^,)\n]+),\s*(?P<second>[^\)\n]+)\s*\)\s*(?P<comparison>[<>=]=?)\s*0(?P<after>\D)", r"\g<first> \g<comparison> \g<second>\g<after>", max_repeat=0),
         # public static bool operator ==(Range<T> left, Range<T> right) => left.Equals(right);
         # 
-        SubRule(r"\r?\n[^\n]+bool operator ==\((?P<type>[^\n]+) (?P<left>[a-zA-Z0-9]+), \k<type> (?P<right>[a-zA-Z0-9]+)\) => (\k<left>|\k<right>)\.Equals\((\k<left>|\k<right>)\);", r"", max_repeat=10),
+        SubRule(r"\r?\n[^\n]+bool operator ==\((?P<type>[^\n]+) (?P<left>[a-zA-Z0-9]+), (?P=type) (?P<right>[a-zA-Z0-9]+)\) => ((?P=left)|(?P=right))\.Equals\(((?P=left)|(?P=right))\);", r"", max_repeat=10),
         # public static bool operator !=(Range<T> left, Range<T> right) => !(left == right);
         # 
-        SubRule(r"\r?\n[^\n]+bool operator !=\((?P<type>[^\n]+) (?P<left>[a-zA-Z0-9]+), \k<type> (?P<right>[a-zA-Z0-9]+)\) => !\((\k<left>|\k<right>) == (\k<left>|\k<right>)\);", r"", max_repeat=10),
+        SubRule(r"\r?\n[^\n]+bool operator !=\((?P<type>[^\n]+) (?P<left>[a-zA-Z0-9]+), (?P=type) (?P<right>[a-zA-Z0-9]+)\) => !\(((?P=left)|(?P=right)) == ((?P=left)|(?P=right))\);", r"", max_repeat=10),
         # public override bool Equals(object obj) => obj is Range<T> range ? Equals(range) : false;
         # 
-        SubRule(r"\r?\n[^\n]+override bool Equals\((System\.)?[Oo]bject (?P<this>[a-zA-Z0-9]+)\) => \k<this> is [^\n]+ (?P<other>[a-zA-Z0-9]+) \? Equals\(\k<other>\) : false;", r"", max_repeat=10),
+        SubRule(r"\r?\n[^\n]+override bool Equals\((System\.)?[Oo]bject (?P<this>[a-zA-Z0-9]+)\) => (?P=this) is [^\n]+ (?P<other>[a-zA-Z0-9]+) \? Equals\((?P=other)\) : false;", r"", max_repeat=10),
         # out TProduct
         # TProduct
         SubRule(r"(?P<before>(<|, ))(in|out) (?P<typeParameter>[a-zA-Z0-9]+)(?P<after>(>|,))", r"\g<before>\g<typeParameter>\g<after>", max_repeat=10),
@@ -104,7 +104,7 @@ class CSharpToCpp(Translator):
         SubRule(r"\A(?P<before>[^\r\n]+\r?\n(.|\n)+)(?P<marker>/\*~extensionMethod~(?P<name>[a-zA-Z0-9]+)~\*/)", r"\g<marker>\g<before>", max_repeat=10),
         # /*~extensionMethod~BuildExceptionString~*/...sb.BuildExceptionString(exception.InnerException, level + 1);
         # /*~extensionMethod~BuildExceptionString~*/...BuildExceptionString(sb, exception.InnerException, level + 1);
-        SubRule(r"(?P<before>/\*~extensionMethod~(?P<name>[a-zA-Z0-9]+)~\*/(.|\n)+\W)(?P<variable>[_a-zA-Z0-9]+)\.\k<name>\(", r"\g<before>\g<name>(\g<variable>, ", max_repeat=50),
+        SubRule(r"(?P<before>/\*~extensionMethod~(?P<name>[a-zA-Z0-9]+)~\*/(.|\n)+\W)(?P<variable>[_a-zA-Z0-9]+)\.(?P=name)\(", r"\g<before>\g<name>(\g<variable>, ", max_repeat=50),
         # Remove markers
         # /*~extensionMethod~BuildExceptionString~*/
         # 
@@ -117,10 +117,10 @@ class CSharpToCpp(Translator):
         SubRule(r"(?P<access>(private|protected|public): )?static readonly (?P<type>[a-zA-Z][a-zA-Z0-9]*) (?P<name>[a-zA-Z_][a-zA-Z0-9_]*) = \((?P<firstArgument>[a-zA-Z_][a-zA-Z0-9_]*), (?P<secondArgument>[a-zA-Z_][a-zA-Z0-9_]*)\) => {\s*};", r"\g<access>inline static std::function<\g<type>> \g<name> = [](auto \g<firstArgument>, auto \g<secondArgument>) { };", max_repeat=0),
         # public: static readonly EnsureAlwaysExtensionRoot Always = new EnsureAlwaysExtensionRoot();
         # public: inline static EnsureAlwaysExtensionRoot Always;
-        SubRule(r"(?P<access>(private|protected|public): )?static readonly (?P<type>[a-zA-Z0-9]+(<[a-zA-Z0-9]+>)?) (?P<name>[a-zA-Z0-9_]+) = new \k<type>\(\);", r"\g<access>inline static \g<type> \g<name>;", max_repeat=0),
+        SubRule(r"(?P<access>(private|protected|public): )?static readonly (?P<type>[a-zA-Z0-9]+(<[a-zA-Z0-9]+>)?) (?P<name>[a-zA-Z0-9_]+) = new (?P=type)\(\);", r"\g<access>inline static \g<type> \g<name>;", max_repeat=0),
         # public: static readonly Range<int> SByte = new Range<int>(std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
         # public: inline static Range<int> SByte = Range<int>(std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
-        SubRule(r"(?P<access>(private|protected|public): )?static readonly (?P<type>[a-zA-Z0-9]+(<[a-zA-Z0-9]+>)?) (?P<name>[a-zA-Z0-9_]+) = new \k<type>\((?P<arguments>[^\n]+)\);", r"\g<access>inline static \g<type> \g<name> = \g<type>(\g<arguments>);", max_repeat=0),
+        SubRule(r"(?P<access>(private|protected|public): )?static readonly (?P<type>[a-zA-Z0-9]+(<[a-zA-Z0-9]+>)?) (?P<name>[a-zA-Z0-9_]+) = new (?P=type)\((?P<arguments>[^\n]+)\);", r"\g<access>inline static \g<type> \g<name> = \g<type>(\g<arguments>);", max_repeat=0),
         # public: static readonly string ExceptionContentsSeparator = "---";
         # public: inline static std::string ExceptionContentsSeparator = "---";
         SubRule(r"(?P<access>(private|protected|public): )?(const|static readonly) string (?P<name>[a-zA-Z0-9_]+) = \"\"(?P<string>(\\\"\"|[^\"\"\r\n])+)\"\";", r"\g<access>inline static std::string \g<name> = \"\g<string>\";", max_repeat=0),
@@ -129,7 +129,7 @@ class CSharpToCpp(Translator):
         SubRule(r"(?P<access>(private|protected|public): )?(const|static readonly) (?P<type>[a-zA-Z0-9]+) (?P<name>[_a-zA-Z0-9]+) = (?P<value>[^;\r\n]+);", r"\g<access>inline static const \g<type> \g<name> = \g<value>;", max_repeat=0),
         #  ArgumentNotNull(EnsureAlwaysExtensionRoot root, TArgument argument) where TArgument : class
         #  ArgumentNotNull(EnsureAlwaysExtensionRoot root, TArgument* argument)
-        SubRule(r"(?P<before> [a-zA-Z]+\(([a-zA-Z *,]+, |))(?P<type>[a-zA-Z]+)(?P<after>(| [a-zA-Z *,]+)\))[ \r\n]+where \k<type> : class", r"\g<before>\g<type>*\g<after>", max_repeat=0),
+        SubRule(r"(?P<before> [a-zA-Z]+\(([a-zA-Z *,]+, |))(?P<type>[a-zA-Z]+)(?P<after>(| [a-zA-Z *,]+)\))[ \r\n]+where (?P=type) : class", r"\g<before>\g<type>*\g<after>", max_repeat=0),
         # protected: abstract TElement GetFirst();
         # protected: virtual TElement GetFirst() = 0;
         SubRule(r"(?P<access>(private|protected|public): )?abstract (?P<method>[^;\r\n]+);", r"\g<access>virtual \g<method> = 0;", max_repeat=0),
@@ -175,11 +175,11 @@ class CSharpToCpp(Translator):
         # Insert scope borders.
         # interface IDisposable { ... }
         # interface IDisposable {/*~start~interface~IDisposable~*/ ... /*~end~interface~IDisposable~*/}
-        SubRule(r"(?P<classDeclarationBegin>\r?\n(?P<indent>[\t ]*)interface[\t ]*(?P<type>[a-zA-Z][a-zA-Z0-9]*(<[^<>\n]*>)?)[^{}]*{)(?P<middle>(.|\n)*)(?P<beforeEnd>(?<=\r?\n)\k<indent>)(?P<end>})", r"\g<classDeclarationBegin>/*~start~interface~\g<type>~*/\g<middle>\g<beforeEnd>/*~end~interface~\g<type>~*/\g<end>", max_repeat=0),
+        SubRule(r"(?P<classDeclarationBegin>\r?\n(?P<indent>[\t ]*)interface[\t ]*(?P<type>[a-zA-Z][a-zA-Z0-9]*(<[^<>\n]*>)?)[^{}]*{)(?P<middle>(.|\n)*)(?P<beforeEnd>(?<=\r?\n)(?P=indent))(?P<end>})", r"\g<classDeclarationBegin>/*~start~interface~\g<type>~*/\g<middle>\g<beforeEnd>/*~end~interface~\g<type>~*/\g<end>", max_repeat=0),
         # Inside the scope replace:
         # /*~start~interface~IDisposable~*/ ... bool IsDisposed { get; } ... /*~end~interface~IDisposable~*/
         # /*~start~interface~IDisposable~*/ ... virtual bool IsDisposed() = 0; /*~end~interface~IDisposable~*/
-        SubRule(r"(?P<before>(?P<typeScopeStart>/\*~start~interface~(?P<type>[^~\n\*]+)~\*/)(.|\n)+?)(?P<propertyDeclaration>(?P<access>(private|protected|public): )?(?P<propertyType>[a-zA-Z_][a-zA-Z0-9_:<>]*) (?P<property>[a-zA-Z_][a-zA-Z0-9_]*)(?P<blockOpen>[\n\s]*{[\n\s]*)(\[[^\n]+\][\n\s]*)?get;(?P<blockClose>[\n\s]*}))(?P<after>(.|\n)+?(?P<typeScopeEnd>/\*~end~interface~\k<type>~\*/))", r"\g<before>virtual \g<propertyType> \g<property>() = 0;\g<after>", max_repeat=20),
+        SubRule(r"(?P<before>(?P<typeScopeStart>/\*~start~interface~(?P<type>[^~\n\*]+)~\*/)(.|\n)+?)(?P<propertyDeclaration>(?P<access>(private|protected|public): )?(?P<propertyType>[a-zA-Z_][a-zA-Z0-9_:<>]*) (?P<property>[a-zA-Z_][a-zA-Z0-9_]*)(?P<blockOpen>[\n\s]*{[\n\s]*)(\[[^\n]+\][\n\s]*)?get;(?P<blockClose>[\n\s]*}))(?P<after>(.|\n)+?(?P<typeScopeEnd>/\*~end~interface~(?P=type)~\*/))", r"\g<before>virtual \g<propertyType> \g<property>() = 0;\g<after>", max_repeat=20),
         # Remove scope borders.
         # /*~start~interface~IDisposable~*/
         # 
@@ -282,10 +282,10 @@ class CSharpToCpp(Translator):
         SubRule(r"(?P<before>\r?\n)(?P<indent>[ \t]*)interface (?P<interface>[a-zA-Z_]\w*)(?P<typeDefinitionEnding>[^{]+){", r"\g<before>\g<indent>class \g<interface>\g<typeDefinitionEnding>{\n" + "    public:", max_repeat=0),
         # struct TreeElement { }
         # struct TreeElement { };
-        SubRule(r"(struct|class) ([a-zA-Z0-9]+)(\s+){([\sa-zA-Z0-9;:_]+?)}([^;])", r"\1 \2\3{\4};\5", max_repeat=0),
+        SubRule(r"(?P<type>struct|class) (?P<name>[a-zA-Z0-9]+)(?P<whitespace>\s+){(?P<body>[\sa-zA-Z0-9;:_]+?)}(?P<after>[^;])", r"\g<type> \g<name>\g<whitespace>{\g<body>};\g<after>", max_repeat=0),
         # class Program { }
         # class Program { };
-        SubRule(r"(?P<type>struct|class) (?P<name>[a-zA-Z0-9]+[^\r\n]*)(?P<beforeBody>[\r\n]+(?P<indentLevel>[\t ]*)?)\{(?P<body>[\S\s]+?[\r\n]+\k<indentLevel>)\}(?P<afterBody>[^;]|$)", r"\g<type> \g<name>\g<beforeBody>{\g<body>};\g<afterBody>", max_repeat=0),
+        SubRule(r"(?P<type>struct|class) (?P<name>[a-zA-Z0-9]+[^\r\n]*)(?P<beforeBody>[\r\n]+(?P<indentLevel>[\t ]*)?)\{(?P<body>[\S\s]+?[\r\n]+(?P=indentLevel))\}(?P<afterBody>[^;]|$)", r"\g<type> \g<name>\g<beforeBody>{\g<body>};\g<afterBody>", max_repeat=0),
         # Insert scope borders.
         # ref TElement root
         # ~!root!~ref TElement root
@@ -293,7 +293,7 @@ class CSharpToCpp(Translator):
         # Inside the scope of ~!root!~ replace:
         # root
         # *root
-        SubRule(r"(?P<definition>~!(?P<pointer>[a-zA-Z0-9]+)!~ref [a-zA-Z0-9]+ \k<pointer>(?=\)|, | =))(?P<before>((?<!~!\k<pointer>!~)(.|\n))*?)(?P<prefix>(\W |\())\k<pointer>(?P<suffix>( |\)|;|,))", r"\g<definition>\g<before>\g<prefix>*\g<pointer>\g<suffix>", max_repeat=70),
+        SubRule(r"(?P<definition>~!(?P<pointer>[a-zA-Z0-9]+)!~ref [a-zA-Z0-9]+ (?P=pointer)(?=\)|, | =))(?P<before>((?<!~!(?P=pointer)!~)(.|\n))*?)(?P<prefix>(\W |\())(?P=pointer)(?P<suffix>( |\)|;|,))", r"\g<definition>\g<before>\g<prefix>*\g<pointer>\g<suffix>", max_repeat=70),
         # Remove scope borders.
         # ~!root!~
         # 
@@ -361,11 +361,11 @@ class CSharpToCpp(Translator):
         # Insert scope borders.
         # class Range { ... public: override std::string ToString() { return ...; }
         # class Range {/*~Range<T>~*/ ... public: override std::string ToString() { return ...; }
-        SubRule(r"(?P<classDeclarationBegin>\r?\n(?P<indent>[\t ]*)template <typename (?P<typeParameter>[^<>\n]+)> (struct|class) (?P<type>[a-zA-Z0-9]+<\k<typeParameter>>)(\s*:\s*[^{\n]+)?[\t ]*(\r?\n)?[\t ]*{)(?P<middle>((?!class|struct).|\n)+?)(?P<toStringDeclaration>(?P<access>(private|protected|public): )override std::string ToString\(\))", r"\g<classDeclarationBegin>/*~\g<type>~*/\g<middle>\g<toStringDeclaration>", max_repeat=0),
+        SubRule(r"(?P<classDeclarationBegin>\r?\n(?P<indent>[\t ]*)template <typename (?P<typeParameter>[^<>\n]+)> (struct|class) (?P<type>[a-zA-Z0-9]+<(?P=typeParameter)>)(\s*:\s*[^{\n]+)?[\t ]*(\r?\n)?[\t ]*{)(?P<middle>((?!class|struct).|\n)+?)(?P<toStringDeclaration>(?P<access>(private|protected|public): )override std::string ToString\(\))", r"\g<classDeclarationBegin>/*~\g<type>~*/\g<middle>\g<toStringDeclaration>", max_repeat=0),
         # Inside the scope of ~!Range!~ replace:
         # public: override std::string ToString() { return ...; }
         # public: operator std::string() const { return ...; }\n\npublic: friend std::ostream & operator <<(std::ostream &out, const A &obj) { return out << (std::string)obj; }
-        SubRule(r"(?P<scope>/\*~(?P<type>[_a-zA-Z0-9<>:]+)~\*/)(?P<separator>.|\n)(?P<before>((?<!/\*~\k<type>~\*/)(.|\n))*?)(?P<toStringDeclaration>\r?\n(?P<indent>[ \t]*)(?P<access>(private|protected|public): )override std::string ToString\(\) (?P<toStringMethodBody>{[^}\n]+}))", r"\g<scope>\g<separator>\g<before>\n\g<indent>\g<access>operator std::string() const \g<toStringMethodBody>\n\n\g<indent>\g<access>friend std::ostream & operator <<(std::ostream &out, const \g<type> &obj) { return out << (std::string)obj; }", max_repeat=0),
+        SubRule(r"(?P<scope>/\*~(?P<type>[_a-zA-Z0-9<>:]+)~\*/)(?P<separator>.|\n)(?P<before>((?<!/\*~(?P=type)~\*/)(.|\n))*?)(?P<toStringDeclaration>\r?\n(?P<indent>[ \t]*)(?P<access>(private|protected|public): )override std::string ToString\(\) (?P<toStringMethodBody>{[^}\n]+}))", r"\g<scope>\g<separator>\g<before>\n\g<indent>\g<access>operator std::string() const \g<toStringMethodBody>\n\n\g<indent>\g<access>friend std::ostream & operator <<(std::ostream &out, const \g<type> &obj) { return out << (std::string)obj; }", max_repeat=0),
         # Remove scope borders.
         # /*~Range~*/
         # 
@@ -378,7 +378,7 @@ class CSharpToCpp(Translator):
         SubRule(r"(?P<access>(private|protected|public): )?static IReadOnlyCollection<(?P<argumentType>[^;\r\n]+)> (?P<methodName>[_a-zA-Z0-9]+)\(\) { return (?P<fieldName>[_a-zA-Z0-9]+); }", r"\g<access>static std::vector<\g<argumentType>> \g<methodName>() { return std::vector<\g<argumentType>>(\g<fieldName>); }", max_repeat=0),
         # public: static event EventHandler<std::exception> ExceptionIgnored = OnExceptionIgnored; ... };
         # ... public: static inline Platform::Delegates::MulticastDelegate<void(void*, const std::exception&)> ExceptionIgnored = OnExceptionIgnored; };
-        SubRule(r"(?P<begin>\r?\n(\r?\n)?(?P<halfIndent>[ \t]+)\k<halfIndent>)(?P<access>(private|protected|public): )?static event EventHandler<(?P<argumentType>[^;\r\n]+)> (?P<name>[_a-zA-Z0-9]+) = (?P<defaultDelegate>[_a-zA-Z0-9]+);(?P<middle>(.|\n)+?)(?P<end>\r?\n\k<halfIndent>};)", r"\g<middle>\n\n\g<halfIndent>\g<halfIndent>\g<access>static inline Platform::Delegates::MulticastDelegate<void(void*, const \g<argumentType>&)> \g<name> = \g<defaultDelegate>;\g<end>", max_repeat=0),
+        SubRule(r"(?P<begin>\r?\n(\r?\n)?(?P<halfIndent>[ \t]+)(?P=halfIndent))(?P<access>(private|protected|public): )?static event EventHandler<(?P<argumentType>[^;\r\n]+)> (?P<name>[_a-zA-Z0-9]+) = (?P<defaultDelegate>[_a-zA-Z0-9]+);(?P<middle>(.|\n)+?)(?P<end>\r?\n(?P=halfIndent)};)", r"\g<middle>\n\n\g<halfIndent>\g<halfIndent>\g<access>static inline Platform::Delegates::MulticastDelegate<void(void*, const \g<argumentType>&)> \g<name> = \g<defaultDelegate>;\g<end>", max_repeat=0),
         # public: event Disposal OnDispose;
         # public: Platform::Delegates::MulticastDelegate<Disposal> OnDispose;
         SubRule(r"(?P<begin>(?P<access>(private|protected|public): )?(static )?)event (?P<type>[a-zA-Z][:_a-zA-Z0-9]+) (?P<name>[a-zA-Z][_a-zA-Z0-9]+);", r"\g<begin>Platform::Delegates::MulticastDelegate<\g<type>> \g<name>;", max_repeat=0),
@@ -389,7 +389,7 @@ class CSharpToCpp(Translator):
         # Inside the scope of ~!_exceptionsBag!~ replace:
         # _exceptionsBag.Add(exception);
         # _exceptionsBag.push_back(exception);
-        SubRule(r"(?P<scope>/\*~(?P<fieldName>[_a-zA-Z0-9]+)~\*/)(?P<separator>.|\n)(?P<before>((?<!/\*~\k<fieldName>~\*/)(.|\n))*?)\k<fieldName>\.Add", r"\g<scope>\g<separator>\g<before>\g<fieldName>.push_back", max_repeat=10),
+        SubRule(r"(?P<scope>/\*~(?P<fieldName>[_a-zA-Z0-9]+)~\*/)(?P<separator>.|\n)(?P<before>((?<!/\*~(?P=fieldName)~\*/)(.|\n))*?)(?P=fieldName)\.Add", r"\g<scope>\g<separator>\g<before>\g<fieldName>.push_back", max_repeat=10),
         # Remove scope borders.
         # /*~_exceptionsBag~*/
         # 
@@ -401,11 +401,11 @@ class CSharpToCpp(Translator):
         # Inside the scope of ~!_exceptionsBag!~ replace:
         # return std::vector<std::exception>(_exceptionsBag);
         # std::lock_guard<std::mutex> guard(_exceptionsBag_mutex); return std::vector<std::exception>(_exceptionsBag);
-        SubRule(r"(?P<scope>/\*~(?P<fieldName>[_a-zA-Z0-9]+)~\*/)(?P<separator>.|\n)(?P<before>((?<!/\*~\k<fieldName>~\*/)(.|\n))*?){(?P<after>((?!lock_guard)[^{};\r\n])*\k<fieldName>[^;}\r\n]*;)", r"\g<scope>\g<separator>\g<before>{ std::lock_guard<std::mutex> guard(\g<fieldName>_mutex);\g<after>", max_repeat=10),
+        SubRule(r"(?P<scope>/\*~(?P<fieldName>[_a-zA-Z0-9]+)~\*/)(?P<separator>.|\n)(?P<before>((?<!/\*~(?P=fieldName)~\*/)(.|\n))*?){(?P<after>((?!lock_guard)[^{};\r\n])*(?P=fieldName)[^;}\r\n]*;)", r"\g<scope>\g<separator>\g<before>{ std::lock_guard<std::mutex> guard(\g<fieldName>_mutex);\g<after>", max_repeat=10),
         # Inside the scope of ~!_exceptionsBag!~ replace:
         # _exceptionsBag.Add(exception);
         # std::lock_guard<std::mutex> guard(_exceptionsBag_mutex); \r\n _exceptionsBag.Add(exception);
-        SubRule(r"(?P<scope>/\*~(?P<fieldName>[_a-zA-Z0-9]+)~\*/)(?P<separator>.|\n)(?P<before>((?<!/\*~\k<fieldName>~\*/)(.|\n))*?){(?P<after>((?!lock_guard)([^{};]|\n))*?\r?\n(?P<indent>[ \t]*)\k<fieldName>[^;}\r\n]*;)", r"\g<scope>\g<separator>\g<before>{\n" + "\g<indent>std::lock_guard<std::mutex> guard(\g<fieldName>_mutex);\g<after>", max_repeat=10),
+        SubRule(r"(?P<scope>/\*~(?P<fieldName>[_a-zA-Z0-9]+)~\*/)(?P<separator>.|\n)(?P<before>((?<!/\*~(?P=fieldName)~\*/)(.|\n))*?){(?P<after>((?!lock_guard)([^{};]|\n))*?\r?\n(?P<indent>[ \t]*)(?P=fieldName)[^;}\r\n]*;)", r"\g<scope>\g<separator>\g<before>{\n" + "\g<indent>std::lock_guard<std::mutex> guard(\g<fieldName>_mutex);\g<after>", max_repeat=10),
         # Remove scope borders.
         # /*~_exceptionsBag~*/
         # 
@@ -417,7 +417,7 @@ class CSharpToCpp(Translator):
         # Inside the scope of ~!ExceptionIgnored!~ replace:
         # ExceptionIgnored.Invoke(NULL, exception);
         # ExceptionIgnored(NULL, exception);
-        SubRule(r"(?P<scope>/\*~(?P<eventName>[a-zA-Z0-9]+)~\*/)(?P<separator>.|\n)(?P<before>((?<!/\*~\k<eventName>~\*/)(.|\n))*?)\k<eventName>\.Invoke", r"\g<scope>\g<separator>\g<before>\g<eventName>", max_repeat=10),
+        SubRule(r"(?P<scope>/\*~(?P<eventName>[a-zA-Z0-9]+)~\*/)(?P<separator>.|\n)(?P<before>((?<!/\*~(?P=eventName)~\*/)(.|\n))*?)(?P=eventName)\.Invoke", r"\g<scope>\g<separator>\g<before>\g<eventName>", max_repeat=10),
         # Remove scope borders.
         # /*~ExceptionIgnored~*/
         # 
@@ -432,16 +432,16 @@ class CSharpToCpp(Translator):
         # Inside the scope of ~!added!~ replace:
         # sb.ToString()
         # sb
-        SubRule(r"(?P<scope>/\*~(?P<variable>[a-zA-Z0-9]+)~\*/)(?P<separator>.|\n)(?P<before>((?<!/\*~\k<variable>~\*/)(.|\n))*?)\k<variable>\.ToString\(\)", r"\g<scope>\g<separator>\g<before>\g<variable>", max_repeat=10),
+        SubRule(r"(?P<scope>/\*~(?P<variable>[a-zA-Z0-9]+)~\*/)(?P<separator>.|\n)(?P<before>((?<!/\*~(?P=variable)~\*/)(.|\n))*?)(?P=variable)\.ToString\(\)", r"\g<scope>\g<separator>\g<before>\g<variable>", max_repeat=10),
         # sb.AppendLine(argument)
         # sb.append(Platform::Converters::To<std::string>(argument)).append(1, '\n')
-        SubRule(r"(?P<scope>/\*~(?P<variable>[a-zA-Z0-9]+)~\*/)(?P<separator>.|\n)(?P<before>((?<!/\*~\k<variable>~\*/)(.|\n))*?)\k<variable>\.AppendLine\((?P<argument>[^\),\r\n]+)\)", r"\g<scope>\g<separator>\g<before>\g<variable>.append(Platform::Converters::To<std::string>(\g<argument>)).append(1, '\\n')", max_repeat=10),
+        SubRule(r"(?P<scope>/\*~(?P<variable>[a-zA-Z0-9]+)~\*/)(?P<separator>.|\n)(?P<before>((?<!/\*~(?P=variable)~\*/)(.|\n))*?)(?P=variable)\.AppendLine\((?P<argument>[^\),\r\n]+)\)", r"\g<scope>\g<separator>\g<before>\g<variable>.append(Platform::Converters::To<std::string>(\g<argument>)).append(1, '\\n')", max_repeat=10),
         # sb.Append('\t', level);
         # sb.append(level, '\t');
-        SubRule(r"(?P<scope>/\*~(?P<variable>[a-zA-Z0-9]+)~\*/)(?P<separator>.|\n)(?P<before>((?<!/\*~\k<variable>~\*/)(.|\n))*?)\k<variable>\.Append\('(?P<character>[^'\r\n]+)', (?P<count>[^\),\r\n]+)\)", r"\g<scope>\g<separator>\g<before>\g<variable>.append(\g<count>, '\g<character>')", max_repeat=10),
+        SubRule(r"(?P<scope>/\*~(?P<variable>[a-zA-Z0-9]+)~\*/)(?P<separator>.|\n)(?P<before>((?<!/\*~(?P=variable)~\*/)(.|\n))*?)(?P=variable)\.Append\('(?P<character>[^'\r\n]+)', (?P<count>[^\),\r\n]+)\)", r"\g<scope>\g<separator>\g<before>\g<variable>.append(\g<count>, '\g<character>')", max_repeat=10),
         # sb.Append(argument)
         # sb.append(Platform::Converters::To<std::string>(argument))
-        SubRule(r"(?P<scope>/\*~(?P<variable>[a-zA-Z0-9]+)~\*/)(?P<separator>.|\n)(?P<before>((?<!/\*~\k<variable>~\*/)(.|\n))*?)\k<variable>\.Append\((?P<argument>[^\),\r\n]+)\)", r"\g<scope>\g<separator>\g<before>\g<variable>.append(Platform::Converters::To<std::string>(\g<argument>))", max_repeat=10),
+        SubRule(r"(?P<scope>/\*~(?P<variable>[a-zA-Z0-9]+)~\*/)(?P<separator>.|\n)(?P<before>((?<!/\*~(?P=variable)~\*/)(.|\n))*?)(?P=variable)\.Append\((?P<argument>[^\),\r\n]+)\)", r"\g<scope>\g<separator>\g<before>\g<variable>.append(Platform::Converters::To<std::string>(\g<argument>))", max_repeat=10),
         # Remove scope borders.
         # /*~sb~*/
         # 
@@ -453,11 +453,11 @@ class CSharpToCpp(Translator):
         # Inside the scope of ~!added!~ replace:
         # added.Add(node)
         # added.insert(node)
-        SubRule(r"(?P<scope>~!(?P<variable>[a-zA-Z0-9]+)!~)(?P<separator>.|\n)(?P<before>((?<!~!\k<variable>!~)(.|\n))*?)\k<variable>\.Add\((?P<argument>[a-zA-Z0-9]+)\)", r"\g<scope>\g<separator>\g<before>\g<variable>.insert(\g<argument>)", max_repeat=10),
+        SubRule(r"(?P<scope>~!(?P<variable>[a-zA-Z0-9]+)!~)(?P<separator>.|\n)(?P<before>((?<!~!(?P=variable)!~)(.|\n))*?)(?P=variable)\.Add\((?P<argument>[a-zA-Z0-9]+)\)", r"\g<scope>\g<separator>\g<before>\g<variable>.insert(\g<argument>)", max_repeat=10),
         # Inside the scope of ~!added!~ replace:
         # added.Remove(node)
         # added.erase(node)
-        SubRule(r"(?P<scope>~!(?P<variable>[a-zA-Z0-9]+)!~)(?P<separator>.|\n)(?P<before>((?<!~!\k<variable>!~)(.|\n))*?)\k<variable>\.Remove\((?P<argument>[a-zA-Z0-9]+)\)", r"\g<scope>\g<separator>\g<before>\g<variable>.erase(\g<argument>)", max_repeat=10),
+        SubRule(r"(?P<scope>~!(?P<variable>[a-zA-Z0-9]+)!~)(?P<separator>.|\n)(?P<before>((?<!~!(?P=variable)!~)(.|\n))*?)(?P=variable)\.Remove\((?P<argument>[a-zA-Z0-9]+)\)", r"\g<scope>\g<separator>\g<before>\g<variable>.erase(\g<argument>)", max_repeat=10),
         # if (added.insert(node)) {
         # if (!added.contains(node)) { added.insert(node);
         SubRule(r"if \((?P<variable>[a-zA-Z0-9]+)\.insert\((?P<argument>[a-zA-Z0-9]+)\)\)(?P<separator>[\t ]*[\r\n]+)(?P<indent>[\t ]*){", r"if (!\g<variable>.contains(\g<argument>))\g<separator>\g<indent>{\n" + "\g<indent>    \g<variable>.insert(\g<argument>);", max_repeat=0),
@@ -472,7 +472,7 @@ class CSharpToCpp(Translator):
         # Inside the scope of ~!random!~ replace:
         # random.Next(1, N)
         # (std::rand() % N) + 1
-        SubRule(r"(?P<scope>~!(?P<variable>[a-zA-Z0-9]+)!~)(?P<separator>.|\n)(?P<before>((?<!~!\k<variable>!~)(.|\n))*?)\k<variable>\.Next\((?P<from>[a-zA-Z0-9]+), (?P<to>[a-zA-Z0-9]+)\)", r"\g<scope>\g<separator>\g<before>(std::rand() % \g<to>) + \g<from>", max_repeat=10),
+        SubRule(r"(?P<scope>~!(?P<variable>[a-zA-Z0-9]+)!~)(?P<separator>.|\n)(?P<before>((?<!~!(?P=variable)!~)(.|\n))*?)(?P=variable)\.Next\((?P<from>[a-zA-Z0-9]+), (?P<to>[a-zA-Z0-9]+)\)", r"\g<scope>\g<separator>\g<before>(std::rand() % \g<to>) + \g<from>", max_repeat=10),
         # Remove scope borders.
         # ~!random!~
         # 
@@ -500,7 +500,7 @@ class CSharpToCpp(Translator):
         # Inside the scope of ~!ex!~ replace:
         # ex.Message
         # ex.what()
-        SubRule(r"(?P<scope>/\*~(?P<variable>[_a-zA-Z0-9]+)~\*/)(?P<separator>.|\n)(?P<before>((?<!/\*~\k<variable>~\*/)(.|\n))*?)(Platform::Converters::To<std::string>\(\k<variable>\.Message\)|\k<variable>\.Message)", r"\g<scope>\g<separator>\g<before>\g<variable>.what()", max_repeat=10),
+        SubRule(r"(?P<scope>/\*~(?P<variable>[_a-zA-Z0-9]+)~\*/)(?P<separator>.|\n)(?P<before>((?<!/\*~(?P=variable)~\*/)(.|\n))*?)(Platform::Converters::To<std::string>\((?P=variable)\.Message\)|(?P=variable)\.Message)", r"\g<scope>\g<separator>\g<before>\g<variable>.what()", max_repeat=10),
         # Remove scope borders.
         # /*~ex~*/
         # 
@@ -530,7 +530,7 @@ class CSharpToCpp(Translator):
         # Inside the scope of /*~message~*/ replace:
         # Platform::Converters::To<std::string>(message)
         # message
-        SubRule(r"(?P<scope>/\*~(?P<variable>[_a-zA-Z0-9]+)~\*/)(?P<separator>.|\n)(?P<before>((?<!/\*~\k<variable>~\*/)(.|\n))*?)Platform::Converters::To<std::string>\(\k<variable>\)", r"\g<scope>\g<separator>\g<before>\g<variable>", max_repeat=10),
+        SubRule(r"(?P<scope>/\*~(?P<variable>[_a-zA-Z0-9]+)~\*/)(?P<separator>.|\n)(?P<before>((?<!/\*~(?P=variable)~\*/)(.|\n))*?)Platform::Converters::To<std::string>\((?P=variable)\)", r"\g<scope>\g<separator>\g<before>\g<variable>", max_repeat=10),
         # Remove scope borders.
         # /*~ex~*/
         # 
@@ -542,7 +542,7 @@ class CSharpToCpp(Translator):
         # Inside the scope of ~!ex!~ replace:
         # tuple.Item1
         # std::get<1-1>(tuple)
-        SubRule(r"(?P<scope>/\*~(?P<variable>[_a-zA-Z0-9]+)~\*/)(?P<separator>.|\n)(?P<before>((?<!/\*~\k<variable>~\*/)(.|\n))*?)\k<variable>\.Item(?P<itemNumber>\d+)(?P<after>\W)", r"\g<scope>\g<separator>\g<before>std::get<\g<itemNumber>-1>(\g<variable>)\g<after>", max_repeat=10),
+        SubRule(r"(?P<scope>/\*~(?P<variable>[_a-zA-Z0-9]+)~\*/)(?P<separator>.|\n)(?P<before>((?<!/\*~(?P=variable)~\*/)(.|\n))*?)(?P=variable)\.Item(?P<itemNumber>\d+)(?P<after>\W)", r"\g<scope>\g<separator>\g<before>std::get<\g<itemNumber>-1>(\g<variable>)\g<after>", max_repeat=10),
         # Remove scope borders.
         # /*~ex~*/
         # 
@@ -554,15 +554,15 @@ class CSharpToCpp(Translator):
         # Inside the scope of /*~type~Range<T>~*/ insert inner scope and replace:
         # public: static implicit operator std::tuple<T, T>(Range<T> range)
         # public: operator std::tuple<T, T>() const {/*~variable~Range<T>~*/
-        SubRule(r"(?P<scope>/\*~type~(?P<typeName>[^~\n\*]+)~(?P<fullType>[^~\n\*]+)~\*/)(?P<separator>.|\n)(?P<before>((?<!/\*~type~\k<typeName>~\k<fullType>~\*/)(.|\n))*?)(?P<access>(private|protected|public): )static implicit operator (?P<targetType>[^\(\n]+)\((?P<argumentDeclaration>\k<fullType> (?P<variable>[a-zA-Z0-9]+))\)(?P<after>\s*\n?\s*{)", r"\g<scope>\g<separator>\g<before>\g<access>operator \g<targetType>() const\g<after>/*~variable~\g<variable>~*/", max_repeat=10),
+        SubRule(r"(?P<scope>/\*~type~(?P<typeName>[^~\n\*]+)~(?P<fullType>[^~\n\*]+)~\*/)(?P<separator>.|\n)(?P<before>((?<!/\*~type~(?P=typeName)~(?P=fullType)~\*/)(.|\n))*?)(?P<access>(private|protected|public): )static implicit operator (?P<targetType>[^\(\n]+)\((?P<argumentDeclaration>(?P=fullType) (?P<variable>[a-zA-Z0-9]+))\)(?P<after>\s*\n?\s*{)", r"\g<scope>\g<separator>\g<before>\g<access>operator \g<targetType>() const\g<after>/*~variable~\g<variable>~*/", max_repeat=10),
         # Inside the scope of /*~type~Range<T>~*/ replace:
         # public: static implicit operator Range<T>(std::tuple<T, T> tuple) { return new Range<T>(std::get<1-1>(tuple), std::get<2-1>(tuple)); }
         # public: Range(std::tuple<T, T> tuple) : Range(std::get<1-1>(tuple), std::get<2-1>(tuple)) { }
-        SubRule(r"(?P<scope>/\*~type~(?P<typeName>[^~\n\*]+)~(?P<fullType>[^~\n\*]+)~\*/)(?P<separator>.|\n)(?P<before>((?<!/\*~type~\k<typeName>~\k<fullType>~\*/)(.|\n))*?)(?P<access>(private|protected|public): )static implicit operator (\k<fullType>|\k<typeName>)\((?P<arguments>[^{}\n]+)\)(\s|\n)*{(\s|\n)*return (new )?(\k<fullType>|\k<typeName>)\((?P<passedArguments>[^\n]+)\);(\s|\n)*}", r"\g<scope>\g<separator>\g<before>\g<access>\g<typeName>(\g<arguments>) : \g<typeName>(\g<passedArguments>) { }", max_repeat=10),
+        SubRule(r"(?P<scope>/\*~type~(?P<typeName>[^~\n\*]+)~(?P<fullType>[^~\n\*]+)~\*/)(?P<separator>.|\n)(?P<before>((?<!/\*~type~(?P=typeName)~(?P=fullType)~\*/)(.|\n))*?)(?P<access>(private|protected|public): )static implicit operator ((?P=fullType)|(?P=typeName))\((?P<arguments>[^{}\n]+)\)(\s|\n)*{(\s|\n)*return (new )?((?P=fullType)|(?P=typeName))\((?P<passedArguments>[^\n]+)\);(\s|\n)*}", r"\g<scope>\g<separator>\g<before>\g<access>\g<typeName>(\g<arguments>) : \g<typeName>(\g<passedArguments>) { }", max_repeat=10),
         # Inside the scope of /*~variable~range~*/ replace:
         # range.Minimum
         # this->Minimum
-        SubRule(r"(?P<scope>{/\*~variable~(?P<variable>[^~\n]+)~\*/)(?P<separator>.|\n)(?P<before>(?P<beforeExpression>(?P<bracket>{)|(?(bracket)})|[^{}]|\n)*?)\k<variable>\.(?P<field>[_a-zA-Z0-9]+)(?P<after>(,|;|}| |\))(?P<afterExpression>(?P<bracket>{)|(?(bracket)})|[^{}]|\n)*?})", r"\g<scope>\g<separator>\g<before>this->\g<field>\g<after>", max_repeat=10),
+        SubRule(r"(?P<scope>{/\*~variable~(?P<variable>[^~\n]+)~\*/)(?P<separator>.|\n)(?P<before>(?P<beforeExpression>(?P<bracket>{)|(?(bracket)})|[^{}]|\n)*?)(?P=variable)\.(?P<field>[_a-zA-Z0-9]+)(?P<after>(,|;|}| |\))(?P<afterExpression>(?P<bracket>{)|(?(bracket)})|[^{}]|\n)*?})", r"\g<scope>\g<separator>\g<before>this->\g<field>\g<after>", max_repeat=10),
         # Remove scope borders.
         # /*~ex~*/
         # 
@@ -570,15 +570,15 @@ class CSharpToCpp(Translator):
         # Insert scope borders.
         # namespace Platform::Ranges { ... }
         # namespace Platform::Ranges {/*~start~namespace~Platform::Ranges~*/ ... /*~end~namespace~Platform::Ranges~*/} 
-        SubRule(r"(?P<namespaceDeclarationBegin>\r?\n(?P<indent>[\t ]*)namespace (?P<namespaceName>(?P<namePart>[a-zA-Z][a-zA-Z0-9]+)(?P<nextNamePart>::[a-zA-Z][a-zA-Z0-9]+)+)(\s|\n)*{)(?P<middle>(.|\n)*)(?P<end>(?<=\r?\n)\k<indent>}(?!;))", r"\g<namespaceDeclarationBegin>/*~start~namespace~\g<namespaceName>~*/\g<middle>/*~end~namespace~\g<namespaceName>~*/\g<end>", max_repeat=0),
+        SubRule(r"(?P<namespaceDeclarationBegin>\r?\n(?P<indent>[\t ]*)namespace (?P<namespaceName>(?P<namePart>[a-zA-Z][a-zA-Z0-9]+)(?P<nextNamePart>::[a-zA-Z][a-zA-Z0-9]+)+)(\s|\n)*{)(?P<middle>(.|\n)*)(?P<end>(?<=\r?\n)(?P=indent)}(?!;))", r"\g<namespaceDeclarationBegin>/*~start~namespace~\g<namespaceName>~*/\g<middle>/*~end~namespace~\g<namespaceName>~*/\g<end>", max_repeat=0),
         # Insert scope borders.
         # class Range<T> { ... };
         # class Range<T> {/*~start~type~Range<T>~T~*/ ... /*~end~type~Range<T>~T~*/};
-        SubRule(r"(?P<classDeclarationBegin>\r?\n(?P<indent>[\t ]*)template <typename (?P<typeParameter>[^\n]+)> (struct|class) (?P<type>[a-zA-Z0-9]+<\k<typeParameter>>)(\s*:\s*[^{\n]+)?[\t ]*(\r?\n)?[\t ]*{)(?P<middle>(.|\n)*)(?P<endIndent>(?<=\r?\n)\k<indent>)(?P<end>};)", r"\g<classDeclarationBegin>/*~start~type~\g<type>~\g<typeParameter>~*/\g<middle>\g<endIndent>/*~end~type~\g<type>~\g<typeParameter>~*/\g<end>", max_repeat=0),
+        SubRule(r"(?P<classDeclarationBegin>\r?\n(?P<indent>[\t ]*)template <typename (?P<typeParameter>[^\n]+)> (struct|class) (?P<type>[a-zA-Z0-9]+<(?P=typeParameter)>)(\s*:\s*[^{\n]+)?[\t ]*(\r?\n)?[\t ]*{)(?P<middle>(.|\n)*)(?P<endIndent>(?<=\r?\n)(?P=indent))(?P<end>};)", r"\g<classDeclarationBegin>/*~start~type~\g<type>~\g<typeParameter>~*/\g<middle>\g<endIndent>/*~end~type~\g<type>~\g<typeParameter>~*/\g<end>", max_repeat=0),
         # Inside the scope replace:
         # /*~start~namespace~Platform::Ranges~*/ ... /*~start~type~Range<T>~T~*/ ... public: override std::int32_t GetHashCode() { return {Minimum, Maximum}.GetHashCode(); } ... /*~end~type~Range<T>~T~*/ ... /*~end~namespace~Platform::Ranges~*/
         # /*~start~namespace~Platform::Ranges~*/ ... /*~start~type~Range<T>~T~*/ ... /*~end~type~Range<T>~T~*/ ... /*~end~namespace~Platform::Ranges~*/ namespace std { template <typename T> struct hash<Platform::Ranges::Range<T>> { std::size_t operator()(const Platform::Ranges::Range<T> &obj) const { return {Minimum, Maximum}.GetHashCode(); } }; }
-        SubRule(r"(?P<namespaceScopeStart>/\*~start~namespace~(?P<namespace>[^~\n\*]+)~\*/)(?P<betweenStartScopes>(.|\n)+)(?P<typeScopeStart>/\*~start~type~(?P<type>[^~\n\*]+)~(?P<typeParameter>[^~\n\*]+)~\*/)(?P<before>(.|\n)+?)(?P<hashMethodDeclaration>\r?\n[ \t]*(?P<access>(private|protected|public): )override std::int32_t GetHashCode\(\)(\s|\n)*{\s*(?P<methodBody>[^\s][^\n]+[^\s])\s*}\s*)(?P<after>(.|\n)+?)(?P<typeScopeEnd>/\*~end~type~\k<type>~\k<typeParameter>~\*/)(?P<betweenEndScopes>(.|\n)+)(?P<namespaceScopeEnd>/\*~end~namespace~\k<namespace>~\*/)}\r?\n", r"\g<namespaceScopeStart>\g<betweenStartScopes>\g<typeScopeStart>\g<before>\g<after>\g<typeScopeEnd>\g<betweenEndScopes>\g<namespaceScopeEnd>}\n" + "\nnamespace std\n" + "{\n" + "    template <typename \g<typeParameter>>\n" + "    struct hash<\g<namespace>::\g<type>>\n" + "    {\n" + "        std::size_t operator()(const \g<namespace>::\g<type> &obj) const\n" + "        {\n" + "            /*~start~method~*/\g<methodBody>/*~end~method~*/\n" + "        }\n" + "    };\n" + "}\n", max_repeat=10),
+        SubRule(r"(?P<namespaceScopeStart>/\*~start~namespace~(?P<namespace>[^~\n\*]+)~\*/)(?P<betweenStartScopes>(.|\n)+)(?P<typeScopeStart>/\*~start~type~(?P<type>[^~\n\*]+)~(?P<typeParameter>[^~\n\*]+)~\*/)(?P<before>(.|\n)+?)(?P<hashMethodDeclaration>\r?\n[ \t]*(?P<access>(private|protected|public): )override std::int32_t GetHashCode\(\)(\s|\n)*{\s*(?P<methodBody>[^\s][^\n]+[^\s])\s*}\s*)(?P<after>(.|\n)+?)(?P<typeScopeEnd>/\*~end~type~(?P=type)~(?P=typeParameter)~\*/)(?P<betweenEndScopes>(.|\n)+)(?P<namespaceScopeEnd>/\*~end~namespace~(?P=namespace)~\*/)}\r?\n", r"\g<namespaceScopeStart>\g<betweenStartScopes>\g<typeScopeStart>\g<before>\g<after>\g<typeScopeEnd>\g<betweenEndScopes>\g<namespaceScopeEnd>}\n" + "\nnamespace std\n" + "{\n" + "    template <typename \g<typeParameter>>\n" + "    struct hash<\g<namespace>::\g<type>>\n" + "    {\n" + "        std::size_t operator()(const \g<namespace>::\g<type> &obj) const\n" + "        {\n" + "            /*~start~method~*/\g<methodBody>/*~end~method~*/\n" + "        }\n" + "    };\n" + "}\n", max_repeat=10),
         # Inside scope of /*~start~method~*/ replace:
         # /*~start~method~*/ ... Minimum ... /*~end~method~*/
         # /*~start~method~*/ ... obj.Minimum ... /*~end~method~*/
@@ -589,23 +589,23 @@ class CSharpToCpp(Translator):
         SubRule(r"/\*~[^~\*\n]+(~[^~\*\n]+)*~\*/", r"", max_repeat=0),
         # class Disposable<T> : public Disposable
         # class Disposable<T> : public Disposable<>
-        SubRule(r"(?P<before>(struct|class) (?P<type>[a-zA-Z][a-zA-Z0-9]*)<[^<>\n]+> : (?P<access>(private|protected|public) )?\k<type>)(?P<after>\b(?!<))", r"\g<before><>\g<after>", max_repeat=0),
+        SubRule(r"(?P<before>(struct|class) (?P<type>[a-zA-Z][a-zA-Z0-9]*)<[^<>\n]+> : (?P<access>(private|protected|public) )?(?P=type))(?P<after>\b(?!<))", r"\g<before><>\g<after>", max_repeat=0),
         # Insert scope borders.
         # class Disposable<T> : public Disposable<> { ... };
         # class Disposable<T> : public Disposable<> {/*~start~type~Disposable~Disposable<T>~Disposable~Disposable<>~*/ ... /*~end~type~Disposable~Disposable<T>~Disposable~Disposable<>~*/};
-        SubRule(r"(?P<classDeclarationBegin>\r?\n(?P<indent>[\t ]*)template[\t ]*<(?P<typeParameters>[^\n]*)>[\t ]*(struct|class)[\t ]+(?P<fullType>(?P<type>[a-zA-Z][a-zA-Z0-9]*)(<[^<>\n]*>)?)[\t ]*:[\t ]*(?P<access>(private|protected|public)[\t ]+)?(?P<fullBaseType>(?P<baseType>[a-zA-Z][a-zA-Z0-9]*)(<[^<>\n]*>)?)[\t ]*(\r?\n)?[\t ]*{)(?P<middle>(.|\n)*)(?P<beforeEnd>(?<=\r?\n)\k<indent>)(?P<end>};)", r"\g<classDeclarationBegin>/*~start~type~\g<type>~\g<fullType>~\g<baseType>~\g<fullBaseType>~*/\g<middle>\g<beforeEnd>/*~end~type~\g<type>~\g<fullType>~\g<baseType>~\g<fullBaseType>~*/\g<end>", max_repeat=0),
+        SubRule(r"(?P<classDeclarationBegin>\r?\n(?P<indent>[\t ]*)template[\t ]*<(?P<typeParameters>[^\n]*)>[\t ]*(struct|class)[\t ]+(?P<fullType>(?P<type>[a-zA-Z][a-zA-Z0-9]*)(<[^<>\n]*>)?)[\t ]*:[\t ]*(?P<access>(private|protected|public)[\t ]+)?(?P<fullBaseType>(?P<baseType>[a-zA-Z][a-zA-Z0-9]*)(<[^<>\n]*>)?)[\t ]*(\r?\n)?[\t ]*{)(?P<middle>(.|\n)*)(?P<beforeEnd>(?<=\r?\n)(?P=indent))(?P<end>};)", r"\g<classDeclarationBegin>/*~start~type~\g<type>~\g<fullType>~\g<baseType>~\g<fullBaseType>~*/\g<middle>\g<beforeEnd>/*~end~type~\g<type>~\g<fullType>~\g<baseType>~\g<fullBaseType>~*/\g<end>", max_repeat=0),
         # Inside the scope replace:
         # /*~start~type~Disposable~Disposable<T>~Disposable~Disposable<>~*/ ... ) : base( ... /*~end~type~Disposable~Disposable<T>~Disposable~Disposable<>~*/
         # /*~start~type~Disposable~Disposable<T>~Disposable~Disposable<>~*/ ... ) : Disposable<>( /*~end~type~Disposable~Disposable<T>~Disposable~Disposable<>~*/
-        SubRule(r"(?P<before>(?P<typeScopeStart>/\*~start~type~(?P<types>(?P<type>[^~\n\*]+)~(?P<fullType>[^~\n\*]+)~\k<type>~(?P<fullBaseType>[^~\n\*]+))~\*/)(.|\n)+?\)\s*:\s)base(?P<after>\((.|\n)+?(?P<typeScopeEnd>/\*~end~type~\k<types>~\*/))", r"\g<before>\g<fullBaseType>\g<after>", max_repeat=20),
+        SubRule(r"(?P<before>(?P<typeScopeStart>/\*~start~type~(?P<types>(?P<type>[^~\n\*]+)~(?P<fullType>[^~\n\*]+)~(?P=type)~(?P<fullBaseType>[^~\n\*]+))~\*/)(.|\n)+?\)\s*:\s)base(?P<after>\((.|\n)+?(?P<typeScopeEnd>/\*~end~type~(?P=types)~\*/))", r"\g<before>\g<fullBaseType>\g<after>", max_repeat=20),
         # Inside the scope replace:
         # /*~start~type~Disposable~Disposable<T>~X~X<>~*/ ... ) : base( ... /*~end~type~Disposable~Disposable<T>~X~X<>~*/
         # /*~start~type~Disposable~Disposable<T>~X~X<>~*/ ... ) : X( /*~end~type~Disposable~Disposable<T>~X~X<>~*/
-        SubRule(r"(?P<before>(?P<typeScopeStart>/\*~start~type~(?P<types>(?P<type>[^~\n\*]+)~(?P<fullType>[^~\n\*]+)~(?P<baseType>[^~\n\*]+)~(?P<fullBaseType>[^~\n\*]+))~\*/)(.|\n)+?\)\s*:\s)base(?P<after>\((.|\n)+?(?P<typeScopeEnd>/\*~end~type~\k<types>~\*/))", r"\g<before>\g<baseType>\g<after>", max_repeat=20),
+        SubRule(r"(?P<before>(?P<typeScopeStart>/\*~start~type~(?P<types>(?P<type>[^~\n\*]+)~(?P<fullType>[^~\n\*]+)~(?P<baseType>[^~\n\*]+)~(?P<fullBaseType>[^~\n\*]+))~\*/)(.|\n)+?\)\s*:\s)base(?P<after>\((.|\n)+?(?P<typeScopeEnd>/\*~end~type~(?P=types)~\*/))", r"\g<before>\g<baseType>\g<after>", max_repeat=20),
         # Inside the scope replace:
         # /*~start~type~Disposable~Disposable<T>~X~X<>~*/ ... public: Disposable(T object) { Object = object; } ... public: Disposable(T object) : Disposable(object) { } ... /*~end~type~Disposable~Disposable<T>~X~X<>~*/
         # /*~start~type~Disposable~Disposable<T>~X~X<>~*/ ... public: Disposable(T object) { Object = object; } /*~end~type~Disposable~Disposable<T>~X~X<>~*/
-        SubRule(r"(?P<before>(?P<typeScopeStart>/\*~start~type~(?P<types>(?P<type>[^~\n\*]+)~(?P<fullType>[^~\n\*]+)~(?P<baseType>[^~\n\*]+)~(?P<fullBaseType>[^~\n\*]+))~\*/)(.|\n)+?(?P<constructor>(?P<access>(private|protected|public):[\t ]*)?\k<type>\((?P<arguments>[^()\n]+)\)\s*{[^{}\n]+})(.|\n)+?)(?P<duplicateConstructor>(?P<access>(private|protected|public):[\t ]*)?\k<type>\(\k<arguments>\)\s*:[^{}\n]+\s*{[^{}\n]+})(?P<after>(.|\n)+?(?P<typeScopeEnd>/\*~end~type~\k<types>~\*/))", r"\g<before>\g<after>", max_repeat=20),
+        SubRule(r"(?P<before>(?P<typeScopeStart>/\*~start~type~(?P<types>(?P<type>[^~\n\*]+)~(?P<fullType>[^~\n\*]+)~(?P<baseType>[^~\n\*]+)~(?P<fullBaseType>[^~\n\*]+))~\*/)(.|\n)+?(?P<constructor>(?P<access>(private|protected|public):[\t ]*)?(?P=type)\((?P<arguments>[^()\n]+)\)\s*{[^{}\n]+})(.|\n)+?)(?P<duplicateConstructor>(?P<access>(private|protected|public):[\t ]*)?(?P=type)\((?P=arguments)\)\s*:[^{}\n]+\s*{[^{}\n]+})(?P<after>(.|\n)+?(?P<typeScopeEnd>/\*~end~type~(?P=types)~\*/))", r"\g<before>\g<after>", max_repeat=20),
         # Remove scope borders.
         # /*~start~type~Disposable~Disposable<T>~Disposable~Disposable<>~*/
         # 
@@ -617,15 +617,15 @@ class CSharpToCpp(Translator):
         # Inside the scope replace:
         # /*~app-domain~_currentDomain~*/ ... _currentDomain.ProcessExit += OnProcessExit;
         # /*~app-domain~_currentDomain~*/ ... std::atexit(OnProcessExit);
-        SubRule(r"(?P<before>(?P<fieldScopeStart>/\*~app-domain~(?P<field>[^~\n\*]+)~\*/)(.|\n)+?)\k<field>\.ProcessExit[\t ]*\+=[\t ]*(?P<eventHandler>[a-zA-Z_][a-zA-Z0-9_]*);", r"\g<before>std::atexit(\g<eventHandler>);/*~process-exit-handler~\g<eventHandler>~*/", max_repeat=20),
+        SubRule(r"(?P<before>(?P<fieldScopeStart>/\*~app-domain~(?P<field>[^~\n\*]+)~\*/)(.|\n)+?)(?P=field)\.ProcessExit[\t ]*\+=[\t ]*(?P<eventHandler>[a-zA-Z_][a-zA-Z0-9_]*);", r"\g<before>std::atexit(\g<eventHandler>);/*~process-exit-handler~\g<eventHandler>~*/", max_repeat=20),
         # Inside the scope replace:
         # /*~app-domain~_currentDomain~*/ ... _currentDomain.ProcessExit -= OnProcessExit;
         # /*~app-domain~_currentDomain~*/ ... /* No translation. It is not possible to unsubscribe from std::atexit. */
-        SubRule(r"(?P<before>(?P<fieldScopeStart>/\*~app-domain~(?P<field>[^~\n\*]+)~\*/)(.|\n)+?\r?\n[\t ]*)\k<field>\.ProcessExit[\t ]*\-=[\t ]*(?P<eventHandler>[a-zA-Z_][a-zA-Z0-9_]*);", r"\g<before>/* No translation. It is not possible to unsubscribe from std::atexit. */", max_repeat=20),
+        SubRule(r"(?P<before>(?P<fieldScopeStart>/\*~app-domain~(?P<field>[^~\n\*]+)~\*/)(.|\n)+?\r?\n[\t ]*)(?P=field)\.ProcessExit[\t ]*\-=[\t ]*(?P<eventHandler>[a-zA-Z_][a-zA-Z0-9_]*);", r"\g<before>/* No translation. It is not possible to unsubscribe from std::atexit. */", max_repeat=20),
         # Inside the scope replace:
         # /*~process-exit-handler~OnProcessExit~*/ ... static void OnProcessExit(void *sender, EventArgs e)
         # /*~process-exit-handler~OnProcessExit~*/ ... static void OnProcessExit()
-        SubRule(r"(?P<before>(?P<fieldScopeStart>/\*~process-exit-handler~(?P<handler>[^~\n\*]+)~\*/)(.|\n)+?static[\t ]+void[\t ]+\k<handler>\()[^()\n]+\)", r"\g<before>)", max_repeat=20),
+        SubRule(r"(?P<before>(?P<fieldScopeStart>/\*~process-exit-handler~(?P<handler>[^~\n\*]+)~\*/)(.|\n)+?static[\t ]+void[\t ]+(?P=handler)\()[^()\n]+\)", r"\g<before>)", max_repeat=20),
         # Remove scope borders.
         # /*~app-domain~_currentDomain~*/
         # 
@@ -699,7 +699,7 @@ class CSharpToCpp(Translator):
         SubRule(r"(\W)(ArgumentException|ArgumentOutOfRangeException)(\W)", r"\1std::invalid_argument\3", max_repeat=0),
         # template <typename T> struct Range : IEquatable<Range<T>>
         # template <typename T> struct Range {
-        SubRule(r"(?P<before>template <typename (?P<typeParameter>[^\n]+)> (struct|class) (?P<type>[a-zA-Z0-9]+<[^\n]+>)) : (public )?IEquatable<\k<type>>(?P<after>(\s|\n)*{)", r"\g<before>\g<after>", max_repeat=0),
+        SubRule(r"(?P<before>template <typename (?P<typeParameter>[^\n]+)> (struct|class) (?P<type>[a-zA-Z0-9]+<[^\n]+>)) : (public )?IEquatable<(?P=type)>(?P<after>(\s|\n)*{)", r"\g<before>\g<after>", max_repeat=0),
         # public: delegate void Disposal(bool manual, bool wasDisposed);
         # public: delegate void Disposal(bool, bool);
         SubRule(r"(?P<before>(?P<access>(private|protected|public): )delegate (?P<returnType>[a-zA-Z][a-zA-Z0-9:]+) (?P<delegate>[a-zA-Z][a-zA-Z0-9]+)\(((?P<leftArgumentType>[a-zA-Z][a-zA-Z0-9:]+), )*)(?P<argumentType>[a-zA-Z][a-zA-Z0-9:]+) (?P<argumentName>[a-zA-Z][a-zA-Z0-9]+)(?P<after>(, (?P<rightArgumentType>[a-zA-Z][a-zA-Z0-9:]+) (?P<rightArgumentName>[a-zA-Z][a-zA-Z0-9]+))*\);)", r"\g<before>\g<argumentType>\g<after>", max_repeat=20),
@@ -729,7 +729,7 @@ class CSharpToCpp(Translator):
         SubRule(r"#if [a-zA-Z0-9]+\s+#endif", r"", max_repeat=0),
         # [Fact]
         # 
-        SubRule(r"(?P<firstNewLine>\r?\n|\A)(?P<indent>[\t ]+)\[[a-zA-Z0-9]+(\((?P<expression>((?P<parenthesis>\()|(?(parenthesis)\))|[^()\r\n]*)+)(?(parenthesis)(?!))\))?\][ \t]*(\r?\n\k<indent>)?", r"\g<firstNewLine>\g<indent>", max_repeat=5),
+        SubRule(r"(?P<firstNewLine>\r?\n|\A)(?P<indent>[\t ]+)\[[a-zA-Z0-9]+(\((?P<expression>((?P<parenthesis>\()|(?(parenthesis)\))|[^()\r\n]*)+)(?(parenthesis)(?!))\))?\][ \t]*(\r?\n(?P=indent))?", r"\g<firstNewLine>\g<indent>", max_repeat=5),
         # \A \n ... namespace
         # \Anamespace
         SubRule(r"(\A)(\r?\n)+namespace", r"\1namespace", max_repeat=0),
