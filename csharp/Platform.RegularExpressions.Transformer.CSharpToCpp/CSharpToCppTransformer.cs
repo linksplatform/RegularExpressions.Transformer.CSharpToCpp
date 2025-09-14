@@ -283,7 +283,7 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             (new Regex(@"(?<before>\r?\n)(?<indent>[ \t]*)interface (?<interface>[a-zA-Z_]\w*)(?<typeDefinitionEnding>[^{]+){"), "${before}${indent}class ${interface}${typeDefinitionEnding}{" + Environment.NewLine + "    public:", 0),
             // struct TreeElement { }
             // struct TreeElement { };
-            (new Regex(@"(struct|class) ([a-zA-Z0-9]+)(\s+){([\sa-zA-Z0-9;:_]+?)}([^;])"), "$1 $2$3{$4};$5", 0),
+            (new Regex(@"(?<type>struct|class) (?<name>[a-zA-Z0-9]+)(?<whitespace>\s+){(?<body>[\sa-zA-Z0-9;:_]+?)}(?<after>[^;])"), "${type} ${name}${whitespace}{${body}};${after}", 0),
             // class Program { }
             // class Program { };
             (new Regex(@"(?<type>struct|class) (?<name>[a-zA-Z0-9]+[^\r\n]*)(?<beforeBody>[\r\n]+(?<indentLevel>[\t ]*)?)\{(?<body>[\S\s]+?[\r\n]+\k<indentLevel>)\}(?<afterBody>[^;]|$)"), "${type} ${name}${beforeBody}{${body}};${afterBody}", 0),
