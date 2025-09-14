@@ -1,0 +1,17 @@
+{
+  "README.html": {
+    "href": "README.html",
+    "title": "RegularExpressions.Transformer.CSharpToCpp | LinksPlatform's Platform.RegularExpressions.Transformer.CSharpToCpp Library",
+    "summary": "C# Python RegularExpressions.Transformer.CSharpToCpp LinksPlatform's Platform.RegularExpressions.Transformer.CSharpToCpp Class Library. Namespace: Platform.RegularExpressions.Transformer.CSharpToCpp Forked from: LinksPlatform/Collections.Methods/CSharpToCppTranslator NuGet package: Platform.RegularExpressions.Transformer.CSharpToCpp Python version: cs2cpp Documentation PDF file with code for e-readers. Depend on Platform.RegularExpressions.Transformer"
+  },
+  "api/Platform.RegularExpressions.Transformer.CSharpToCpp.CSharpToCppTransformer.html": {
+    "href": "api/Platform.RegularExpressions.Transformer.CSharpToCpp.CSharpToCppTransformer.html",
+    "title": "Class CSharpToCppTransformer | LinksPlatform's Platform.RegularExpressions.Transformer.CSharpToCpp Library",
+    "summary": "Class CSharpToCppTransformer Represents the sharp to cpp transformer. Inheritance object TextTransformer CSharpToCppTransformer Implements ITextTransformer ITransformer Inherited Members TextTransformer.Transform(string) TextTransformer.Rules object.Equals(object) object.Equals(object, object) object.GetHashCode() object.GetType() object.MemberwiseClone() object.ReferenceEquals(object, object) object.ToString() Namespace: Platform.RegularExpressions.Transformer.CSharpToCpp Assembly: Platform.RegularExpressions.Transformer.CSharpToCpp.dll Syntax public class CSharpToCppTransformer : TextTransformer, ITextTransformer, ITransformer Constructors | Edit this page View Source CSharpToCppTransformer() Initializes a new CSharpToCppTransformer instance. Declaration public CSharpToCppTransformer() | Edit this page View Source CSharpToCppTransformer(IList<ISubstitutionRule>) Initializes a new CSharpToCppTransformer instance. Declaration public CSharpToCppTransformer(IList<ISubstitutionRule> extraRules) Parameters Type Name Description IList<ISubstitutionRule> extraRules A extra rules. Fields | Edit this page View Source FirstStage The to list. Declaration public static readonly IList<ISubstitutionRule> FirstStage Field Value Type Description IList<ISubstitutionRule> | Edit this page View Source LastStage The to list. Declaration public static readonly IList<ISubstitutionRule> LastStage Field Value Type Description IList<ISubstitutionRule> Implements Platform.RegularExpressions.Transformer.ITextTransformer Platform.RegularExpressions.Transformer.ITransformer See Also TextTransformer"
+  },
+  "api/Platform.RegularExpressions.Transformer.CSharpToCpp.html": {
+    "href": "api/Platform.RegularExpressions.Transformer.CSharpToCpp.html",
+    "title": "Namespace Platform.RegularExpressions.Transformer.CSharpToCpp | LinksPlatform's Platform.RegularExpressions.Transformer.CSharpToCpp Library",
+    "summary": "Namespace Platform.RegularExpressions.Transformer.CSharpToCpp Classes CSharpToCppTransformer Represents the sharp to cpp transformer."
+  }
+}
