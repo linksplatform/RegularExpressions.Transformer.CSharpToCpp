@@ -257,6 +257,9 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // ulong
             // std::uint64_t
             (new Regex(@"(?<before>\W)((System\.)?UInt64|ulong)(?!\s*=|\()(?<after>\W)"), "${before}std::uint64_t${after}", 0),
+            // Boolean
+            // bool
+            (new Regex(@"(?<before>\W)((System\.)?Boolean)(?!\s*=|\()(?<after>\W)"), "${before}bool${after}", 0),
             // char*[] args
             // char* args[]
             (new Regex(@"([_a-zA-Z0-9:\*]?)\[\] ([a-zA-Z0-9]+)"), "$1 $2[]", 0),
@@ -266,7 +269,10 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // double.MaxValue
             // std::numeric_limits<float>::max()
             (new Regex(@"(?<before>\W)(?<type>std::[a-z0-9_]+|float|double)\.MaxValue(?<after>\W)"), "${before}std::numeric_limits<${type}>::max()${after}", 0),
-            // using Platform.Numbers;
+            // using System;
+            // #include <iostream>
+            (new Regex(@"([\r\n]{2}|^)\s*?using System;\s*?$"), "$1#include <iostream>" + Environment.NewLine + "#include <string>" + Environment.NewLine, 0),
+            // using Platform.Numbers; (other usings)
             // 
             (new Regex(@"([\r\n]{2}|^)\s*?using [\.a-zA-Z0-9]+;\s*?$"), "", 0),
             // class SizedBinaryTreeMethodsBase : GenericCollectionMethodsBase
@@ -347,6 +353,18 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // Console.WriteLine("...")
             // printf("...\n")
             (new Regex(@"Console\.WriteLine\(""([^""\r\n]+)""\)"), "printf(\"$1\\n\")", 0),
+            // Console.WriteLine(variable)
+            // std::cout << variable << std::endl
+            (new Regex(@"Console\.WriteLine\(([^""\r\n\)]+)\)"), "std::cout << $1 << std::endl", 0),
+            // std::string variable = Console.ReadLine();
+            // std::string variable; std::getline(std::cin, variable);
+            (new Regex(@"(std::string)\s+([a-zA-Z_][a-zA-Z0-9_]*)\s*=\s*Console\.ReadLine\(\);"), "$1 $2;" + Environment.NewLine + "        std::getline(std::cin, $2);", 0),
+            // variable = Console.ReadLine(); (when already declared)
+            // std::getline(std::cin, variable);
+            (new Regex(@"([a-zA-Z_][a-zA-Z0-9_]*)\s*=\s*Console\.ReadLine\(\);"), "std::getline(std::cin, $1);", 0),
+            // int.Parse(variable) or std::int32_t.Parse(variable)
+            // std::stoi(variable)
+            (new Regex(@"(std::)?int(32_t)?\.Parse\(([^)]+)\)"), "std::stoi($3)", 0),
             // TElement Root;
             // TElement Root = 0;
             (new Regex(@"(?<before>\r?\n[\t ]+)(?<access>(private|protected|public)(: )?)?(?<type>[a-zA-Z0-9:_]+(?<!return)) (?<name>[_a-zA-Z0-9]+);"), "${before}${access}${type} ${name} = 0;", 0),
