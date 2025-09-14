@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Platform.RegularExpressions.Transformer.CSharpToCpp - Documentation</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 600px;
+            margin: 20px;
+        }
+        
+        .logo {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            margin: 0 auto 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            color: white;
+            font-weight: bold;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 40px;
+            font-size: 16px;
+        }
+        
+        .language-options {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .language-card {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            text-decoration: none;
+            color: #333;
+            transition: all 0.3s ease;
+            min-width: 200px;
+            cursor: pointer;
+        }
+        
+        .language-card:hover {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .language-icon {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        
+        .language-name {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .language-description {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        
+        .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #e9ecef;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .footer a {
+            color: #667eea;
+            text-decoration: none;
+        }
+        
+        .footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">RE</div>
+        <h1>Platform.RegularExpressions.Transformer.CSharpToCpp</h1>
+        <p class="subtitle">Choose your preferred documentation language</p>
+        
+        <div class="language-options">
+            <a href="./csharp/" class="language-card" id="csharp-docs">
+                <div class="language-icon">🔷</div>
+                <div class="language-name">C#</div>
+                <div class="language-description">Complete API documentation and examples</div>
+            </a>
+            
+            <a href="./python/" class="language-card" id="python-docs">
+                <div class="language-icon">🐍</div>
+                <div class="language-name">Python</div>
+                <div class="language-description">Python package documentation</div>
+            </a>
+        </div>
+        
+        <div class="footer">
+            <p>Part of <a href="https://github.com/linksplatform" target="_blank">LinksPlatform</a> ecosystem</p>
+            <p><a href="https://github.com/linksplatform/RegularExpressions.Transformer.CSharpToCpp" target="_blank">View on GitHub</a></p>
+        </div>
+    </div>
+    
+    <script>
+        // Auto-redirect to C# documentation if no specific language is requested
+        // This maintains backward compatibility with existing links
+        const params = new URLSearchParams(window.location.search);
+        const lang = params.get('lang');
+        
+        // If a specific language is requested via URL parameter
+        if (lang === 'python') {
+            window.location.href = './python/';
+        } else if (lang === 'csharp' || lang === 'cs') {
+            window.location.href = './csharp/';
+        }
+        
+        // Store user preference in localStorage for future visits
+        document.getElementById('csharp-docs').addEventListener('click', function(e) {
+            localStorage.setItem('preferred-docs-lang', 'csharp');
+        });
+        
+        document.getElementById('python-docs').addEventListener('click', function(e) {
+            localStorage.setItem('preferred-docs-lang', 'python');
+        });
+        
+        // Check for stored preference and highlight the preferred option
+        const preferredLang = localStorage.getItem('preferred-docs-lang');
+        if (preferredLang) {
+            const preferredCard = document.getElementById(preferredLang + '-docs');
+            if (preferredCard) {
+                preferredCard.style.background = '#e6f3ff';
+                preferredCard.style.borderColor = '#0066cc';
+            }
+        }
+    </script>
+</body>
+</html>
