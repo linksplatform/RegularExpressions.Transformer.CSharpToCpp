@@ -634,6 +634,9 @@ namespace Platform.RegularExpressions.Transformer.CSharpToCpp
             // AppDomain.CurrentDomain.ProcessExit -= OnProcessExit;
             // /* No translation. It is not possible to unsubscribe from std::atexit. */
             (new Regex(@"AppDomain\.CurrentDomain\.ProcessExit -= ([a-zA-Z_][a-zA-Z0-9_]*);"), "/* No translation. It is not possible to unsubscribe from std::atexit. */", 0),
+            // class Program { ... public: static void Main(std::string args[]) ... };
+            // class Program { ... public: void Main(std::vector<std::string> args) ... }; \n\nint main(int argc, char* argv[]) { ... }
+            (new Regex(@"(?<before>class Program\s*\{(?:(?!\}\;).|\n)*?)public:\s*static\s+void\s+Main\(std::string\s+args\[\]\)(?<after>(?:(?!\}\;).|\n)*\}\;)"), "${before}public:" + Environment.NewLine + "    void Main(std::vector<std::string> args)${after}" + Environment.NewLine + Environment.NewLine + "int main(int argc, char* argv[])" + Environment.NewLine + "{" + Environment.NewLine + "    Program program{};" + Environment.NewLine + "    try" + Environment.NewLine + "    {" + Environment.NewLine + "        program.Main(std::vector<std::string>(argv + 1, argv + argc));" + Environment.NewLine + "    }" + Environment.NewLine + "    catch(...)" + Environment.NewLine + "    {" + Environment.NewLine + "        // Handle exception" + Environment.NewLine + "    }" + Environment.NewLine + "    return 0;" + Environment.NewLine + "}", 0),
         }.Cast<ISubstitutionRule>().ToList();
 
         /// <summary>

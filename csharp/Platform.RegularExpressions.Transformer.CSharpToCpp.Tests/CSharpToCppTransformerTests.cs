@@ -26,11 +26,26 @@ class Program
 }";
             const string expectedResult = @"class Program
 {
-    public: static void Main(std::string args[])
+    public:
+    void Main(std::vector<std::string> args)
     {
         printf(""Hello, world!\n"");
     }
-};";
+};
+
+int main(int argc, char* argv[])
+{
+    Program program{};
+    try
+    {
+        program.Main(std::vector<std::string>(argv + 1, argv + argc));
+    }
+    catch(...)
+    {
+        // Handle exception
+    }
+    return 0;
+}";
             var transformer = new CSharpToCppTransformer();
             var actualResult = transformer.Transform(helloWorldCode);
             Assert.Equal(expectedResult, actualResult);
